@@ -92,7 +92,7 @@ const page = () => {
         </div>
 
 
-        <button className='hover:bg-transparent bg-[#E0BFB8] w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white hover:scale-110 fixed bottom-8 right-3' onClick={() => {router.push('/profile/createEvent')}}>create event</button>
+        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white hover:scale-110 fixed bottom-8 right-3' onClick={() => {router.push('/profile/createEvent')}}>create event</button>
     </div>
   )
 }
