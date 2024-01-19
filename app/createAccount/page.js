@@ -5,7 +5,7 @@ import { useMyContext } from '../context/createContext';
 import supabase from '../supabase';
 import { useDispatch, useSelector } from "react-redux";
 import { setUserId, setEmail, setFirstName, setLastName, setOrganizerName, setPhoneNumber } from "../globalRedux/slices/userSlice";
-import SuccessNotif from '../modals/successNotif';
+import SuccessNotif from '../modals/SuccessNotif';
 
 const page = () => {
     const router = useRouter();
