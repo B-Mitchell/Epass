@@ -1,12 +1,16 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
+import { useMyContext } from '../context/createContext';
 import supabase from '../supabase';
 import { useDispatch, useSelector } from "react-redux";
 import { setUserId, setEmail, setFirstName, setLastName, setOrganizerName, setPhoneNumber } from "../globalRedux/slices/userSlice";
+import SuccessNotif from '../modals/successNotif';
 
 const page = () => {
     const router = useRouter();
+    const { accountCreation, setAccountCreation } = useMyContext();
+    const [loading, setLoading] = useState(false);
     //user authentication: check if user has logged in, if not redirect to home page
     const userId = useSelector(state => state.user.user_id);
     const authFunction = () => {
@@ -33,6 +37,7 @@ const page = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
             const formData = {
                 email: emailU,
                 password: passwordU,
@@ -45,6 +50,7 @@ const page = () => {
                     }
                 }
             }
+            
             const { data , error } = await supabase.auth.signUp(formData)
             if (error) {
                 console.log(error)
@@ -52,12 +58,13 @@ const page = () => {
                 const User = data.user;
                 console.log(User.identities[0].user_id)
                 console.log(User.user_metadata);
-                alert('registration successful! now login.');
-                router.push('/login');
+                setAccountCreation(!accountCreation);
                 // saveUserData(data)
             }
         } catch(error) {
             console.error('Error is :' + error)
+        } finally {
+            setLoading(false);
         }
         function saveUserData (data) {
             dispatch(setEmail(registeredUserEmail));
@@ -72,7 +79,8 @@ const page = () => {
 
   return (
     <div className='pb-[2rem]'>
-    <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-[70%] w-[80%] block m-auto mt-[3rem] rounded-3xl p-5 '>
+        {accountCreation && <SuccessNotif />}
+    <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-[70%] w-[90%] block m-auto mt-[3rem] rounded-3xl p-5 '>
     <h2 className='text-center font-bold text-[1.4rem]'>Create an  Account</h2>
     <div className='md:flex block justify-between mt-6'>
 
@@ -109,7 +117,7 @@ const page = () => {
     </div>
 
 
-        <button className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>Register</button>
+        <button className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
         <br />
         <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#E0BFB8] font-extrabold'>login to your Account</span></p>
     </form>

@@ -7,10 +7,13 @@ const MyContext = createContext();
 // Create a provider component
 export const MyContextProvider = ({ children }) => {
   const [createEventModal, setCreateEventModal] = useState(false);
+  const [accountCreation, setAccountCreation] = useState(false);
 
   const contextData = {
     createEventModal,
-    setCreateEventModal
+    setCreateEventModal,
+    accountCreation,
+    setAccountCreation
   }
 
   // Provide the context value to the children components

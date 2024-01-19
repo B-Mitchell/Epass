@@ -8,6 +8,7 @@ import {  setUserId, setEmail, setFirstName, setLastName, setOrganizerName, setP
 const page = () => {
     const router = useRouter();
     const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
     const [emailU, setEmailU] = useState('');
     const [passwordU, setPasswordU] = useState('');
     const authFunction = () => {
@@ -29,6 +30,7 @@ const page = () => {
             password: passwordU
         }
         try {
+            setLoading(true);
             const { data, error } = await supabase.auth.signInWithPassword(formData)
             if (error) {
                 console.log('login error: ' + error)
@@ -45,6 +47,8 @@ const page = () => {
             }
         } catch (error) {
             console.log('Error is:' + error);
+        } finally {
+            setLoading(false);
         }
     }
     const user_id = useSelector(state => state.user.user_id);
@@ -77,7 +81,7 @@ const page = () => {
         <p className='text-[1.2rem] my-2'>Password: </p>
         <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
 
-        <button type='submit' className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110' >Login to your account</button>
+        <button type='submit' className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging into your account' : 'Login to your account'}</button>
         <br />
         <p onClick={() => {router.push('/createAccount')}} className='text-center'>you don't have an account ? <span className='cursor-pointer text-[#E0BFB8] font-extrabold'>Create an Account</span></p>
 
