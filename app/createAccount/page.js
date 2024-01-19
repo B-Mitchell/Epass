@@ -52,7 +52,9 @@ const page = () => {
                 const User = data.user;
                 console.log(User.identities[0].user_id)
                 console.log(User.user_metadata);
-                saveUserData(data)
+                alert('registration successful! now login.');
+                router.push('/login');
+                // saveUserData(data)
             }
         } catch(error) {
             console.error('Error is :' + error)
