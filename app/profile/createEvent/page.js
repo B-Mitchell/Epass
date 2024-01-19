@@ -93,7 +93,7 @@ const page = () => {
 
         <p className='text-center font-bold text-[1.6rem] my-3'>Create Event</p>
 
-        <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-1/2 w-[80%] block m-auto rounded-3xl p-5 '>
+        <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
             <p className='text-[1.2rem] my-2'>Event Image:</p>
             {/* <input type='file' onChange={(e) => {setEventImage(e.target.files[0])}}/> */}
             <input type='file' onChange={(e) => {setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0])} } className='bg-[#E0BFB8] w-[100%] rounded-r-2xl overflow-hidden' required />
