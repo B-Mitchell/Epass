@@ -148,7 +148,7 @@ const page = () => {
       <input type='text' placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
 
       <p className='text-[1.2rem] my-2'>Ticket Price: </p>
-      <input type='text' placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
+      <input type='text' placeholder='eg: 8000'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
 
       <button className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>create event</button>
         </form>
