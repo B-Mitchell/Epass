@@ -58,7 +58,7 @@ const NavBar = () => {
                 }>{loginOut}</li>
             {
                 loginOut == 'login' ? 
-                <li  className='cursor-pointer hover:text-[#E0BFB8] transition mt-6 text-[1.3rem] mb-5'>Create Account</li> : null
+                <li  className='cursor-pointer hover:text-[#E0BFB8] transition mt-6 text-[1.3rem] mb-5' onClick={() => {router.push('/createAccount'); setIsActive(!active)}}>Create Account</li> : null
             }
           </ul> : null
         }
