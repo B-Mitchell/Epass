@@ -5,8 +5,8 @@ const ProfileTickets = (props) => {
     const { user_id, address, time, date , title, image, typeOfEvent, price } = props.data;
   return (
     <div className='w-[100%] border border-[#E0BFB8] md:flex block p-4 rounded-3xl mt-4'>
-        <div className='md:w-[40%] w-[100%] bg-black'>
-            <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${user_id}_${image}`} alt='event image' className='w-[100%] min-h-[10rem] h-full' width={400} height={400}/>
+        <div className='md:w-[40%] w-[100%] bg-black rounded-t-3xl overflow-hidden'>
+            <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${user_id}_${image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
         </div>
 
         <div className='md:ml-4 ml-0'>

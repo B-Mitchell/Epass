@@ -74,7 +74,7 @@ const page = () => {
         </div>
 
         {/* continue here */}
-        <div className='w-[90%] m-auto block border border-[#E0BFB8] mt-3 rounded-3xl p-5'>
+        <div className='w-[90%] m-auto block mt-3 rounded-3xl '>
             <p className='text-center font-bold text-[1.4rem]'>Your Events</p>
 
             {
