@@ -74,7 +74,7 @@ const page = () => {
         </div>
 
         {/* continue here */}
-        <div className='w-[90%] m-auto block mt-3 rounded-3xl '>
+        <div className='w-[90%] m-auto block mt-3 rounded-3xl pb-5'>
             <p className='text-center font-bold text-[1.4rem]'>Your Events</p>
 
             {
@@ -82,7 +82,7 @@ const page = () => {
                 <div >
                     {
                     datas.map((data) => {
-                        return <ProfileTickets data={data} key={data.user_id} />
+                        return <ProfileTickets data={data} key={data.uuid} />
                     })
                 }
                 </div>

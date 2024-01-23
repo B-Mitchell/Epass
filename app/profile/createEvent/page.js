@@ -18,6 +18,7 @@ const page = () => {
     const [eventDate, setEventDate] = useState('');
     const [eventTime, setEventTime] = useState('');
     const [eventPrice, setEventPrice] = useState('');
+    const [eventPricingType, setPricingType] = useState('');
 
     const authFunction = () => {
         if (userId) {
@@ -34,6 +35,9 @@ const page = () => {
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
+  const handleTicketPricingChange = (event) => {
+    setPricingType(event.target.value);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,7 +49,8 @@ const page = () => {
         date: eventDate,
         time: eventTime,
         price: eventPrice,
-        image: imageFileName.name
+        image: imageFileName.name,
+        pricingType: eventPricingType,
     }
     try {
         const { data, error } = await supabase
@@ -86,7 +91,6 @@ const page = () => {
         }
         console.log(Data);
   }
-  console.log(eventImage);
   return (
     <div className='pb-6'>
         {createEventModal ? <EventCreation /> : null}
@@ -146,6 +150,22 @@ const page = () => {
 
       <p className='text-[1.2rem] my-2'>Time: </p>
       <input type='text' placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
+
+      <p className='text-[1.2rem] my-2'>Pricing Type: </p>
+
+      <div className='flex my-3'>
+        <div className='mr-4'>
+          <label>
+            <input type="radio" value="free" checked={eventPricingType === 'free'} onChange={handleTicketPricingChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>Free
+          </label>
+          </div>
+          <div>
+          <label>
+            <input type="radio" value="paid" checked={eventPricingType === 'paid'} onChange={handleTicketPricingChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>Paid
+          </label>
+          </div>
+
+        </div>
 
       <p className='text-[1.2rem] my-2'>Ticket Price: </p>
       <input type='text' placeholder='eg: 8000'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
