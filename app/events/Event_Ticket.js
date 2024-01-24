@@ -7,7 +7,7 @@ const Event_Ticket = (props) => {
     const { user_id, address, time, date , title, image, typeOfEvent, price, uuid } = props.data
   return (
     <div className='w-[100%] border border-[#E0BFB8] md:flex block p-4 rounded-3xl mt-4 cursor-pointer relative transition shadow-md hover:shadow-black' >
-        <div className='md:w-[40%] w-[100%] h-[15rem] bg-black rounded-t-3xl overflow-hidden md:relative'>
+        <div className='md:w-[40%] w-[100%] h-[15rem] bg-black rounded-t-3xl overflow-hidden md:relative z-0'>
             <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${user_id}_${image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
         </div>
 
