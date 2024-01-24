@@ -2,6 +2,7 @@ import './globals.css'
 import NavBar from './components/Navbar'
 import { Providers } from './globalRedux/Provider'
 import { MyContextProvider } from './context/createContext'
+import Footer from './components/Footer'
 
 export const metadata = {
   title: 'Epass',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }) {
         {children}
         </Providers>
         </MyContextProvider>
+        <Footer/>
         </body>
     </html>
   )

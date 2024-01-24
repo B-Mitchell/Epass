@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
-
+import Logo from '../../public/images/Epass.png'
+import Image from 'next/image';
 const NavBar = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -26,13 +27,13 @@ const NavBar = () => {
 
   return (
     <nav className='bg-[#1E1E1E] text-white w-full flex justify-between pb-3'>
-        <h3 className='text-[2rem] font-bold mt-3 ml-3'><span className='text-xxl'>E</span>pass</h3>
+        <Image className='mt-5 ml-4' height={'60'} width={'90'} src={Logo}/>
 
         {/* DESKTOP VIEW*/}
         <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>
             <li className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {router.push('/')}}>Home</li>
             <li  className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {userId ? null : alert('please login'); router.push('/profile')}}>Profile</li>
-            <li  className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {router.push('/events')}}>Events</li>
+            <li  className='cursor-pointer hover:text-[#E0BFB8] transition'>Events</li>
             <li  className={`cursor-pointer transition ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#E0BFB8]'}`} onClick={() => {handleLoginOut()}}>{loginOut}</li>
             {
                 loginOut == 'login' ? 
@@ -50,7 +51,7 @@ const NavBar = () => {
          <ul className={`md:hidden block absolute m-0 w-[100%] mt-[4.56rem] bg-[#1E1E1E] text-center pb-5`}>
               <li className='cursor-pointer hover:text-[#E0BFB8] transition mt-3 text-[1.3rem]' onClick={() => {router.push('/') ; setIsActive(!active)}}>Home</li>
               <li  className='cursor-pointer hover:text-[#E0BFB8] transition mt-6 text-[1.3rem]' onClick={() => {userId ? null : alert('please login'); router.push('/profile'); setIsActive(!active)}}>Profile</li>
-              <li  className='cursor-pointer hover:text-[#E0BFB8] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/events'); setIsActive(!active)}}>Events</li>
+              <li  className='cursor-pointer hover:text-[#E0BFB8] transition mt-6 text-[1.3rem]'>Event</li>
 
               <li  className={`cursor-pointer transition mt-6 text-[1.3rem] ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#E0BFB8]'}`} onClick={() => {
                 handleLoginOut(); 
