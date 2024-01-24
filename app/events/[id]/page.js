@@ -57,7 +57,7 @@ const page = ({params}) => {
                 <p className='text-[1rem] my-1'>Price: {fetchedData[0].price}</p>
             </div>
             ) : (
-                <p>loading...</p>
+                <p className='mt-4 text-center font-light italic block ml-4'>loading...</p>
             )}
             </div>
 
@@ -82,7 +82,7 @@ const page = ({params}) => {
 
         </div>
 
-        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 3' onClick={() => alert('no payment method added yet, fool!')}>checkout</button>
+        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 ' onClick={() => alert('no payment method added yet, fool!')}>checkout</button>
     </div>
   )
 }

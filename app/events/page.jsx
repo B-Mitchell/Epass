@@ -13,6 +13,7 @@ const page = () => {
             let { data , error } = await supabase
             .from('tickets')
             .select('*')
+            .order('created_at', { ascending: false });
             if (error) {
                 console.log('error fetching tickets')
             } else {
@@ -29,7 +30,6 @@ const page = () => {
 
     useEffect(() => {
         fetchTickets();
-        console.log(datas);
     }, []);
     
   return (
