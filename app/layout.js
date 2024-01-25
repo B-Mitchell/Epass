@@ -14,13 +14,13 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <MyContextProvider >
-      <Providers >
-        <NavBar />
-        {children}
-        </Providers>
+          <Providers >
+            <NavBar />
+            {children}
+            <Footer />
+         </Providers>
         </MyContextProvider>
-        <Footer/>
-        </body>
+      </body>
     </html>
   )
 }
