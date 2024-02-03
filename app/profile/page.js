@@ -76,7 +76,7 @@ const page = () => {
 
         {/* continue here */}
         <div className='w-[96%] m-auto block mt-3 rounded-3xl pb-5'>
-            <p className='text-center font-bold text-[1.4rem]'>Your Events</p>
+            <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
             
             {
             loading  ? <LoadingAnimation /> : 
@@ -89,7 +89,6 @@ const page = () => {
                       <ProfileTickets data={data} />
                     </div>
                   )
-                  
                 })}
             </div>
         ) : (
