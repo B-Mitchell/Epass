@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { logoutUser } from '../globalRedux/slices/userSlice'
 import supabase from '../supabase'
 import ProfileTickets from '../components/ProfileTickets'
+import LoadingAnimation from '../components/LoadingAnimation'
 
 const page = () => {
     const router = useRouter();
@@ -74,19 +75,28 @@ const page = () => {
         </div>
 
         {/* continue here */}
-        <div className='w-[90%] m-auto block mt-3 rounded-3xl pb-5'>
+        <div className='w-[96%] m-auto block mt-3 rounded-3xl pb-5'>
             <p className='text-center font-bold text-[1.4rem]'>Your Events</p>
-
+            
             {
-                datas.length === 0 ? <p className='text-center mt-5 text-red-600'>you haven't created any event yet</p> : 
-                <div >
-                    {
-                    datas.map((data) => {
-                        return <ProfileTickets data={data} key={data.uuid} />
-                    })
-                }
-                </div>
-            }
+            loading  ? <LoadingAnimation /> : 
+            ( datas.length > 0 ? (
+            <div className='grid lg:grid-cols-3 grid-cols-2 gap-4 w-[100%] m-auto '>
+                {
+                datas.map((data) => {
+                  return (
+                    <div  className='flex items-center justify-center' key={data.uuid}>
+                      <ProfileTickets data={data} />
+                    </div>
+                  )
+                  
+                })}
+            </div>
+        ) : (
+          <p className='text-center mt-5 text-red-600'>you haven't created any event yet</p>
+            )
+        )
+        }
             
             
         </div>

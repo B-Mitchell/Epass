@@ -48,7 +48,7 @@ const page = ({params}) => {
                 <div className='md:w-[100%] w-[100%] h-[10rem] overflow-hidden md:relative'>
                     <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${fetchedData[0].user_id}_${fetchedData[0].image}`} alt='event image' className='w-fit min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
                 </div>
-                <p className='font-bold text-[.7rem]'>uuid: {fetchedData[0].uuid}</p>
+                <p className='font-bold text-[.7rem]'>ticket id: {fetchedData[0].uuid}</p>
                 <p className='text-[1.2rem] my-2 font-bold'>{fetchedData[0].title}</p>
                 <p className='text-[1rem] my-1'>Address: {fetchedData[0].address}</p>
                 <p className='text-[1rem] my-1'>Time: {fetchedData[0].time}</p>

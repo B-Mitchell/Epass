@@ -1,5 +1,6 @@
 import './globals.css'
 import NavBar from './components/Navbar'
+import Footer from './components/Footer'
 import { Providers } from './globalRedux/Provider'
 import { MyContextProvider } from './context/createContext'
 
@@ -11,11 +12,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body>
+      <body className=''>
         <MyContextProvider >
       <Providers >
         <NavBar />
         {children}
+        <Footer />
         </Providers>
         </MyContextProvider>
         </body>

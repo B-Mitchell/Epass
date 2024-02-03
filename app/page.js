@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSelector } from 'react-redux'
 import heroImage from '../public/images/hero-image.png'
+import MainTickets from './components/MainTickets'
 
 export default function Home() {
   const router = useRouter();
@@ -42,6 +43,10 @@ export default function Home() {
                 </div>
             </div>
         </div>
+      
+      <section className='bg-white'>
+        <MainTickets />
+      </section>
       
     </main>
   )
