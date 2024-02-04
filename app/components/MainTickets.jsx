@@ -71,7 +71,7 @@ const MainTickets = () => {
                     <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#E0BFB8]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer' onClick={() => {router.push(`events/${data.uuid}`)}}>
                         <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
                         <div className='px-2 py-2'>
-                        <p className='font-bold text-[1.1rem]'>{data.title}</p>
+                        <p className='font-bold text-[1.1rem] uppercase'>{data.title}</p>
                         <p >{data.address}</p>
                         <div className='flex  justify-between mt-1'>
                             <p >{data.time}</p>
@@ -99,7 +99,7 @@ const MainTickets = () => {
                     <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#E0BFB8]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer' onClick={() => {router.push(`events/${data.uuid}`)}}>
                         <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
                         <div className='px-2 py-2'>
-                        <p className='font-bold text-[1.1rem]'>{data.title}</p>
+                        <p className='font-bold text-[1.1rem] uppercase'>{data.title}</p>
                         <p >{data.address}</p>
                         <div className='flex  justify-between mt-1'>
                             <p >{data.time}</p>
