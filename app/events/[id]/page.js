@@ -54,7 +54,7 @@ const page = ({params}) => {
                 <p className='text-[1rem] my-1'>Time: {fetchedData[0].time}</p>
                 <p className='text-[1rem] my-1'>Date: {fetchedData[0].date}</p>
                 <p className='text-[1rem] my-1'>Type of Event: {fetchedData[0].typeOfEvent}</p>
-                <p className='text-[1rem] my-1'>Price: {fetchedData[0].price}</p>
+                <p className='text-[1rem] my-1'>Price: {fetchedData ? (fetchedData[0].pricingType === 'free' ? 0 : fetchedData[0].price) : '...'}</p>
             </div>
             ) : (
                 <p className='mt-4 text-center font-light italic block ml-4'>loading...</p>
@@ -66,7 +66,8 @@ const page = ({params}) => {
 
                 <div className=' mt-5 flex justify-between'>
                     <p className='text-[1.2rem] my-1'>price: </p>
-                    <p>{fetchedData ? fetchedData[0].price : 'no data'}</p>
+                    {/* <p>{fetchedData ? fetchedData[0].price : 'no data'}</p> */}
+                    <p>{fetchedData ? (fetchedData[0].pricingType === 'free' ? 0 : fetchedData[0].price) : '...'}</p>
                 </div>
 
                 <div className=' mt-5 flex justify-between'>
@@ -76,7 +77,7 @@ const page = ({params}) => {
 
                 <div className=' mt-5 flex justify-between  w-[90%] absolute bottom-0 border-t-8 border-black'>
                     <p  className='text-[1.2rem] my-1'>Total: </p>
-                    {fetchedData && fetchedData.length > 0 ? <p>{fetchedData[0].price + 200}</p> : null}
+                    {fetchedData && fetchedData.length > 0 ? <p>{ fetchedData ? (fetchedData[0].pricingType === 'free' ? 0 + 200 : fetchedData[0].price + 200) : '...'}</p> : null}
                 </div>
             </div>
 
