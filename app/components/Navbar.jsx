@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
-
+import Image from 'next/image';
+import Epass from '../../public/images/Epass.png'
 const NavBar = () => {
   const router = useRouter();
   const dispatch = useDispatch();
@@ -25,11 +26,11 @@ const NavBar = () => {
   const dynamicNav = active ? 'transition transform rotate-90' : 'transition';
 
   return (
-    <nav className='bg-[#1E1E1E] text-white w-full flex justify-between pb-3'>
-        <h3 className='text-[2rem] font-bold mt-3 ml-3'><span className='text-xxl'>E</span>pass</h3>
+    <nav className='bg-[#1E1E1E] text-white w-full flex items-center justify-between pb-3'>
+        <Image className='text-[2rem] font-bold mt-3 ml-4' src={Epass}/>
 
         {/* DESKTOP VIEW*/}
-        <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>
+        <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4 gap-28'>
             <li className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {router.push('/')}}>Home</li>
             <li  className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {userId ? null : alert('please login'); router.push('/profile')}}>Profile</li>
             <li  className='cursor-pointer hover:text-[#E0BFB8] transition' onClick={() => {router.push('/events')}}>Events</li>
