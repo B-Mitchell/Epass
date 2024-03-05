@@ -61,6 +61,8 @@ const MainTickets = () => {
 
   return (
     <div>
+        {/* FREE TICKETS */}
+
         <p className='mt-4 text-center font-bold text-[1.4rem]'>Free tickets</p>
         
         {
@@ -86,8 +88,7 @@ const MainTickets = () => {
             )
         )
         }
-{/* user_id, address, time, date , title, image, typeOfEvent, price, uuid */}
-        
+        {/* PAID TICKETS */}
         <p className='mt-4 text-center font-bold text-[1.4rem]'>Paid Tickets</p>
         {
             loadingPaid ? 

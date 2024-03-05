@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import supabase from '@/app/supabase';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Flutterwave from '@/app/components/Flutterwave';
 
 const page = ({params}) => {
     const router = useRouter();
@@ -83,7 +84,8 @@ const page = ({params}) => {
 
         </div>
 
-        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 ' onClick={() => alert('no payment method added yet, fool!')}>checkout</button>
+        {/* <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 ' onClick={() => alert('no payment method added yet, fool!')}>checkout</button> */}
+        < Flutterwave price={fetchedData?.[0] ?.price + 200 ?? 0} />
     </div>
   )
 }

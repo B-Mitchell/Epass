@@ -41,7 +41,6 @@ const page = () => {
                     setPasswordU('');
                     setErrorMsg(!errorMsg);
                 }
-
             } else {
                 console.log(data);
                 console.log(data.user.identities[0].user_id);

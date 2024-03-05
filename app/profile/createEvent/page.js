@@ -146,10 +146,10 @@ const page = () => {
       <input type='text' placeholder='eg: 19 Avenue building, Victoria Island' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventAddress(e.target.value)}} value={eventAddress}/>
 
       <p className='text-[1.2rem] my-2'>date:</p>
-      <input type='text' placeholder='eg: 15 January, 2024' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventDate(e.target.value)}} value={eventDate}/>
+      <input type="date" placeholder='eg: 15 January, 2024' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventDate(e.target.value)}} value={eventDate}/>
 
       <p className='text-[1.2rem] my-2'>Time: </p>
-      <input type='text' placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
+      <input type="time" placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
 
       <p className='text-[1.2rem] my-2'>Pricing Type: </p>
 
