@@ -17,7 +17,7 @@
 }
 
 body {
-  font-family:   Cursive;
+  font-family:   Times new roman;
 }
 .slide-in {
   transition: margin-left 0.3s ease-out; /* Adjust the duration and timing function as needed */
