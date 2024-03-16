@@ -110,19 +110,19 @@ const Page = () => {
       <p className='text-center font-bold text-[1.4rem] mt-4'>Available Events</p>
 
       {/* Search Bar */}
-      <div className='flex items-center justify-center mt-4 mb-2'>
+      <div className='flex items-center justify-center mt-4 mb-2 m-auto'>
         <input
           type='text'
           placeholder='Search by Event Name'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className='border border-gray-300 p-2 mr-2'
+          className='border border-gray-300 outline-[#E0BFB8] p-2 mr-2'
         />
         {/* Category Filter */}
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className='border border-gray-300 p-2'
+          className='border border-gray-300 p-2 outline-[#E0BFB8]'
         >
           <option value=''>All Categories</option>
           {uniqueTypeOfEvents.map((eventType) => (
@@ -132,7 +132,7 @@ const Page = () => {
           ))}
         </select>
         {/* Search Button */}
-        <button onClick={handleSearch} className='bg-black rounded-lg  text-white p-2 ml-2 hover:text-[#E0BFB8]'>Search</button>
+        <button onClick={handleSearch} className='bg-black rounded-lg  text-white p-2 ml-2 hover:text-[#E0BFB8]  hover:scale-105 transition'>Search</button>
       </div>
 
       <p className={`text-center ${loading ? 'mt-10' : null} font-bold italic`}>

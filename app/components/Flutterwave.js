@@ -36,7 +36,7 @@ export default function Flutterwave(props) {
           });
         }}
       >
-        Checkout
+        proceed to pay
       </button>
     </div>
   );
