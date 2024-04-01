@@ -24,10 +24,9 @@ const Event_Ticket = (props) => {
     //         <div className='relative lg:mt-4 md:block flex md:items-start items-end'>
     //           <button className='md:absolute  bg-[#E0BFB8] text-white md:p-1 p-3 rounded-lg hover:scale-110 transition' onClick={() => {router.push(`events/${uuid}`)}}>View Ticket details</button>
     //         </div>
-            
     //     </div>
-
     // </div>
+    
     <div  className='w-[100%] h-[27rem] md:w-[23rem] border border-[#E0BFB8]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer' onClick={() => {router.push(`events/${uuid}`)}}>
       <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${user_id}_${image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
       <div className='px-2 py-2'>

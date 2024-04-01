@@ -81,7 +81,7 @@ const page = () => {
             {
             loading  ? <LoadingAnimation /> : 
             ( datas.length > 0 ? (
-            <div className='grid lg:grid-cols-3 grid-cols-2 gap-4 w-[100%] m-auto '>
+            <div className='grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4 w-[100%] m-auto '>
                 {
                 datas.map((data) => {
                   return (
