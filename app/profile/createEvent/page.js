@@ -19,6 +19,8 @@ const page = () => {
     const [eventTime, setEventTime] = useState('');
     const [eventPrice, setEventPrice] = useState('');
     const [eventPricingType, setPricingType] = useState('');
+    const [nops, setNops] = useState();
+    //nops is number of paid subscribers-i'm using this to handle the number of people that paid for a ticket and i'll also update it automatically if someone pays for a ticket
 
     const authFunction = () => {
         if (userId) {
@@ -51,6 +53,7 @@ const page = () => {
         price: eventPrice,
         image: imageFileName.name,
         pricingType: eventPricingType,
+        nops: nops
     }
     try {
         const { data, error } = await supabase
@@ -85,6 +88,7 @@ const page = () => {
             setSelectedOption('');
             setEventDate('');
             setEventPrice('');
+            setNops(null);
         }
         } catch (error) {
         console.error('Error during avatar upload:', error.message);
@@ -169,6 +173,9 @@ const page = () => {
 
       <p className='text-[1.2rem] my-2'>Ticket Price: </p>
       <input type='text' placeholder='eg: 8000'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
+
+      <p className='text-[1.2rem] my-2'>Number of tickets: </p>
+      <input type='number' placeholder='eg: 20'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setNops(e.target.value)}} value={nops}/>
 
       <button className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>create event</button>
         </form>
