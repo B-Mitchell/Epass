@@ -44,7 +44,7 @@ const Page = () => {
       <p className='text-center font-bold text-[1.4rem] mt-4'>Available Events</p>
 
       {/* Search Bar */}
-      <div className='flex items-center justify-center mt-4 mb-2 m-auto'>
+      <div className='flex items-center justify-center mt-4 mb-2 m-auto md:w-[60%] w-[80%]'>
         <input
           type='text'
           placeholder='Search by Event Name'
