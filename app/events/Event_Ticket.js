@@ -15,7 +15,7 @@ const Event_Ticket = (props) => {
         <h2 className='font-bold text-[1.1rem] uppercase overflow-hidden whitespace-nowrap text-ellipsis'>{title}</h2>
         <p className=' border border-[#E0BFB8] w-fit p-1 rounded-md text-[#E0BFB8] font-bold'>{typeOfEvent}</p>
         <p className='text-[.9rem] absolute top-0 right-0 bg-[#E0BFB8] p-1 rounded-md'>{nops} left</p>
-        <p className='text-[.9rem] w-[9rem] whitespace-nowrap overflow-ellipsis'>{address}</p>
+        <p className='text-[.9rem] w-[9rem] whitespace-nowrap overflow-ellipsis '>{address}</p>
         <p >NGN{price}</p>
         <div className='flex  justify-between mt-1'>
           <p className='text-[.9rem]'>{time}</p>

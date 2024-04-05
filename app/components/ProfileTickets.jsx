@@ -12,7 +12,7 @@ const ProfileTickets = (props) => {
   <div className='px-2 py-2'>
     <h2 className='font-bold text-[1.1rem] uppercase overflow-hidden whitespace-nowrap text-ellipsis'>{title}</h2>
     <p className='border border-[#E0BFB8] w-fit p-1 rounded-md text-[#E0BFB8] font-bold'>{typeOfEvent}</p>
-    <p className='text-[.9rem]'>{address}</p>
+    <p className='text-[.9rem] overflow-hidden whitespace-nowrap text-ellipsis'>{address}</p>
     <p>NGN{price}</p>
     <p className='text-[.9rem] absolute top-0 right-0 bg-[#E0BFB8] p-1 rounded-md'>{nops} left</p>
     <div className='flex justify-between mt-1'>
