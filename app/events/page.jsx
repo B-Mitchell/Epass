@@ -73,7 +73,7 @@ const Page = () => {
         {loading ? <LoadingAnimation /> : null}
       </p>
 
-      <div className='mt-5 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-4 p-2 w-[95%] m-auto mb-7'>
+      <div className='mt-5 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3 p-2 w-[98%] m-auto mb-7'>
         {datas
           .filter(filterBySearchAndCategory)
           .map((ticket) => (
