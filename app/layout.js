@@ -3,6 +3,7 @@ import NavBar from './components/Navbar'
 import Footer from './components/Footer'
 import { Providers } from './globalRedux/Provider'
 import { MyContextProvider } from './context/createContext'
+import { Analytics } from "@vercel/analytics/react"
 
 export const metadata = {
   title: 'Epass',
@@ -17,6 +18,7 @@ export default function RootLayout({ children }) {
       <Providers >
         <NavBar />
         {children}
+        <Analytics />
         <Footer />
         </Providers>
         </MyContextProvider>
