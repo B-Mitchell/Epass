@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
+import Image from 'next/image';
+import LogoImage from '../../public/images/Epass.png'
 
 const NavBar = () => {
   const router = useRouter();
@@ -26,7 +28,8 @@ const NavBar = () => {
 
   return (
     <nav className='bg-[#1E1E1E] text-white w-full flex justify-between pb-3'>
-        <h3 className='text-[2rem] font-bold mt-3 ml-3'><span className='text-xxl'>E</span>pass</h3>
+        <h3 className='text-[2rem] font-bold mt-3 -mb-1 ml-6'><Image src={LogoImage} className='w-[100%] h-[100%]'/></h3>
+       
 
         {/* DESKTOP VIEW*/}
         <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>
