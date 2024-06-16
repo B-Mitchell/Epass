@@ -8,6 +8,7 @@ import { useMyContext } from '@/app/context/createContext';
 
 const page = () => {
     const router = useRouter();
+
     const { createEventModal, setCreateEventModal } = useMyContext();
     const userId = useSelector(state => state.user.user_id);
     const [eventImage, setEventImage] = useState(null); 

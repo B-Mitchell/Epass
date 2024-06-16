@@ -6,6 +6,7 @@ import { logoutUser } from '../globalRedux/slices/userSlice'
 import supabase from '../supabase'
 import ProfileTickets from '../components/ProfileTickets'
 import LoadingAnimation from '../components/LoadingAnimation'
+import { IoSettingsOutline } from "react-icons/io5";
 
 const page = () => {
     const router = useRouter();
@@ -76,7 +77,11 @@ const page = () => {
 
         {/* continue here */}
         <div className='w-[96%] m-auto block mt-3 rounded-3xl pb-5'>
-            <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
+          <div className='flex justify-between mb-3'>
+          <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
+
+          <button className='font-bold border-[#E0BFB8] border rounded-lg p-2 hover:bg-[#E0BFB8] transition px-3' onClick={() => router.push('/profile/userInfo')}><IoSettingsOutline /></button>
+          </div>
             
             {
             loading  ? <LoadingAnimation /> : 
