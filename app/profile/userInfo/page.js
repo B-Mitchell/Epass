@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { setUserId } from '../../globalRedux/slices/userSlice'
 import { useSelector } from 'react-redux';
 import supabase from '@/app/supabase';
 
@@ -36,16 +35,6 @@ const page = () => {
         accountNumber: accountNumber
       }
       try {
-        // const { data, error } = await supabase
-        // .from('userBankDetails')
-        // .insert([Data])
-        // .select()
-
-        // if (error) {
-        //     console.error('Error uploading data:', error.message);
-        // } else {
-        //     console.log('product uploaded successfully:', data);
-        // }
         const { data: existingData, error: fetchError } = await supabase
         .from('userBankDetails')
         .select('*')
