@@ -7,7 +7,7 @@ const page = () => {
   // check if authenticated
     const authFunction = () => {
       if (userId) {
-          console.log('user is logged in')
+          console.log('user is logged in');
       } else {
           console.log("redirecting to login...");
           router.push('/login');

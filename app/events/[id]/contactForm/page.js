@@ -4,8 +4,14 @@ import { FlutterWaveButton, closePaymentModal } from 'flutterwave-react-v3';
 import { useMyContext } from '@/app/context/createContext';
 import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
+import EmailTemplate from '@/app/components/Email-Template';
+import { Resend } from 'resend';
 
 const ContactForm = () => {
+  const resendApiKey = process.env.RESEND_API_KEY;
+
+  // Initialize Resend client with API key
+  const resend = new Resend("re_e5R5nccX_FW8SzLnUuohv74sy3UZyobMB");
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
@@ -14,6 +20,9 @@ const ContactForm = () => {
   // state handling if ticket is sold out
   const [isSoldOut, setIsSoldOut] = useState(false);
   // const flutterwaveApiKey = process.env.FLUTTERWAVE_PUBLIC_KEY;
+  // API MESSAGES
+  const [transactionMessage, setTransactionMessage] = useState('');
+  const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
 
   const config = {
     public_key: 'FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X',
@@ -36,15 +45,67 @@ const ContactForm = () => {
   const fwConfig = {
     ...config,
     text: 'Pay with Flutterwave!',
-    callback: (response) => {
+    callback: async (response) => {
       console.log(response);
+      
+      if (response.status === "successful") {
+        try {
+          const verificationResponse = await fetch(
+            `https://api.flutterwave.com/v3/transactions/${response.transaction_id}/verify`,
+            {
+              headers: {
+                Authorization: `Bearer ${process.env.NEXT_PUBLIC_FLUTTERWAVE_SECRET_KEY}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+  
+          const verificationData = await verificationResponse.json();
+  
+          if (verificationData.status === 'success') {
+            setTransactionMessage('Payment was successful!');
+            updateNops();
+            await sendEmail();
+            // Perform additional actions such as updating your database or notifying the user
+          } else {
+            setTransactionMessage('Payment verification failed.');
+          }
+        } catch (error) {
+          console.error('Error verifying payment:', error);
+          alert('Error verifying payment.');
+        }
+      } else {
+        alert('Payment failed.');
+      }
+  
       closePaymentModal(); // Close the modal programmatically
     },
     onClose: () => {
-      updateNops();
-      // email service
+      if (isPaymentProcessing) {
+        setTransactionMessage('Payment was not completed.');
+      }
+      console.log('Payment modal closed');
+      setIsPaymentProcessing(false);
     },
   };
+  const sendEmail = async () => {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: 'Acme <onboarding@resend.dev>',
+        to: email,
+        subject: "Transaction successful",
+        react: EmailTemplate({ firstName: name }),
+      });
+  
+      if (error) {
+        console.log(error)
+      }
+  
+      return data;
+    } catch(error) {
+      console.log(error)
+    }
+  }
 
   const checkData = () => {
     if (!ticketPrice || isNaN(ticketPrice)) {
@@ -127,7 +188,7 @@ const ContactForm = () => {
         {
           isSoldOut ? <button className='hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 '>SOLD OUT!</button> 
           :
-          <FlutterWaveButton className='hover:bg-transparent bg-[#E0BFB8] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 ' {...fwConfig} />
+          <FlutterWaveButton className='hover:bg-transparent bg-[#E0BFB8] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 ' {...fwConfig} onClick={() => setIsPaymentProcessing(true) } />
         }
         
 
