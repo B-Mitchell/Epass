@@ -181,7 +181,7 @@ const Page = () => {
 
                 <div className='mb-4'>
                     <label className='block text-lg font-medium mb-2'>Title:</label>
-                    <input type='text' placeholder='e.g., "Sonic Fusion"' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventTitle(e.target.value) }} value={eventTitle} />
+                    <input type='text' placeholder='e.g., "Sonic Fusion"' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventTitle(e.target.value) }} value={eventTitle} />
                 </div>
 
                 <div className='mb-4'>
@@ -198,36 +198,36 @@ const Page = () => {
 
                 <div className='mb-4'>
                     <label className='block text-lg font-medium mb-2'>Address:</label>
-                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
+                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
                 </div>
 
                 <div className='flex justify-center mb-6'>
-                    <button type="button" className={`px-4 py-2 rounded-l-lg ${activeTab === 'single' ? 'bg-[#E0BFB8] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('single')}>Single Event</button>
-                    <button type="button" className={`px-4 py-2 rounded-r-lg ${activeTab === 'recurring' ? 'bg-[#E0BFB8] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('recurring')}>Recurring Event</button>
+                    <button type="button" className={`px-4 py-2 rounded-l-lg ${activeTab === 'single' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('single')}>Single Event</button>
+                    <button type="button" className={`px-4 py-2 rounded-r-lg ${activeTab === 'recurring' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('recurring')}>Recurring Event</button>
                 </div>
 
                 {activeTab === 'single' && (
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Event Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
                         </div>
 
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>Start Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime} />
                             </div>
 
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>End Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#E0BFB8]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime} />
                             </div>
                         </div>
 
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Event Price:</label>
-                            <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventPrice(e.target.value) }} value={eventPrice} />
+                            <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventPrice(e.target.value) }} value={eventPrice} />
                         </div>
                     </>
                 )}
@@ -236,12 +236,12 @@ const Page = () => {
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Start Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
                         </div>
 
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Frequency:</label>
-                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEventFrequency(e.target.value) }} value={eventFrequency}>
+                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventFrequency(e.target.value) }} value={eventFrequency}>
                                 <option value="">Select</option>
                                 <option value="daily">Daily</option>
                                 <option value="weekly">Weekly</option>
@@ -252,7 +252,7 @@ const Page = () => {
 
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>End Condition:</label>
-                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEndCondition(e.target.value) }} value={endCondition}>
+                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndCondition(e.target.value) }} value={endCondition}>
                                 <option value="">Select</option>
                                 <option value="date">End Date</option>
                                 <option value="occurrences">Number of Occurrences</option>
@@ -262,14 +262,14 @@ const Page = () => {
                         {endCondition === 'date' && (
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>End Date:</label>
-                                <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setEndDate(e.target.value) }} value={endDate} />
+                                <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndDate(e.target.value) }} value={endDate} />
                             </div>
                         )}
 
                         {endCondition === 'occurrences' && (
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>Occurrences:</label>
-                                <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setOccurrences(e.target.value) }} value={occurrences} />
+                                <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setOccurrences(e.target.value) }} value={occurrences} />
                             </div>
                         )}
                     </>
@@ -278,22 +278,22 @@ const Page = () => {
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-4'>
                     <div>
                         <label className='block text-lg font-medium mb-2'>Instagram Handle:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' onChange={(e) => { setInstagramHandle(e.target.value) }} value={instagramHandle} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setInstagramHandle(e.target.value) }} value={instagramHandle} />
                     </div>
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Twitter Handle:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
                     </div>
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Facebook Handle:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' onChange={(e) => { setFacebookHandle(e.target.value) }} value={facebookHandle} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setFacebookHandle(e.target.value) }} value={facebookHandle} />
                     </div>
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Number of Participants:</label>
-                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setNops(e.target.value) }} value={nops} />
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setNops(e.target.value) }} value={nops} />
                     </div>
                 </div>
 
@@ -314,19 +314,19 @@ const Page = () => {
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                     <div className='mb-4'>
                         <label className='block text-lg font-medium mb-2'>Ticket Name:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setTicketName(e.target.value) }} value={ticketName} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketName(e.target.value) }} value={ticketName} />
                     </div>
 
                     <div className='mb-4'>
                         <label className='block text-lg font-medium mb-2'>Ticket Description:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setTicketDescription(e.target.value) }} value={ticketDescription} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketDescription(e.target.value) }} value={ticketDescription} />
                     </div>
                 </div>
 
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-4'>
                     <div>
                         <label className='block text-lg font-medium mb-2'>Ticket Limit:</label>
-                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' disabled={isUnlimited} required onChange={(e) => { setTicketLimit(e.target.value) }} value={ticketLimit} />
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' disabled={isUnlimited} required onChange={(e) => { setTicketLimit(e.target.value) }} value={ticketLimit} />
                     </div>
 
                     <div className='flex items-center space-x-2 mt-8'>
@@ -338,19 +338,19 @@ const Page = () => {
                 {ticketType === 'single' && (
                     <div className='mb-4'>
                         <label className='block text-lg font-medium mb-2'>Purchase Limit:</label>
-                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
                     </div>
                 )}
 
                 {ticketType === 'group' && (
                     <div className='mb-4'>
                         <label className='block text-lg font-medium mb-2'>Group Size:</label>
-                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#E0BFB8]' required onChange={(e) => { setGroupSize(e.target.value) }} value={groupSize} />
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setGroupSize(e.target.value) }} value={groupSize} />
                     </div>
                 )}
 
                 <div className='flex justify-end'>
-                    <button type='submit' className='bg-[#E0BFB8] text-white px-6 py-3 rounded-xl hover:bg-[#E0BFB9]'>Create Event</button>
+                    <button type='submit' className='bg-[#FFC0CB] text-white px-6 py-3 rounded-xl hover:bg-[#E0BFB9]'>Create Event</button>
                 </div>
             </form>
         </div>
@@ -358,4 +358,3 @@ const Page = () => {
 }
 
 export default Page;
-

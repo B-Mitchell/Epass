@@ -80,48 +80,48 @@ const page = () => {
   return (
     <div className='pb-[2rem]'>
         {accountCreation && <SuccessNotif />}
-    <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-[70%] w-[90%] block m-auto mt-[3rem] rounded-3xl p-5 '>
+    <form onSubmit={handleSubmit} className='border border-[#FFC0CB] md:w-[70%] w-[90%] block m-auto mt-[3rem] rounded-3xl p-5 '>
     <h2 className='text-center font-bold text-[1.4rem]'>Create an  Account</h2>
     <div className='md:flex block justify-between mt-6'>
 
         <div className='w-[100%] md:mr-3'>
             <p className='text-[1.2rem] my-2'>Email</p>
-            <input placeholder='eg: johnDoe@gmail.com' required value={emailU} onChange={(e) => {setEmailU(e.target.value)}} className='p-3 w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition' />
+            <input placeholder='eg: johnDoe@gmail.com' required value={emailU} onChange={(e) => {setEmailU(e.target.value)}} className='p-3 w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition' />
         </div>
         <div className='md:w-[80%] w-[100%]'>
             <p className='text-[1.2rem] my-2'>Organizer Name</p>
-        <input placeholder='eg: John Events' required  value={organizersNameU} onChange={(e) => {setOrganizersNameU(e.target.value)}} className='md:w-[80%] p-3 w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: John Events' required  value={organizersNameU} onChange={(e) => {setOrganizersNameU(e.target.value)}} className='md:w-[80%] p-3 w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
     </div>
 
     <div className='md:flex block justify-between md:mt-6'>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>First Name</p>
-        <input placeholder='eg: Doe' required  value={firstNameU} onChange={(e) => {setFirstNameU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: Doe' required  value={firstNameU} onChange={(e) => {setFirstNameU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>Last Name</p>
-            <input placeholder='eg: John' required  value={lastNameU} onChange={(e) => {setLastNameU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+            <input placeholder='eg: John' required  value={lastNameU} onChange={(e) => {setLastNameU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
     </div>
 
     <div className='md:flex block justify-between md:mt-6'>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>Phone Number</p>
-        <input placeholder='eg: 09034*****76' required  value={phoneNumberU} onChange={(e) => {setPhoneNumberU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: 09034*****76' required  value={phoneNumberU} onChange={(e) => {setPhoneNumberU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>Password</p>
-        <input placeholder='**********' required value={passwordU} onChange={(e) => {setPasswordU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#E0BFB8] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='**********' required value={passwordU} onChange={(e) => {setPasswordU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFC0CB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
     </div>
 
 
-        <button className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
+        <button className='hover:bg-[#FFC0CB] w-[70%] block m-auto mt-7 p-2 border border-[#FFC0CB] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
         <br />
-        <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#E0BFB8] font-extrabold'>login to your Account</span></p>
+        <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#FFC0CB] font-extrabold'>login to your Account</span></p>
     </form>
-    <button className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
+    <button className='hover:bg-[#FFC0CB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFC0CB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
     </div>
   )
 }

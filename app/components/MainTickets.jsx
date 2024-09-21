@@ -63,16 +63,21 @@ const MainTickets = () => {
     <div>
         {/* FREE TICKETS */}
 
-        <p className='mt-4 text-center font-bold text-[1.4rem]'>Free tickets</p>
+        <p className='mt-6 text-center font-bold text-[1.4rem]'>
+            
+            🎟️Free tickets
+        <span className='block w-[20%] h-[3px] bg-[#FFC0CB] mt-1 mx-auto'></span>
+        </p>
+        
         
         {
             loadingFree ? <LoadingAnimation /> : 
             ( freeTickets.length > 0 ? (
                 <div className='flex w-[100%] overflow-x-auto  text-black p-3 '>
                 {freeTickets.map((data) => (
-                    <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#E0BFB8]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer relative' onClick={() => {router.push(`events/${data.uuid}`)}}>
+                    <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#FFC0CB]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer relative' onClick={() => {router.push(`events/${data.uuid}`)}}>
                         <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
-                        <p className='text-[.9rem] absolute top-0 right-0 bg-[#E0BFB8] p-1 rounded-md'>{data.nops} left</p>
+                        <p className='text-[.9rem] absolute top-0 right-0 bg-[#FFC0CB] p-1 rounded-md'>{data.nops} left</p>
                         <div className='px-2 py-2'>
                         <p className='font-bold text-[1.1rem] uppercase'>{data.title}</p>
                         <p >{data.address}</p>
@@ -90,7 +95,11 @@ const MainTickets = () => {
         )
         }
         {/* PAID TICKETS */}
-        <p className='mt-4 text-center font-bold text-[1.4rem]'>Paid Tickets</p>
+        <p className='mt-4 text-center font-bold text-[1.4rem]'>
+            
+            🎟️Paid tickets
+        <span className='block w-[20%] h-[3px] bg-[#FFC0CB] mt-1 mx-auto'></span>
+        </p>
         {
             loadingPaid ? 
             <LoadingAnimation />
@@ -98,9 +107,9 @@ const MainTickets = () => {
             ( paidTickets.length > 0 ? (
             <div className='flex justify-between w-[100%] overflow-x-auto  text-black p-3'>
                 {paidTickets.map((data) => (
-                    <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#E0BFB8]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer relative' onClick={() => {router.push(`events/${data.uuid}`)}}>
+                    <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#FFC0CB]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer relative' onClick={() => {router.push(`events/${data.uuid}`)}}>
                         <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
-                        <p className='text-[.9rem] absolute top-0 right-0 bg-[#E0BFB8] p-1 rounded-md'>{data.nops} left</p>
+                        <p className='text-[.9rem] absolute top-0 right-0 bg-[#FFC0CB] p-1 rounded-md'>{data.nops} left</p>
                         <div className='px-2 py-2'>
                         <p className='font-bold text-[1.1rem] uppercase'>{data.title}</p>
                         <p >{data.address}</p>
