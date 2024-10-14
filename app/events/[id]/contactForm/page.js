@@ -64,7 +64,7 @@ const ContactForm = () => {
   
           if (verificationData.status === 'success') {
             setTransactionMessage('Payment was successful!');
-            updateNops();
+            updateStock();
             await sendEmail();
             // Perform additional actions such as updating your database or notifying the user
           } else {
@@ -121,16 +121,16 @@ const ContactForm = () => {
   const checkIfTicketIsSoldOut = async () => {
     try {
       let { data: queryData, error: queryError } = await supabase
-      .from('tickets')
-      .select('nops')
-      .eq('uuid', ticketRoute)
+      .from('ticketdata')
+      .select('ticketStock')
+      .eq('eventId', ticketRoute)
       if (queryError) {
         console.log(queryError)
       } else {
         // check if ticket is sold out and update state
         if (queryData && queryData.length > 0) {
-          const currentNops = queryData[0].nops;
-          if (currentNops === 0) {
+          const currentStock = queryData[0].ticketStock;
+          if (currentStock === 0) {
             setIsSoldOut(!isSoldOut)
           } 
         }
@@ -142,27 +142,27 @@ const ContactForm = () => {
     }
   }
   //update nops (number of people that paid for the ticket)
-  const updateNops = async () => {
+  const updateStock = async () => {
     try {
       // Retrieve the current value of nops from Supabase
       let { data: queryData, error: queryError } = await supabase
-        .from('tickets')
-        .select('nops')
-        .eq('uuid', ticketRoute);
+        .from('ticketdata')
+        .select('ticketStock')
+        .eq('eventId', ticketRoute);
   
       if (queryError) {
         console.log(queryError);
       } else if (queryData && queryData.length > 0) {
-        const updatedNops = queryData[0].nops - 1;
+        const updatedStock = queryData[0].ticketStock - 1;
         let { data: updateData, error: updateError } = await supabase
-          .from('tickets')
-          .update({ nops: updatedNops })
-          .eq('uuid', ticketRoute);
+          .from('ticketdata')
+          .update({ ticketStock: updatedStock })
+          .eq('eventId', ticketRoute);
   
         if (updateError) {
           console.log('Error updating column:', updateError.message);
         } else {
-          console.log('nops updated successfully:', updateData);
+          console.log('Ticket stock updated successfully:', updateData);
         }
       } else {
         console.log('No data found for the given UUID.');
