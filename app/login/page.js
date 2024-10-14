@@ -79,22 +79,22 @@ const page = () => {
 
   return (
     <div className=''>
-    <form onSubmit={loginToAccount} className='border border-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-[5rem] rounded-3xl p-5 '>
+    <form onSubmit={loginToAccount} className='border border-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-[5rem] rounded-3xl p-5 '>
     
         <h2 className='text-center font-bold text-[1.4rem]'>Login to your Account</h2>
         <p className='text-[1.2rem] my-2'>Email: </p>
-        <input placeholder='eg: johndoe@gmail.com' required value={emailU} type='email' name="email" onChange={(e) => {setEmailU(e.target.value)}} className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: johndoe@gmail.com' required value={emailU} type='email' name="email" onChange={(e) => {setEmailU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
 
         <p className='text-[1.2rem] my-2'>Password: </p>
-        <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         <p className='text-red-400 text-[.9rem] mt-2'>{errorMsg && 'Invalid login credentials, please try again'}</p>
 
-        <button type='submit' className='hover:bg-[#E0BFB8] w-[70%] block m-auto mt-6 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging in...' : 'Login to your account'}</button>
+        <button type='submit' className='hover:bg-[#FFCOCB] w-[70%] block m-auto mt-6 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging in...' : 'Login to your account'}</button>
         <br />
-        <p onClick={() => {router.push('/createAccount')}} className='text-center'>you don't have an account ? <span className='cursor-pointer text-[#E0BFB8] font-extrabold'>Create an Account</span></p>
+        <p onClick={() => {router.push('/createAccount')}} className='text-center'>you don't have an account ? <span className='cursor-pointer text-[#FFCOCB] font-extrabold'>Create an Account</span></p>
 
     </form>
-    <button className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
+    <button className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
     </div>
   )
 }

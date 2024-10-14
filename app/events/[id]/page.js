@@ -50,7 +50,7 @@ const page = ({params}) => {
     <div>
         <p className='text-center font-bold text-[1.4rem] my-4'>Event/Ticket Details</p>
         <p className={`text-center ${loading ? 'mt-10 mb-4' : null} font-bold italic`}>{ loading ? 'loading Checkout...' : null }</p>
-        <div className='border border-[#E0BFB8] md:w-[90%] w-[95%] m-auto md:flex justify-between block'>
+        <div className='border border-[#FFCOCB] md:w-[90%] w-[95%] m-auto md:flex justify-between block'>
             <div >
             {fetchedData && fetchedData.length > 0 ? (
             <div className='p-2 m-2 md:w-[100%]'>
@@ -93,7 +93,7 @@ const page = ({params}) => {
 
         </div>
 
-        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 ' onClick={() => {router.push(`/events/${route}/contactForm`)}}>get ticket</button>
+        <button className='hover:bg-transparent bg-[#FFCOCB] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#FFCOCB] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110 ' onClick={() => {router.push(`/events/${route}/contactForm`)}}>get ticket</button>
     </div>
   )
 }

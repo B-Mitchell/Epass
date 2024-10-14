@@ -8,7 +8,7 @@ const EventCreation = () => {
   return (
     <div >
         <div className='bg-black fixed inset-0 items-center z-50 bg-opacity-50' >
-        <div className='bg-white rounded-[2rem] md:w-[50%] w-[80%] m-auto md:mt-[15%] mt-[40%] p-4 border border-[#E0BFB8]'>
+        <div className='bg-white rounded-[2rem] md:w-[50%] w-[80%] m-auto md:mt-[15%] mt-[40%] p-4 border border-[#FFCOCB]'>
             <button className='p-2 rounded-[1rem] block text-right hover:scale-110 transition ml-auto text-[#A0A4A8]' onClick={() => {setCreateEventModal(!createEventModal)}}>X</button>
 
             <div className='w-[100%] text-center p-2'>
@@ -16,8 +16,8 @@ const EventCreation = () => {
             </div>
 
             <div className='flex justify-between w-[100%] pb-2'>
-                <button className='hover:bg-[#E0BFB8] w-[100%] block mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110 mr-2' onClick={() => router.push('/profile')}>back to profile</button>
-                <button className='hover:bg-[#E0BFB8] w-[100%] block mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110 ml-2' onClick={() => setCreateEventModal(!createEventModal)}>create another event</button>
+                <button className='hover:bg-[#FFCOCB] w-[100%] block mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110 mr-2' onClick={() => router.push('/profile')}>back to profile</button>
+                <button className='hover:bg-[#FFCOCB] w-[100%] block mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110 ml-2' onClick={() => setCreateEventModal(!createEventModal)}>create another event</button>
             </div>
 
         </div>
