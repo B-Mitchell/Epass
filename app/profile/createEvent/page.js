@@ -1,187 +1,473 @@
 'use client'
-import React, {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
 import EventCreation from '@/app/modals/EventCreation';
 import { useMyContext } from '@/app/context/createContext';
 
-const page = () => {
+const Page = () => {
     const router = useRouter();
-
     const { createEventModal, setCreateEventModal } = useMyContext();
     const userId = useSelector(state => state.user.user_id);
-    const [eventImage, setEventImage] = useState(null); 
+    const [activeTab, setActiveTab] = useState('single');
+
+    const [eventImage, setEventImage] = useState(null);
     const [imageFileName, setImageFileName] = useState(null);
     const [eventTitle, setEventTitle] = useState('');
     const [selectedOption, setSelectedOption] = useState('');
     const [eventAddress, setEventAddress] = useState('');
     const [eventDate, setEventDate] = useState('');
-    const [eventTime, setEventTime] = useState('');
-    const [eventPrice, setEventPrice] = useState('');
-    const [eventPricingType, setPricingType] = useState('');
-    const [nops, setNops] = useState();
-    //nops is number of paid subscribers-i'm using this to handle the number of people that paid for a ticket and i'll also update it automatically if someone pays for a ticket
-
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [instagramHandle, setInstagramHandle] = useState('');
+    const [twitterHandle, setTwitterHandle] = useState('');
+    const [facebookHandle, setFacebookHandle] = useState('');
+    const [eventFrequency, setEventFrequency] = useState('');
+    const [endCondition, setEndCondition] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [occurrences, setOccurrences] = useState('');
+    const [ticketType, setTicketType] = useState('single');
+    const [pricingType,setPricingType]=useState();
+    const [ticketName, setTicketName] = useState('');
+    const [ticketPrice, setTicketPrice] = useState('');
+    const [ticketDescription, setTicketDescription] = useState('');
+    const [ticketStock, setTicketStock] = useState('');
+    const [isUnlimited, setIsUnlimited] = useState(false);
+    const [purchaseLimit, setPurchaseLimit] = useState('');
+    const [groupSize, setGroupSize] = useState('');
+    const[ticketList,setTicketList]=useState([{id:"",ticketName:"",ticketPrice:" ",ticketStock:"",ticketType}])
     const authFunction = () => {
         if (userId) {
-            console.log('user: ' + userId)
+            console.log('user: ' + userId);
         } else {
             console.log("redirecting to login...");
             router.push('/login');
         }
-    }
+    };
+
     useEffect(() => {
         authFunction();
-    },[userId]);
+    }, [userId]);
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
-  };
-  const handleTicketPricingChange = (event) => {
-    setPricingType(event.target.value);
-  }
+    const handleOptionChange = (event) => {
+        setSelectedOption(event.target.value);
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const Data = {
-        user_id: userId,
-        title: eventTitle,
-        typeOfEvent: selectedOption,
-        address: eventAddress,
-        date: eventDate,
-        time: eventTime,
-        price: eventPrice,
-        image: imageFileName.name,
-        pricingType: eventPricingType,
-        nops: nops
+    const handleTicketPricingChange = (event) => {
+        setPricingType(event.target.value);
+    };
+    const handleAddTicket = () => {
+        // Add ticket to the list
+        setTicketList([
+            ...ticketList,
+            {
+                ticketName: ticketName,
+                ticketPrice:ticketPrice,
+                ticketType: ticketType,
+                pricingType: pricingType,
+                ticketDescription: ticketDescription,
+                ticketStock: isUnlimited ? 'unlimited' : ticketStock,
+                purchaseLimit: ticketType === 'single' ? purchaseLimit : null,
+                groupSize: ticketType === 'group' ? groupSize : null,
+            },
+        ]);
     }
-    try {
-        const { data, error } = await supabase
-            .from('tickets')
-            .insert([Data])
-            .select()
+    const removeTicket = (id) => {
+        setTicketList(ticketList.filter((ticket) => ticket.id !== id));
+      };
 
-        if (error) {
-            console.error('Error uploading product:', error.message);
-        } else {
-            console.log('product uploaded successfully:', data);
-        }
-
-    } catch(err) {
-        console.log('error during text upload:' + err)
-    }
-    // https://zzupaillunqrgfwshuvb.supabase.co/storage/v1/object/public/tickets/2023_07_02_01_55_IMG_6791.JPG?t=2024-01-19T11%3A38%3A46.479Z
-    try {
-        const { data, error } = await supabase.storage
-            .from('ticketBucket')
-            .upload(`public/${userId}_${imageFileName.name}`, imageFileName);
-        if (error) {
-            console.error('Error uploading avatar:', error.message);
-        } else {
-            console.log('Avatar uploaded successfully:', data);
-            setCreateEventModal(!createEventModal);
-            setEventImage(null);
-            setEventAddress('');
-            setImageFileName(null);
-            setEventTitle('');
-            setEventTime('');
-            setSelectedOption('');
-            setEventDate('');
-            setEventPrice('');
-            setNops(null);
-        }
-        } catch (error) {
-        console.error('Error during avatar upload:', error.message);
-        }
-        console.log(Data);
-  }
-  return (
-    <div className='pb-6'>
-        {createEventModal ? <EventCreation /> : null}
-
-        <p className='text-center font-bold text-[1.6rem] my-3'>Create Event</p>
-
-        <form onSubmit={handleSubmit} className='border border-[#FFCOCB] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
-            <p className='text-[1.2rem] my-2'>Event Image:</p>
-            <input type='file' onChange={(e) => {setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0])} } className='bg-[#FFCOCB] w-[100%] rounded-r-2xl overflow-hidden' required />
-            <div className='border border-[#FFCOCB] mt-2 w-[40%] block h-[5rem] rounded-xl overflow-hidden'>
-                {eventImage && <img src={eventImage} alt='event'  className='w-[100%] h-full '/>}
-            </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const commonData = {
+            user_id: userId,
+            title: eventTitle,
+            typeOfEvent: selectedOption,
+            address: eventAddress,
+            image: imageFileName?.name || '',
+            instagram: instagramHandle,
+            twitter: twitterHandle,
+            facebook: facebookHandle,
+        };
+        const singleEventData = {
+            ...commonData,
+            date: eventDate,
+            startTime:startTime,
+            endTime:endTime,
             
+        };
 
-            <p className='text-[1.2rem] my-2'>Title:</p>
-            <input type='text' placeholder='eg: "Sonic Fusion"' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTitle(e.target.value)}} value={eventTitle}/>
+        const recurringEventData = {
+            ...commonData,
+            
+            eventFrequency:eventFrequency,
+            endCondition:endCondition,
+            endDate: endCondition === 'date' ? endDate : null,
+            occurrences: endCondition === 'occurrences' ? occurrences : null,
+        };
+        console.log(ticketList);
+        console.log(ticketData);
+        console.log(recurringEventData)
+        console.log(singleEventData)
+        
+        const ticketData = ticketList.map((ticket) => ({
+            // id: ticket.id,
+            ticketName: ticket.ticketName,
+            ticketPrice: ticket.pricingType === 'free' ? 0 : ticket.ticketPrice,
+            ticketType: ticket.ticketType === 'single' ? 'single' : 'group',
+            pricingType: ticket.pricingType,
+            ticketDescription: ticket.ticketDescription,
+            ticketStock: ticket.ticketStock,
+            purchaseLimit: ticket.purchaseLimit,
+            groupSize: ticket.groupSize,
+          }));
+        
+        //   try {
+        //     // Insert ticket data
+            
+            
+        //     const {data:eventInsertedData, error: ticketError } = await supabase
+        //       .from('ticketdata')
+        //       .insert(ticketData)
+        //       .select();
+        //     console.log("after insert");
+            
+        //     if (ticketError) throw ticketError;
+        //   } catch (error) {
+        //     console.error('Error creating ticket:', error.message);
+        //   }
+        const eventData = activeTab === 'single' ? singleEventData : recurringEventData;
 
-            <p className='text-[1.2rem] my-2'>Event Type:</p>
-            <div className=' w-[100%] grid md:grid-cols-3 grid-cols-2 md:gap-4 gap-2'>
-            <div>
-        <label>
-          <input type="radio" value="party" checked={selectedOption === 'party'} onChange={handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>Party
-        </label>
-      </div>
-      <div>
-        <label>
-          <input type="radio" value="sports" checked={selectedOption === 'sports'} onChange= {handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>sports
-        </label>
-      </div>
-      <div>
-        <label>
-          <input type="radio"  value="concert" checked={selectedOption === 'concert'} onChange={handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>concert
-        </label>
+        try {
+            
+            // Insert event data into Supabase
+            const {data:event,error: eventError } = await supabase
+              
+                .from('tickets')
+                .insert(eventData)
+                .select('uuid');
+            
+            
+            if (eventError) throw eventError;
+            
+            const eventId = event[0].uuid; // Get the newly created event ID
+       
+            // Insert ticket data
+            if (ticketList.length > 0) {
+                const ticketData = ticketList.map((ticket) => ({
+                    ...ticket,
+                    event_id: eventId, // Associate each ticket with the event ID
+                }));
+
+                const { error: ticketError } = await supabase
+                    .from('ticketdata')
+                    .insert(ticketData)
+                    .select();
+
+                if (ticketError) throw ticketError;
+            }
+
+            console.log('Event and tickets successfully created.');
+            resetForm();
+            setCreateEventModal(true); // Close modal on success
+
+        } catch (error) {
+            console.error('Error creating event and tickets:', error.message);
+        }
+
+        // Upload image
+        try {
+            const { data, error } = await supabase.storage
+                .from('ticketBucket')
+                .upload(`public/${userId}_${imageFileName.name}`, imageFileName);
+            if (error) {
+                console.error('Error uploading image:', error.message);
+            } else {
+                console.log('Image uploaded successfully:', data);
+                setCreateEventModal(!createEventModal);
+                resetForm();
+            }
+        } catch (error) {
+            console.error('Error during image upload:', error.message);
+        }
+        
+    };
+
+   
+    const resetForm = () => {
+        setEventImage(null);
+        setImageFileName(null);
+        setEventTitle('');
+        setSelectedOption('');
+        setEventAddress('');
+        setEventDate('');
+        setStartTime('');
+        setEndTime('');
+        setInstagramHandle('');
+        setTwitterHandle('');
+        setFacebookHandle('');
+        setNops('');
+        setEventFrequency('');
+        setEndCondition('');
+        setEndDate('');
+        setOccurrences('');
+        setTicketType('single');
+        setTicketName('');
+        setTicketPrice('');
+        setTicketDescription('');
+        setTicketStock('');
+        setIsUnlimited(false);
+        setPurchaseLimit('');
+        setGroupSize('');
+        setTicketList([]);
+    };
+
+    return (
+        <div className='pb-6'>
+            {createEventModal ? <EventCreation /> : null}
+
+            <p className='text-center font-bold text-2xl my-4'>Create Event</p>
+
+            <form className='border border-gray-300 md:w-1/2 w-[90%] mx-auto rounded-3xl p-6 shadow-lg' onSubmit={handleSubmit}>
+                <div className='mb-4'>
+                    <label className='block text-lg font-medium mb-2'>Event Image:</label>
+                    <input type='file' onChange={(e) => { setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0]) }} className='bg-gray-100 w-full p-3 rounded-xl' required />
+                    {eventImage && <div className='border border-gray-300 mt-2 w-[40%] h-20 rounded-xl overflow-hidden'>
+                        <img src={eventImage} alt='event' className='w-full h-full object-cover' />
+                    </div>}
+                </div>
+
+                <div className='mb-4'>
+                    <label className='block text-lg font-medium mb-2'>Title:</label>
+                    <input type='text' placeholder='e.g., "Sonic Fusion"' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventTitle(e.target.value) }} value={eventTitle} />
+                </div>
+
+                <div className='mb-4'>
+                    <label className='block text-lg font-medium mb-2'>Event Type:</label>
+                    <div className='grid md:grid-cols-3 grid-cols-2 gap-4'>
+                        {['party', 'sports', 'concert', 'webinar', 'seminar', 'conference'].map(type => (
+                            <label key={type} className='flex items-center space-x-2'>
+                                <input type="radio" value={type} checked={selectedOption === type} onChange={handleOptionChange} required className='w-4 h-4' />
+                                <span className='capitalize'>{type}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <div className='mb-4'>
+                    <label className='block text-lg font-medium mb-2'>Address:</label>
+                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
+                </div>
+
+                <div className='flex justify-center mb-6'>
+                    <button type="button" className={`px-4 py-2 rounded-l-lg ${activeTab === 'single' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('single')}>Single Event</button>
+                    <button type="button" className={`px-4 py-2 rounded-r-lg ${activeTab === 'recurring' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('recurring')}>Recurring Event</button>
+                </div>
+
+                {activeTab === 'single' && (
+                    <>
+                        <div className='mb-4'>
+                            <label className='block text-lg font-medium mb-2'>Event Date:</label>
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                        </div>
+
+                        <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
+                            <div className='mb-4'>
+                                <label className='block text-lg font-medium mb-2'>Start Time:</label>
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime} />
+                            </div>
+
+                            <div className='mb-4'>
+                                <label className='block text-lg font-medium mb-2'>End Time:</label>
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime} />
+                            </div>
+                        </div>
+
+                       
+                    </>
+                )}
+
+                {activeTab === 'recurring' && (
+                    <>
+                        <div className='mb-4'>
+                            <label className='block text-lg font-medium mb-2'>Start Date:</label>
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                        </div>
+
+                        <div className='mb-4'>
+                            <label className='block text-lg font-medium mb-2'>Frequency:</label>
+                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventFrequency(e.target.value) }} value={eventFrequency}>
+                                <option value="">Select</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Biweekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+
+                        <div className='mb-4'>
+                            <label className='block text-lg font-medium mb-2'>End Condition:</label>
+                            <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndCondition(e.target.value) }} value={endCondition}>
+                                <option value="">Select</option>
+                                <option value="date">End Date</option>
+                                <option value="occurrences">Number of Occurrences</option>
+                            </select>
+                        </div>
+
+                        {endCondition === 'date' && (
+                            <div className='mb-4'>
+                                <label className='block text-lg font-medium mb-2'>End Date:</label>
+                                <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndDate(e.target.value) }} value={endDate} />
+                            </div>
+                        )}
+
+                        {endCondition === 'occurrences' && (
+                            <div className='mb-4'>
+                                <label className='block text-lg font-medium mb-2'>Occurrences:</label>
+                                <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setOccurrences(e.target.value) }} value={occurrences} />
+                            </div>
+                        )}
+                    </>
+                )}
+
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-4'>
+                    <div>
+                        <label className='block text-lg font-medium mb-2'>Instagram Handle:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setInstagramHandle(e.target.value) }} value={instagramHandle} />
+                    </div>
+
+                    <div>
+                        <label className='block text-lg font-medium mb-2'>Twitter Handle:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
+                    </div>
+
+                    <div>
+                        <label className='block text-lg font-medium mb-2'>Facebook Handle:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setFacebookHandle(e.target.value) }} value={facebookHandle} />
+                    </div>
+
+                    
+                </div>
+
+                <div className='mb-6'>
+                    <label className='block text-lg font-medium mb-2'>Ticket Type:</label>
+                     {/* Add Ticket Button */}
+                <button type="button" className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={handleAddTicket}>
+                    Add Ticket
+                </button>
+                    <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-3'>
+                        <label className='flex items-center space-x-2'>
+                            <input type="radio" value="single" checked={ticketType === 'single'} onChange={(e) => setTicketType(e.target.value)} required className='w-4 h-4' />
+                            <span>Single Ticket</span>
+                        </label>
+                        <label className='flex items-center space-x-2'>
+                            <input type="radio" value="group" checked={ticketType === 'group'} onChange={(e) => setTicketType(e.target.value)} required className='w-4 h-4' />
+                            <span>Group Ticket</span>
+                        </label>
+                    </div>
+                    <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
+                            <label className='flex items-center space-x-2'>
+                                <input
+                                type='radio'
+                                value='free'
+                                checked={pricingType === 'free'} // Set `checked` based on whether pricingType is 'free'
+                                onChange={(e) =>{ 
+                                    setPricingType(e.target.value)
+                                    setTicketPrice('0')
+                                }}
+                                 // Set pricingType to 'free' when this option is selected
+                                required
+                                className='w-4 h-4'
+                                />
+                                <span>Free</span>
+                            </label>
+                            <label className='flex items-center space-x-2'>
+                                <input
+                                type='radio'
+                                value='paid'
+                                checked={pricingType === 'paid'} // Set `checked` based on whether pricingType is 'paid'
+                                onChange={(e) => setPricingType(e.target.value)} // Set pricingType to 'paid' when this option is selected
+                                required
+                                className='w-4 h-4'
+                                />
+                                <span>Paid</span>
+                            </label>
+                    </div>
+
+                </div>
+
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
+                    <div className='mb-4'>
+                        <label className='block text-lg font-medium mb-2'>Ticket Name:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketName(e.target.value) }} value={ticketName} />
+                    </div>
+                    <div className='mb-4'>
+                        <label className='block text-lg font-medium mb-2'>Ticket Price:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]'
+                        required={pricingType === 'paid'} // Only required if 'paid' is selected
+                        disabled={pricingType === 'free'} 
+                        onChange={(e) => { setTicketPrice(e.target.value) }}  value={pricingType === 'free' ? '0' : ticketPrice} />
+                    </div>
+
+                    <div className='mb-4'>
+                        <label className='block text-lg font-medium mb-2'>Ticket Description:</label>
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketDescription(e.target.value) }} value={ticketDescription} />
+                    </div>
+                </div>
+
+                <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-4'>
+                    <div>
+                        <label className='block text-lg font-medium mb-2'>Ticket stock:</label>
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' disabled={isUnlimited} required onChange={(e) => { setTicketStock(e.target.value) }} value={ticketStock} />
+                    </div>
+
+                    <div className='flex items-center space-x-2 mt-8'>
+                        <input type="checkbox" onChange={() => { setIsUnlimited(!isUnlimited) }} checked={isUnlimited} className='w-4 h-4' />
+                        <span>Unlimited</span>
+                    </div>
+                </div>
+
+                {ticketType === 'single' && (
+                    <div className='mb-4'>
+                        <label className='block text-lg font-medium mb-2'>Purchase Limit:</label>
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
+                    </div>
+                )}
+
+                {ticketType === 'group' && (
+                    <div className='mb-4'>
+                        <label className='block text-lg font-medium mb-2'>Group Size:</label>
+                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setGroupSize(e.target.value) }} value={groupSize} />
+                    </div>
+                )}
+        <ul className="">
+        {ticketList.map((ticket) => (
+          <li
+            key={ticket.id}
+            className="p-2 bg-[#FFC0CB] my-2 rounded-lg flex justify-between items-center"
+          >
+            <div className='flex gap-3' style={{fontFamily:'monospace'}}>
+              <p className="">Ticket Name:{ticket.ticketName}</p>
+              <p>Ticket Price: {ticket.ticketPrice}</p>
+              <p>Ticket stock: {ticket.ticketStock}</p>
+            </div>
+            <button
+              className="ml-4 px-2 py-1 bg-red-500 text-white rounded"
+              onClick={() => removeTicket(ticket.id)}
+            >
+              Cancel
+            </button>
+          </li>
+        ))}
+      </ul>
+
+
+                <div className='flex justify-end'>
+                    <button type='submit' className='bg-[#FFC0CB] text-white px-6 py-3 rounded-xl hover:bg-[#E0BFB9] mt-2'>Create Event</button>
+                </div>
+            </form>
         </div>
-        <div>
-        <label>
-          <input type="radio" value="webinar" checked={selectedOption === 'webinar'} onChange={handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>webinar
-        </label>
-        </div>
-        <div>
-        <label>
-          <input type="radio" value="seminar" checked={selectedOption === 'seminar'} onChange={handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>seminar
-        </label>
-        </div>
-        <div>
-        <label>
-          <input type="radio" value="conference" checked={selectedOption === 'conference'} onChange={handleOptionChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>conference
-        </label>
-        </div>
-      </div>
-
-      <p className='text-[1.2rem] my-2'>Address: </p>
-      <input type='text' placeholder='eg: 19 Avenue building, Victoria Island' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventAddress(e.target.value)}} value={eventAddress}/>
-
-      <p className='text-[1.2rem] my-2'>date:</p>
-      <input type="date" placeholder='eg: 15 January, 2024' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventDate(e.target.value)}} value={eventDate}/>
-
-      <p className='text-[1.2rem] my-2'>Time: </p>
-      <input type="time" placeholder='eg: 10:00 am'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
-
-      <p className='text-[1.2rem] my-2'>Pricing Type: </p>
-
-      <div className='flex my-3'>
-        <div className='mr-4'>
-          <label>
-            <input type="radio" value="free" checked={eventPricingType === 'free'} onChange={handleTicketPricingChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>Free
-          </label>
-          </div>
-          <div>
-          <label>
-            <input type="radio" value="paid" checked={eventPricingType === 'paid'} onChange={handleTicketPricingChange} required className='w-[1rem] h-[1rem] mt-1 mr-1'/>Paid
-          </label>
-          </div>
-
-        </div>
-
-      <p className='text-[1.2rem] my-2'>Ticket Price: </p>
-      <input type='text' placeholder='eg: 8000'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
-
-      <p className='text-[1.2rem] my-2'>Number of tickets: </p>
-      <input type='number' placeholder='eg: 20'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setNops(e.target.value)}} value={nops}/>
-
-      <button className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>create event</button>
-        </form>
-    </div>
-  )
+    )
 }
 
-export default page
+export default Page;
