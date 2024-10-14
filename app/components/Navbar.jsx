@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
 import LogoImage from '../../public/images/Epass.png'
+import Image from 'next/image';
 
 const NavBar = () => {
   const router = useRouter();
