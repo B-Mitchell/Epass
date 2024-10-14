@@ -20,7 +20,7 @@ export default function Home() {
   return (
     <main >
 
-      <div className='bg-[#E0BFB8] md:flex block pt-6 pb-3' >
+      <div className='bg-[#FFCOCB] md:flex block pt-6 pb-3' >
             <div  className='md:pl-[4rem] pl-[.5rem] md:w-[70%] w-[100%]'>
                 <h1 className='text-[2.5rem] font-bold text-[#1E1E1E]'>EVENTS<br /> HAVE NEVER BEEN<br /> EASIER TO FIND &<br /> ATTEND.</h1>
                 <p className='text-[#6F624A] text-[1rem] font-semibold lg:mt-6 mb-4'>E-Pass is a website for purchasing event tickets for trips throughout Africa.Organize events live or virtual sell tickets, and accept money using a mobile device.</p>

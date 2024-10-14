@@ -102,16 +102,16 @@ const page = () => {
 
         <p className='text-center font-bold text-[1.6rem] my-3'>Create Event</p>
 
-        <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
+        <form onSubmit={handleSubmit} className='border border-[#FFCOCB] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
             <p className='text-[1.2rem] my-2'>Event Image:</p>
-            <input type='file' onChange={(e) => {setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0])} } className='bg-[#E0BFB8] w-[100%] rounded-r-2xl overflow-hidden' required />
-            <div className='border border-[#E0BFB8] mt-2 w-[40%] block h-[5rem] rounded-xl overflow-hidden'>
+            <input type='file' onChange={(e) => {setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0])} } className='bg-[#FFCOCB] w-[100%] rounded-r-2xl overflow-hidden' required />
+            <div className='border border-[#FFCOCB] mt-2 w-[40%] block h-[5rem] rounded-xl overflow-hidden'>
                 {eventImage && <img src={eventImage} alt='event'  className='w-[100%] h-full '/>}
             </div>
             
 
             <p className='text-[1.2rem] my-2'>Title:</p>
-            <input type='text' placeholder='eg: "Sonic Fusion"' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTitle(e.target.value)}} value={eventTitle}/>
+            <input type='text' placeholder='eg: "Sonic Fusion"' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTitle(e.target.value)}} value={eventTitle}/>
 
             <p className='text-[1.2rem] my-2'>Event Type:</p>
             <div className=' w-[100%] grid md:grid-cols-3 grid-cols-2 md:gap-4 gap-2'>
@@ -148,13 +148,13 @@ const page = () => {
       </div>
 
       <p className='text-[1.2rem] my-2'>Address: </p>
-      <input type='text' placeholder='eg: 19 Avenue building, Victoria Island' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventAddress(e.target.value)}} value={eventAddress}/>
+      <input type='text' placeholder='eg: 19 Avenue building, Victoria Island' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventAddress(e.target.value)}} value={eventAddress}/>
 
       <p className='text-[1.2rem] my-2'>date:</p>
-      <input type="date" placeholder='eg: 15 January, 2024' className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventDate(e.target.value)}} value={eventDate}/>
+      <input type="date" placeholder='eg: 15 January, 2024' className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventDate(e.target.value)}} value={eventDate}/>
 
       <p className='text-[1.2rem] my-2'>Time: </p>
-      <input type="time" placeholder='eg: 10:00 am'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
+      <input type="time" placeholder='eg: 10:00 am'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventTime(e.target.value)}} value={eventTime}/>
 
       <p className='text-[1.2rem] my-2'>Pricing Type: </p>
 
@@ -173,12 +173,12 @@ const page = () => {
         </div>
 
       <p className='text-[1.2rem] my-2'>Ticket Price: </p>
-      <input type='text' placeholder='eg: 8000'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
+      <input type='text' placeholder='eg: 8000'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setEventPrice(e.target.value)}} value={eventPrice}/>
 
       <p className='text-[1.2rem] my-2'>Number of tickets: </p>
-      <input type='number' placeholder='eg: 20'  className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setNops(e.target.value)}} value={nops}/>
+      <input type='number' placeholder='eg: 20'  className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' required onChange={(e) => {setNops(e.target.value)}} value={nops}/>
 
-      <button className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>create event</button>
+      <button className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>create event</button>
         </form>
     </div>
   )
