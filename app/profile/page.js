@@ -58,7 +58,7 @@ const page = () => {
 
   return (
     <div >
-        <div className='w-[90%] border border-[#E0BFB8] block m-auto mt-4 p-5 rounded-3xl'>
+        <div className='w-[90%] border border-[#FFCOCB] block m-auto mt-4 p-5 rounded-3xl'>
             <h2 className='text-center font-bold text-[1.4rem]'>PROFILE</h2>
             <p className='mt-3'><span className='font-semibold'>Hello</span>, {first_name} {last_name}</p>
             <br />
@@ -70,7 +70,7 @@ const page = () => {
                     <p >Phone Number: {phone_number}</p>
                 </div>
                 <div className='w-[20%]'>
-                <button onClick={() => handleLogout()} className='hover:bg-red-500 w-[100%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110 '>Logout</button>
+                <button onClick={() => handleLogout()} className='hover:bg-red-500 w-[100%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110 '>Logout</button>
                 </div>
             </div>
         </div>
@@ -80,7 +80,7 @@ const page = () => {
           <div className='flex justify-between mb-3'>
           <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
 
-          <button className='font-bold border-[#E0BFB8] border rounded-lg p-2 hover:bg-[#E0BFB8] transition px-3' onClick={() => router.push('/profile/userInfo')}><IoSettingsOutline /></button>
+          <button className='font-bold border-[#FFCOCB] border rounded-lg p-2 hover:bg-[#FFCOCB] transition px-3' onClick={() => router.push('/profile/userInfo')}><IoSettingsOutline /></button>
           </div>
             
             {
@@ -106,7 +106,7 @@ const page = () => {
         </div>
 
 
-        <button className='hover:bg-transparent bg-[#E0BFB8] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#E0BFB8] transition rounded-2xl hover:text-black text-white hover:scale-110 fixed bottom-8 right-3' onClick={() => {router.push('/profile/createEvent')}}>create event</button>
+        <button className='hover:bg-transparent bg-[#FFCOCB] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#FFCOCB] transition rounded-2xl hover:text-black text-white hover:scale-110 fixed bottom-8 right-3' onClick={() => {router.push('/profile/createEvent')}}>create event</button>
     </div>
   )
 }
