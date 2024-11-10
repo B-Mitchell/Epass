@@ -63,7 +63,7 @@ const page = () => {
             .select()
 
         if (error) {
-            console.error('Error uploading product:', error.message);
+            console.error('Error uploading event:', error.message);
         } else {
             console.log('product uploaded successfully:', data);
         }
@@ -71,7 +71,6 @@ const page = () => {
     } catch(err) {
         console.log('error during text upload:' + err)
     }
-    // https://zzupaillunqrgfwshuvb.supabase.co/storage/v1/object/public/tickets/2023_07_02_01_55_IMG_6791.JPG?t=2024-01-19T11%3A38%3A46.479Z
     try {
         const { data, error } = await supabase.storage
             .from('ticketBucket')

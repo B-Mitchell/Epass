@@ -6,7 +6,16 @@ import { useRouter } from 'next/navigation';
 import { useMyContext } from '@/app/context/createContext';
 
 const page = ({params}) => {
-    const {ticketPrice, setTicketPrice, ticketRoute , setTicketRoute} = useMyContext();
+    const {
+        ticketPrice, 
+        setTicketPrice , 
+        setTicketRoute, 
+        setImageSrc,
+        setTicketTitle,
+        setTicketDate,
+        setTicketTime,
+        setTicketAddress,
+    } = useMyContext();
     const router = useRouter();
     // const route = decodeURIComponent(params.id);
     const route = params.id;
@@ -38,6 +47,16 @@ const page = ({params}) => {
         setTicketPrice(fetchedData?.[0] ?.price + 200 ?? 0)
         console.log(ticketPrice)
         console.log(typeof ticketPrice);
+        // other data
+        if (fetchedData) {
+            setImageSrc(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${fetchedData[0].user_id}_${fetchedData[0].image}`);
+            setTicketTitle(`${fetchedData[0].title}`);
+            setTicketDate(`${fetchedData[0].date}`);
+            setTicketTime(`${fetchedData[0].time}`);
+            setTicketAddress(`${fetchedData[0].address}`);
+        }
+
+        
     }
     updateTicketPrice();
     
@@ -82,12 +101,12 @@ const page = ({params}) => {
 
                 <div className=' mt-5 flex justify-between'>
                     <p  className='text-[1.2rem] my-1'>charge: </p>
-                    <p>200</p>
+                    <p>0</p>
                 </div>
 
                 <div className=' mt-5 flex justify-between  w-[90%] absolute bottom-0 border-t-8 border-black'>
                     <p  className='text-[1.2rem] my-1'>Total: </p>
-                    {fetchedData && fetchedData.length > 0 ? <p>{ fetchedData ? (fetchedData[0].pricingType === 'free' ? 0 + 200 : fetchedData[0].price + 200) : '...'}</p> : null}
+                    {fetchedData && fetchedData.length > 0 ? <p>{ fetchedData ? (fetchedData[0].pricingType === 'free' ? 0 : fetchedData[0].price + 200) : '...'}</p> : null}
                 </div>
             </div>
 

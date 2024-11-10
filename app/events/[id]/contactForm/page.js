@@ -4,18 +4,13 @@ import { FlutterWaveButton, closePaymentModal } from 'flutterwave-react-v3';
 import { useMyContext } from '@/app/context/createContext';
 import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
-import EmailTemplate from '@/app/components/Email-Template';
-import { Resend } from 'resend';
 
 const ContactForm = () => {
-  const resendApiKey = process.env.RESEND_API_KEY;
-
-  // Initialize Resend client with API key
-  const resend = new Resend("re_e5R5nccX_FW8SzLnUuohv74sy3UZyobMB");
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const { ticketPrice,  ticketRoute , setTicketRoute } = useMyContext();
+  const [transactionId, setTransactionId] = useState('');
+  const { ticketPrice,  ticketRoute ,imageSrc ,ticketAddress ,ticketDate ,ticketTime ,ticketTitle } = useMyContext();
   const router = useRouter();
   // state handling if ticket is sold out
   const [isSoldOut, setIsSoldOut] = useState(false);
@@ -61,7 +56,8 @@ const ContactForm = () => {
           );
   
           const verificationData = await verificationResponse.json();
-  
+          console.log(verificationData.data.id);
+          setTransactionId(verificationData.data.id);
           if (verificationData.status === 'success') {
             setTransactionMessage('Payment was successful!');
             updateNops();
@@ -75,12 +71,13 @@ const ContactForm = () => {
           alert('Error verifying payment.');
         }
       } else {
-        alert('Payment failed.');
+        alert('Payment failed');
       }
   
       closePaymentModal(); // Close the modal programmatically
     },
-    onClose: () => {
+    onClose: async () => {
+      await sendEmail();
       if (isPaymentProcessing) {
         setTransactionMessage('Payment was not completed.');
       }
@@ -88,24 +85,56 @@ const ContactForm = () => {
       setIsPaymentProcessing(false);
     },
   };
+  useEffect(() => {
+    console.log( 'details' + imageSrc)
+  }, [])
   const sendEmail = async () => {
-    try {
-      const { data, error } = await resend.emails.send({
-        from: 'Acme <onboarding@resend.dev>',
+    const emailBody = `
+    <html>
+      <body>
+        <p>Dear ${name},</p>
+        <h1>You paid for a ticket!</h1>
+        <p>Thank you for using Epass, your ticket details are below.</p>
+        <p >your transaction Id is <b >${transactionId}</b> it should be presented at the gate</p>
+        <br />
+        <h1 >Ticket Details</h1>
+        <img src=${imageSrc} style="width: 400px; height: auto;" alt="event image"/>
+        <h2>${ticketTitle}</h2>
+        <p >Address: ${ticketAddress}</p>
+        <p >date: ${ticketDate}</p>
+        <p >time: ${ticketTime}</p>
+      </body>
+    </html>
+  `;
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer sk_004238fa82b11e8614a3c67c40a9a187f77e394b8dcae5c4`
+      },
+      body: JSON.stringify({
         to: email,
-        subject: "Transaction successful",
-        react: EmailTemplate({ firstName: name }),
-      });
-  
-      if (error) {
-        console.log(error)
-      }
-  
+        subject: "Epass limited: you paid for a ticket!",
+        body: emailBody,
+        content_type: 'text/html',
+        subscribed: true,
+        name: "Mitchell Onuorah",
+        reply: "support@useplunk.com",
+        headers:{}
+      })
+    };
+    // WORK ON THE EMAIL BODY NEXT
+
+    try {
+      console.log('Sending email with options:', options);
+      const response = await fetch('https://api.useplunk.com/v1/send', options);
+      const data = await response.json();
+      console.log(data);
       return data;
-    } catch(error) {
-      console.log(error)
+    } catch (error) {
+      console.error('Error sending email:', error);
     }
-  }
+  };
 
   const checkData = () => {
     if (!ticketPrice || isNaN(ticketPrice)) {
@@ -134,9 +163,7 @@ const ContactForm = () => {
             setIsSoldOut(!isSoldOut)
           } 
         }
-
       }
-
     } catch (err) {
       console.log('your error is: ' + err)
     }

@@ -21,7 +21,6 @@ const ProfileTickets = (props) => {
     </div>
   </div>
 </div>
-
   )
 }
 
