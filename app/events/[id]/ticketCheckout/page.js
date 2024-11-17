@@ -100,7 +100,7 @@ const CheckoutPage = () => {
                       onChange={(e) => handleTicketQuantityChange(ticket.uuid, parseInt(e.target.value))} // And here
                       className="border p-2 rounded-md"
                     >
-                      {/* Check if the ticketType is 'group', if so limit the max value to 1 */}
+                      {/* Checks if the ticketType is 'group', if so limit the max value to 1 */}
                       {[...Array(ticket.ticketType === 'group' ? 2 : ticket.purchaseLimit + 1).keys()].map((num) => (
                         <option key={num} value={num}>
                           {num}
@@ -153,7 +153,7 @@ const CheckoutPage = () => {
             onClick={() => {
               if (isAnyTicketSelected()) {
                 setTicketPrice(total)
-                router.push(`/events/${ticketRoute}/contactForm`); // Replace with the actual payment route or next step
+                router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`); 
               }
             }}
         >
