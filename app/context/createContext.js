@@ -8,15 +8,8 @@ const MyContext = createContext();
 export const MyContextProvider = ({ children }) => {
   const [createEventModal, setCreateEventModal] = useState(false);
   const [accountCreation, setAccountCreation] = useState(false);
-  // ticket details
   const [ticketPrice, setTicketPrice] = useState(Number);
-  const [ticketRoute , setTicketRoute] = useState(''); // tikcet id
-  const [imageSrc, setImageSrc] = useState('');
-  const [ticketTitle, setTicketTitle] = useState('');
-  const [ticketDate, setTicketDate] = useState('');
-  const [ticketTime, setTicketTime] = useState('');
-  const [ticketAddress, setTicketAddress] = useState('');
-
+  const [ticketRoute , setTicketRoute] = useState('');
 
   const contextData = {
     createEventModal,
@@ -26,17 +19,7 @@ export const MyContextProvider = ({ children }) => {
     ticketPrice,
     setTicketPrice,
     ticketRoute , 
-    setTicketRoute,
-    setImageSrc,
-    setTicketTitle,
-    setTicketDate,
-    setTicketTime,
-    setTicketAddress,
-    imageSrc,
-    ticketAddress,
-    ticketDate,
-    ticketTime,
-    ticketTitle
+    setTicketRoute
   }
 
   // Provide the context value to the children components

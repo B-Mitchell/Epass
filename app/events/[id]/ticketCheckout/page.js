@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
   const { ticketRoute,setTicketPrice} = useMyContext();
+
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
   const [selectedTickets, setSelectedTickets] = useState({}); // To store selected quantities.
@@ -147,7 +148,7 @@ const CheckoutPage = () => {
         </div>
 
         <button 
-            className="mt-6 w-full py-2 bg-[#FFC0CB] text-white font-semibold hover:bg-transparent hover:text-black border border-[#FFC0CB] transition rounded-2xl"
+            className="mt-6 w-full py-2 bg-[#FFC0CB] text-white font-semibold rounded-lg hover:bg-transparent hover:text-black border border-[#FFC0CB] transition rounded-2xl"
             disabled={!isAnyTicketSelected()} // Disable if no tickets are selected
             onClick={() => {
               if (isAnyTicketSelected()) {
