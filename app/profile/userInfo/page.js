@@ -108,23 +108,23 @@ const page = () => {
 
     <div>
         <h2 className='text-center font-bold text-[1.4rem] my-3'>Settings</h2>
-        <div  className='bg-[#FFCOCB] md:w-1/2 w-[90%] m-auto p-4 text-center rounded-xl mb-4'>
+        <div  className='bg-[#E0BFB8] md:w-1/2 w-[90%] m-auto p-4 text-center rounded-xl mb-4'>
             <p>Pending Payout so far:  <span className='font-bold'>{`NGN1000`}</span></p>
         </div>
 
-        <form onSubmit={handleSubmit} className='border border-[#FFCOCB] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
+        <form onSubmit={handleSubmit} className='border border-[#E0BFB8] md:w-1/2 w-[90%] block m-auto rounded-3xl p-5 '>
           <p className='text-[1.2rem] my-2'>Account Details:</p>
 
           <p className='text-[.9rem] mt-3'>bank name:</p>
-          <input className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='Bank name' required onChange={(e) => setBankName(e.target.value)} value={bankName}/>
+          <input className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='Bank name' required onChange={(e) => setBankName(e.target.value)} value={bankName}/>
 
           <p className='text-[.9rem] mt-3'>account name:</p>
-          <input className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='account name' required onChange={(e) => setAccountName(e.target.value)} value={accountName}/>
+          <input className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='account name' required onChange={(e) => setAccountName(e.target.value)} value={accountName}/>
 
           <p className='text-[.9rem] mt-3'>account number:</p>
-          <input className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='account number' required onChange={(e) => setAccountNumber(e.target.value)} value={accountNumber}/>
+          <input className='border border-[#E0BFB8] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition' placeholder='account number' required onChange={(e) => setAccountNumber(e.target.value)} value={accountNumber}/>
 
-          <button type='submit'  className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'please wait...' : 'submit'} </button>
+          <button type='submit'  className='hover:bg-[#E0BFB8] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#E0BFB8] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'please wait...' : 'submit'} </button>
         </form>
         
     </div>
