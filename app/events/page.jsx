@@ -50,13 +50,13 @@ const Page = () => {
           placeholder='Search by Event Name'
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className='border border-gray-300 outline-[#FFCOCB] p-2 mr-2'
+          className='border border-gray-300 outline-[#E0BFB8] p-2 mr-2'
         />
         {/* Category Filter */}
         <select
           value={selectedCategory}
           onChange={(e) => setSelectedCategory(e.target.value)}
-          className='border border-gray-300 p-2 outline-[#FFCOCB]'
+          className='border border-gray-300 p-2 outline-[#E0BFB8]'
         >
           <option value=''>All Categories</option>
           {uniqueTypeOfEvents.map((eventType) => (
@@ -66,7 +66,7 @@ const Page = () => {
           ))}
         </select>
         {/* Search Button */}
-        <button onClick={handleSearch} className='bg-black rounded-lg  text-white p-2 ml-2 hover:text-[#FFCOCB]  hover:scale-105 transition'>Search</button>
+        <button onClick={handleSearch} className='bg-black rounded-lg  text-white p-2 ml-2 hover:text-[#E0BFB8]  hover:scale-105 transition'>Search</button>
       </div>
 
       <p className={`text-center ${loading ? 'mt-10' : null} font-bold italic`}>
