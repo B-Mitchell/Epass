@@ -4,6 +4,7 @@ import supabase from '@/app/supabase';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useMyContext } from '@/app/context/createContext';
+import LoadingAnimation from '@/app/components/LoadingAnimation';
 
 const page = ({ params }) => {
   const { ticketPrice, setTicketPrice, ticketRoute, setTicketRoute } = useMyContext();
@@ -47,8 +48,9 @@ const page = ({ params }) => {
   return (
     <div>
       <p className='text-center font-bold text-[1.4rem] my-4'>Event/Ticket Details</p>
-      <p className={`text-center ${loading ? 'mt-10 mb-4' : null} font-bold italic`}>{loading ? 'loading Checkout...' : null}</p>
-      <div className='border border-[#FFC0CB] md:w-[90%] w-[95%] m-auto md:flex justify-between block'>
+      {
+        loading ? <LoadingAnimation /> : 
+        <div className='border border-[#FFC0CB] md:w-[90%] w-[95%] m-auto md:flex justify-between block'>
         <div>
           {fetchedData && fetchedData.length > 0 ? (
             <div className='p-2 m-2 md:w-[100%]'>
@@ -87,6 +89,8 @@ const page = ({ params }) => {
 
         
       </div>
+      }
+      
 
       <button
         className='hover:bg-transparent bg-[#FFC0CB] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-4 hover:scale-110'
