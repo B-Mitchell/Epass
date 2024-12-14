@@ -124,7 +124,7 @@ const MainTickets = () => {
         {
             loadingFree ? <LoadingAnimation /> : 
             ( freeTickets.length > 0 ? (
-                <div className='flex w-[100%] overflow-x-auto  text-black p-3 '>
+                <div className='flex w-[100%] overflow-x-auto text-black p-3 '>
                 {freeTickets.map((data) => (
                     <div key={data.id} className='flex-shrink-0 w-[17rem] md:w-[23rem] mr-3 border border-[#FFC0CB]  rounded-lg overflow-hidden hover:scale-105 transition cursor-pointer relative' onClick={() => {router.push(`events/${data.uuid}`)}}>
                         <Image src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} alt='event image' className='w-[100%] min-h-[10rem] max-h-[15rem] h-full' width={400} height={400}/>
