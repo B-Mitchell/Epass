@@ -5,7 +5,7 @@ import { useMyContext } from '@/app/context/createContext';
 import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
-  const { ticketRoute,setTicketPrice} = useMyContext();
+  const { ticketRoute,setTicketPrice,setTicketCheckoutData} = useMyContext();
 
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
@@ -66,8 +66,9 @@ const CheckoutPage = () => {
     return sum;
   }, 0);
 
-  const totalFees = subtotal * 0.05 + 100; // 5% of subtotal + 100 Naira fixed fee
+  const totalFees = subtotal > 0 ? subtotal * 0.05 + 100 : 0;  // 5% of subtotal + 100 Naira fixed fee
   const total = subtotal + totalFees; // Total is subtotal + fees
+  
   
   return (
     <div className="flex flex-col lg:flex-row justify-between max-w-7xl mx-auto p-6 space-y-8 lg:space-y-0 lg:space-x-8">
@@ -152,12 +153,19 @@ const CheckoutPage = () => {
             disabled={!isAnyTicketSelected()} // Disable if no tickets are selected
             onClick={() => {
               if (isAnyTicketSelected()) {
-                setTicketPrice(total)
+                setTicketCheckoutData(selectedTickets)
+                if(total === 0){
+                  
+                  router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
+                }else{
+                  setTicketPrice(total)
                 router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`); 
+                }
+                
               }
             }}
         >
-            Proceed to Payment
+            Proceed to Checkout
         </button>
 
       </div>
