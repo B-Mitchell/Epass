@@ -27,6 +27,7 @@ const Page = () => {
     const [endCondition, setEndCondition] = useState('');
     const [endDate, setEndDate] = useState('');
     const [occurrences, setOccurrences] = useState('');
+    const [isAddingTicket, setIsAddingTicket] = useState(false);
     const [ticketType, setTicketType] = useState('single');
     const [pricingType,setPricingType]=useState();
     const [ticketName, setTicketName] = useState('');
@@ -36,7 +37,7 @@ const Page = () => {
     const [isUnlimited, setIsUnlimited] = useState(false);
     const [purchaseLimit, setPurchaseLimit] = useState('');
     const [groupSize, setGroupSize] = useState('');
-    const[ticketList,setTicketList]=useState([{id:"",ticketName:"",ticketPrice:" ",ticketStock:"",ticketType}])
+    const[ticketList,setTicketList]=useState([])
     const authFunction = () => {
         if (userId) {
             console.log('user: ' + userId);
@@ -57,7 +58,7 @@ const Page = () => {
     const handleTicketPricingChange = (event) => {
         setPricingType(event.target.value);
     };
-    const handleAddTicket = () => {
+    const handleCreateTicket = () => {
         // Add ticket to the list
         setTicketList([
             ...ticketList,
@@ -72,9 +73,22 @@ const Page = () => {
                 groupSize: ticketType === 'group' ? groupSize : null,
             },
         ]);
+        // Reset form fields
+    setTicketType('');
+    setPricingType('');
+    setTicketName('');
+    setTicketPrice('');
+    setTicketDescription('');
+    setTicketStock('');
+    setIsUnlimited(false);
+    setPurchaseLimit('');
+    setGroupSize('');
+
+    // Hide form
+    setIsAddingTicket(false);
     }
-    const removeTicket = (id) => {
-        setTicketList(ticketList.filter((ticket) => ticket.id !== id));
+    const removeTicket = (name) => {
+        setTicketList(ticketList.filter((ticket) => ticket.ticketName !== name));
       };
 
     const handleSubmit = async (e) => {
@@ -348,13 +362,14 @@ const Page = () => {
 
                     
                 </div>
-
-                <div className='mb-6'>
+                <button type='button' className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={()=>setIsAddingTicket(true)}> + Add Ticket</button>
+                {
+                    isAddingTicket ? (
+                        <>
+                                   <div className='mb-6'>
                     <label className='block text-lg font-medium mb-2'>Ticket Type:</label>
                      {/* Add Ticket Button */}
-                <button type="button" className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={handleAddTicket}>
-                    Add Ticket
-                </button>
+                
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-3'>
                         <label className='flex items-center space-x-2'>
                             <input type="radio" value="single" checked={ticketType === 'single'} onChange={(e) => setTicketType(e.target.value)} required className='w-4 h-4' />
@@ -439,7 +454,17 @@ const Page = () => {
                         <label className='block text-lg font-medium mb-2'>Group Size:</label>
                         <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setGroupSize(e.target.value) }} value={groupSize} />
                     </div>
+                    
                 )}
+                <div className='flex gap-3'>
+                    <button type="button" className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={handleCreateTicket}>
+                    Create Ticket
+                </button>
+                <button type="button" className="bg-white text-black border hover:bg-gray-300 border-gray-500 border-1 px-4 py-2 rounded-lg mb-3" onClick={()=>setIsAddingTicket(false)}>Cancel</button>
+                </div>
+                        </>
+                    ):null
+                }
         <ul className="">
         {ticketList.map((ticket) => (
           <li
@@ -451,9 +476,10 @@ const Page = () => {
               <p>Ticket Price: {ticket.ticketPrice}</p>
               <p>Ticket stock: {ticket.ticketStock}</p>
             </div>
+            
             <button
               className="ml-4 px-2 py-1 bg-red-500 text-white rounded"
-              onClick={() => removeTicket(ticket.id)}
+              onClick={() => removeTicket(ticket.ticketName)}
             >
               Cancel
             </button>

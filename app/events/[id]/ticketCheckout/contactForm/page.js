@@ -9,7 +9,7 @@ const ContactForm = () => {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const { ticketPrice,  ticketRoute , setTicketRoute } = useMyContext();
+  const { ticketPrice,  ticketRoute , setTicketRoute,ticketCheckoutData } = useMyContext();
   const router = useRouter();
   // state handling if ticket is sold out
   const [isSoldOut, setIsSoldOut] = useState(false);
@@ -47,7 +47,13 @@ const ContactForm = () => {
   };
 
   const checkData = () => {
-    if (!ticketPrice || isNaN(ticketPrice)) {
+    if (isNaN(ticketPrice)) {
+      router.back();
+    }
+    if (!ticketPrice && ticketPrice !== 0) {
+      router.back();
+    }
+    if(!ticketCheckoutData){
       router.back();
     }
   };
@@ -56,13 +62,15 @@ const ContactForm = () => {
     checkData();
     checkIfTicketIsSoldOut();
   }, [ticketPrice, router]);
+  
+ 
   //check if the ticket is sold out
   const checkIfTicketIsSoldOut = async () => {
     try {
       let { data: queryData, error: queryError } = await supabase
       .from('ticketdata')
       .select('ticketStock')
-      .eq('eventId', ticketRoute)
+      .eq('event_id', ticketRoute)
       if (queryError) {
         console.log(queryError)
       } else {
@@ -82,34 +90,68 @@ const ContactForm = () => {
   }
   //update nops (number of people that paid for the ticket)
   const updateStock = async () => {
-    try {
-      // Retrieve the current value of nops from Supabase
-      let { data: queryData, error: queryError } = await supabase
-        .from('ticketdata')
-        .select('ticketStock')
-        .eq('eventId', ticketRoute);
+    console.log(ticketCheckoutData); 
   
-      if (queryError) {
-        console.log(queryError);
-      } else if (queryData && queryData.length > 0) {
-        const updatedStock = queryData[0].ticketStock - 1;
-        let { data: updateData, error: updateError } = await supabase
+    if (!ticketCheckoutData || typeof ticketCheckoutData !== 'object') {
+      console.log('ticketCheckoutData is not valid.');
+      return;
+    }
+  
+    for (const [ticketId, quantity] of Object.entries(ticketCheckoutData)) {
+      console.log(ticketId, quantity); 
+  
+      try {
+        // Fetch the current ticket stock for the given ticket ID
+        let { data: queryData, error: queryError } = await supabase
           .from('ticketdata')
-          .update({ ticketStock: updatedStock })
-          .eq('eventId', ticketRoute);
+          .select('ticketStock')
+          .eq('uuid', ticketId); // Use the ticket ID here
   
-        if (updateError) {
-          console.log('Error updating column:', updateError.message);
-        } else {
-          console.log('Ticket stock updated successfully:', updateData);
+        if (queryError) {
+          console.log(queryError.message);
+          continue;
         }
-      } else {
-        console.log('No data found for the given UUID.');
+  
+        if (queryData && queryData.length > 0) {
+          const currentStock = queryData[0].ticketStock;
+  
+          // Calculate the updated stock
+          const updatedStock = currentStock - quantity;
+  
+          // Update the stock in the database
+          let { data: updateData, error: updateError } = await supabase
+            .from('ticketdata')
+            .update({ ticketStock: updatedStock })
+            .eq('uuid', ticketId);
+  
+          if (updateError) {
+            alert(updateError.message);
+          } else {
+            console.log('Stock updated successfully.');
+          }
+        } else {
+          console.log('No tickets found with this ID.');
+        }
+      } catch (error) {
+        alert(error.message);
       }
-    } catch (error) {
-      console.error('Error updating nops:', error.message);
     }
   };
+  
+  const handleFreeTicket = async () => {
+    try {
+      // Call updateStock to reduce ticket stock
+      await updateStock();
+     
+      // Notify the user about successful ticket acquisition
+      alert('Ticket successfully purchased!');
+  
+    } catch (error) {
+      console.error('Error handling free ticket:', error);
+      alert('An error occurred while processing your ticket. Please try again.');
+    }
+  };
+  
   
 
   return (
@@ -126,7 +168,14 @@ const ContactForm = () => {
         <input type="email" placeholder="eg: johnDoe@gmail.com" required value={email} onChange={(e) => setEmail(e.target.value)} className='border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         {
           isSoldOut ? <button className='hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 '>SOLD OUT!</button> 
-          :
+          :ticketPrice === 0 ? (
+            <button
+              className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+              onClick={handleFreeTicket}
+            >
+              Register
+            </button>
+          ) : 
           <FlutterWaveButton className='hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 ' {...fwConfig} />
         }
         
