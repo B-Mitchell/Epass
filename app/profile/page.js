@@ -80,13 +80,13 @@ const page = () => {
           <div className='flex justify-between mb-3'>
           <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
 
-          <button className='font-bold border-[#FFCOCB] border rounded-lg p-2 hover:bg-[#FFCOCB] transition px-3' onClick={() => router.push('/profile/userInfo')}><IoSettingsOutline /></button>
+          <button className='font-bold border-[#FFCOCB] border rounded-lg p-2 hover:bg-[#FFCOCB] transition px-3' onClick={() => router.push('/profile/userInfo')}><IoSettingsOutline className='hover:animate-spin'/></button>
           </div>
             
             {
-            loading  ? <LoadingAnimation /> : 
+            loading  ? <LoadingAnimation /> :
             ( datas.length > 0 ? (
-            <div className='grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3 w-[100%] m-auto '>
+            <div className='grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-3 w-[100%] m-auto '>
                 {
                 datas.map((data) => {
                   return (

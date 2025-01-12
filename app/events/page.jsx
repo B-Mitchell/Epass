@@ -74,14 +74,14 @@ const Page = () => {
       </p>
 
       <div className='mt-5 grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-3 p-2 w-[98%] m-auto mb-7'>
-        {datas
-          .filter(filterBySearchAndCategory)
-          .map((ticket) => (
-            <div key={ticket.created_at} className='flex items-center justify-center'>
-              <Event_Ticket data={ticket} />
-            </div>
-          ))}
-      </div>
+      {datas
+        .filter(filterBySearchAndCategory)
+        .map((ticket) => (
+          <div key={ticket.created_at} className='flex items-center justify-center'>
+            <Event_Ticket data={ticket} />
+          </div>
+        ))}
+    </div>
     </div>
   );
 };
