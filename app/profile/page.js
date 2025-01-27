@@ -121,6 +121,7 @@ import { logoutUser } from '../globalRedux/slices/userSlice';
 import supabase from '../supabase';
 import LoadingAnimation from '../components/LoadingAnimation';
 import { IoSettingsOutline } from 'react-icons/io5';
+import Image from 'next/image';
 
 const Page = () => {
   const router = useRouter();
@@ -230,23 +231,31 @@ const Page = () => {
   {events.map((event) => (
     <div
       key={event.id}
-      className='cursor-pointer border border-gray-200 p-6 rounded-xl hover:shadow-xl transition-all bg-white relative group'>
-      {/* Event Icon */}
-      <div className='absolute top-4 right-4 text-[#FFC0CB] group-hover:scale-110 transition'>
-        
-      </div>
-      {/* Event Title */}
-      <h3 className='font-bold text-lg text-black capitalize mb-2 group-hover:uppercase  transition'>
+      className='cursor-pointer border border-gray-200 p-6 rounded-xl hover:shadow-xl transition-all bg-white relative group flex justify-between transition'>
+        <div >
+          {/* Event Title */}
+      <h3 className='font-bold text-lg text-black capitalize mb-2 group-hover:uppercase transition'>
         {event.title}
       </h3>
       {/* Event CTA */}
       <div className='mt-4'>
         <button
         onClick={() => handleEventClick(event.uuid)}
-          className='bg-[#FFC0CB] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1e1d1d] transition '>
+          className='hover:bg-transparent bg-[#FFC0CB] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black hover:scale-110 '>
           View Details
         </button>
       </div>
+        </div>
+        <div className="w-[40%] md:w-2/5">
+        <Image
+          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${event.user_id}_${event.image}`}
+          alt="Event image"
+          className="rounded-lg max-h-[6rem]"
+          width={200}
+          height={100}
+          />
+      </div>
+      
     </div>
   ))}
 </div>

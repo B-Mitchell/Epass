@@ -203,14 +203,14 @@ const TicketDashboard = ({ params }) => {
                             name="ticketName"
                             value={editFormData.ticketName || ""}
                             onChange={(e) => handleInputChange(e, setEditFormData)}
-                            className="w-full border rounded px-2 py-1"
+                            className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                             required
                           />
                           <textarea
                             name="ticketDescription"
                             value={editFormData.ticketDescription || ""}
                             onChange={(e) => handleInputChange(e, setEditFormData)}
-                            className="w-full border rounded px-2 py-1"
+                            className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                             required
                           />
                           <input
@@ -218,7 +218,7 @@ const TicketDashboard = ({ params }) => {
                             name="ticketPrice"
                             value={editFormData.ticketPrice || ""}
                             onChange={(e) => handleInputChange(e, setEditFormData)}
-                            className="w-full border rounded px-2 py-1"
+                            className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                             required
                           />
                           <input
@@ -226,7 +226,7 @@ const TicketDashboard = ({ params }) => {
                             name="ticketStock"
                             value={editFormData.ticketStock || ""}
                             onChange={(e) => handleInputChange(e, setEditFormData)}
-                            className="w-full border rounded px-2 py-1"
+                            className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                             required
                           />
                           <button
@@ -277,7 +277,7 @@ const TicketDashboard = ({ params }) => {
                       placeholder="Ticket Name"
                       value={newTicket.ticketName}
                       onChange={(e) => handleInputChange(e, setNewTicket)}
-                      className="border rounded px-2 py-1"
+                      className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
                     <textarea
@@ -285,7 +285,7 @@ const TicketDashboard = ({ params }) => {
                       placeholder="Description"
                       value={newTicket.ticketDescription}
                       onChange={(e) => handleInputChange(e, setNewTicket)}
-                      className="border rounded px-2 py-1"
+                      className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
                     <input
@@ -294,7 +294,7 @@ const TicketDashboard = ({ params }) => {
                       placeholder="Price"
                       value={newTicket.ticketPrice}
                       onChange={(e) => handleInputChange(e, setNewTicket)}
-                      className="border rounded px-2 py-1"
+                      className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
                     <input
@@ -303,7 +303,7 @@ const TicketDashboard = ({ params }) => {
                       placeholder="Stock"
                       value={newTicket.ticketStock}
                       onChange={(e) => handleInputChange(e, setNewTicket)}
-                      className="border rounded px-2 py-1"
+                      className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
                   </div>
