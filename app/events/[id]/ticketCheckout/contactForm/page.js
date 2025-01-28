@@ -69,14 +69,14 @@ const ContactForm = () => {
     try {
       let { data: queryData, error: queryError } = await supabase
       .from('ticketdata')
-      .select('ticketStock')
+      .select('currentStock')
       .eq('event_id', ticketRoute)
       if (queryError) {
         console.log(queryError)
       } else {
         // check if ticket is sold out and update state
         if (queryData && queryData.length > 0) {
-          const currentStock = queryData[0].ticketStock;
+          const currentStock = queryData[0].currentStock;
           if (currentStock === 0) {
             setIsSoldOut(!isSoldOut)
           } 
@@ -104,7 +104,7 @@ const ContactForm = () => {
         // Fetch the current ticket stock for the given ticket ID
         let { data: queryData, error: queryError } = await supabase
           .from('ticketdata')
-          .select('ticketStock')
+          .select('currentStock')
           .eq('uuid', ticketId); // Use the ticket ID here
   
         if (queryError) {
@@ -113,7 +113,7 @@ const ContactForm = () => {
         }
   
         if (queryData && queryData.length > 0) {
-          const currentStock = queryData[0].ticketStock;
+          const currentStock = queryData[0].currentStock;
   
           // Calculate the updated stock
           const updatedStock = currentStock - quantity;
@@ -121,7 +121,7 @@ const ContactForm = () => {
           // Update the stock in the database
           let { data: updateData, error: updateError } = await supabase
             .from('ticketdata')
-            .update({ ticketStock: updatedStock })
+            .update({ currentStock: updatedStock })
             .eq('uuid', ticketId);
   
           if (updateError) {
@@ -145,6 +145,7 @@ const ContactForm = () => {
      
       // Notify the user about successful ticket acquisition
       alert('Ticket successfully purchased!');
+      router.push("/")
   
     } catch (error) {
       console.error('Error handling free ticket:', error);
