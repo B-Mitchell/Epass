@@ -284,7 +284,7 @@ const TicketDashboard = ({ params }) => {
                               onClick={() =>
                                 setActiveMenu(ticket.uuid === activeMenu ? null : ticket.uuid)
                               }
-                              className="text-gray-500 hover:text-black"
+                              className="text-gray-900 text-2xl hover:text-black"
                             >
                               &#x22EE; {/* Vertical Ellipsis */}
                             </button>
