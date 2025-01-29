@@ -29,7 +29,7 @@ const CheckoutPage = () => {
             console.error('Error fetching tickets:', error);
             setError('Failed to fetch tickets. Please try again later.');
           } else {
-            console.log('Fetched Ticket Data:', data);
+            console.log('successful');
             setTicketOptions(data); // Set the entire fetched data to ticketOptions.
 
             // Initialize selectedTickets with 0 quantities for each ticket.

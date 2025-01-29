@@ -22,7 +22,7 @@ const TicketDashboard = ({ params }) => {
   const [newTicket, setNewTicket] = useState({
     ticketName: "",
     ticketDescription: "",
-    ticketPrice: "",
+    ticketPrice: 0,
     ticketStock: "",
     ticketType: "",
     groupSize: null,
@@ -70,7 +70,16 @@ const TicketDashboard = ({ params }) => {
       setLoading(false);
     }
   };
-
+  const [selectedOption, setSelectedOption] = useState("");
+  
+  const handleOptionClick = (option) => {
+    setSelectedOption(option);
+    // Update newTicket state correctly
+  setNewTicket((prevTicket) => ({
+    ...prevTicket,
+    pricingType: option === 'free' ? 'free' : 'paid',
+  }));
+  }
   // Handle ticket form input changes
   const handleInputChange = (e, setter) => {
     const { name, value } = e.target;
@@ -164,6 +173,7 @@ const TicketDashboard = ({ params }) => {
     fetchTickets();
     fetchEventData();
   }, []);
+
 
   return (
     <div className="p-4 w-[100%] block justify-between md:flex">
@@ -276,6 +286,7 @@ const TicketDashboard = ({ params }) => {
                           </button>
                         </form>
                       ) : (
+                        // START
                         <div className="flex justify-between items-center">
                           <span>{ticket.ticketName}</span>
                           {isOwner && (
@@ -292,7 +303,8 @@ const TicketDashboard = ({ params }) => {
           
                             {/* Dropdown Menu */}
                             {activeMenu === ticket.uuid && (
-                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 shadow-md rounded-lg z-10">
+                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 shadow-md rounded-lg z-10"
+                              >
                                 <button
                                   onClick={() => {
                                     setEditTicketId(ticket.uuid);
@@ -351,10 +363,43 @@ const TicketDashboard = ({ params }) => {
                       className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
+                    <h2 className="text-lg font-bold mb-2">pricing Type:</h2>
+                      <div className="flex justify-around">
+                        {/* Option 1 */}
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="free"
+                            value="free"
+                            checked={selectedOption === "free"}
+                            onChange={() => handleOptionClick("free")}
+                            className="w-4 h-4"
+                          />
+                          Free
+                        </label>
+
+                        {/* Option 2 */}
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="paid"
+                            value="paid"
+                            checked={selectedOption === "paid"}
+                            onChange={() => handleOptionClick("paid")}
+                            className="w-4 h-4"
+                          />
+                          Paid
+                        </label>
+                      </div>
+                    {/* Show Selected Option */}
+                    {/* <p className="mt-4 text-gray-600">
+                      Selected: <span className="font-bold">{selectedOption || "None"}</span>
+                    </p> */}
                     <input
                       type="number"
                       name="ticketPrice"
                       placeholder="Price"
+                      disabled = {selectedOption === 'free' ? true : false}
                       value={newTicket.ticketPrice}
                       onChange={(e) => handleInputChange(e, setNewTicket)}
                       className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
