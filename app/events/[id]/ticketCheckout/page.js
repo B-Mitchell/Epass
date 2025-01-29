@@ -1,12 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import supabase from '@/app/supabase';
 import { useMyContext } from '@/app/context/createContext';
-import { useRouter } from 'next/navigation';
 
 const CheckoutPage = () => {
-  const { ticketRoute,setTicketPrice,setTicketCheckoutData} = useMyContext();
-
+  const params = useParams();
+  const { id } = params; //fetched the ticket ID from the url, it doesn't lose state
+  const { ticketRoute, setTicketPrice, setTicketCheckoutData} = useMyContext();
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
   const [selectedTickets, setSelectedTickets] = useState({}); // To store selected quantities.
@@ -16,12 +18,12 @@ const CheckoutPage = () => {
   // Fetch ticket options using the event UUID (route)
   useEffect(() => {
     const fetchTickets = async () => {
-      if (ticketRoute) {
+      if (id) {
         try {
           const { data, error } = await supabase
             .from('ticketdata')
             .select('*') // Fetch all columns.
-            .eq('event_id', ticketRoute);
+            .eq('event_id', id);
 
           if (error) {
             console.error('Error fetching tickets:', error);
@@ -47,7 +49,7 @@ const CheckoutPage = () => {
     };
 
     fetchTickets();
-  }, [ticketRoute]);
+  }, [id]);
 
   // Handle ticket quantity changes.
   const handleTicketQuantityChange = (ticketId, quantity) => {

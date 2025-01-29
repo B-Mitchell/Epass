@@ -135,21 +135,6 @@ const Page = () => {
             purchaseLimit: ticket.purchaseLimit,
             groupSize: ticket.groupSize,
           }));
-        
-        //   try {
-        //     // Insert ticket data
-            
-            
-        //     const {data:eventInsertedData, error: ticketError } = await supabase
-        //       .from('ticketdata')
-        //       .insert(ticketData)
-        //       .select();
-        //     console.log("after insert");
-            
-        //     if (ticketError) throw ticketError;
-        //   } catch (error) {
-        //     console.error('Error creating ticket:', error.message);
-        //   }
         const eventData = activeTab === 'single' ? singleEventData : recurringEventData;
 
         try {

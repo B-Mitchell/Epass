@@ -224,6 +224,7 @@ const TicketDashboard = ({ params }) => {
                           <input
                             type="number"
                             name="ticketStock"
+                            disabled
                             value={editFormData.ticketStock || ""}
                             onChange={(e) => handleInputChange(e, setEditFormData)}
                             className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
