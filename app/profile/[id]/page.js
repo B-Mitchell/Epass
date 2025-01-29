@@ -363,10 +363,10 @@ const TicketDashboard = ({ params }) => {
                       className="border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                       required
                     />
-                    <h2 className="text-lg font-bold mb-2">pricing Type:</h2>
-                      <div className="flex justify-around">
+                    <h2 className="text-lg font-bold">pricing Type:</h2>
+                      <div className="flex justify-start">
                         {/* Option 1 */}
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-1 cursor-pointer">
                           <input
                             type="radio"
                             name="free"
@@ -379,7 +379,7 @@ const TicketDashboard = ({ params }) => {
                         </label>
 
                         {/* Option 2 */}
-                        <label className="flex items-center gap-2 cursor-pointer">
+                        <label className="flex items-center gap-1 mx-2 cursor-pointer">
                           <input
                             type="radio"
                             name="paid"
