@@ -12,7 +12,7 @@ const TicketDashboard = ({ params }) => {
   const { setTicketRoute } = useMyContext();
   const router = useRouter();
   const ticketId = params.id;
-
+  const [activeMenu, setActiveMenu] = useState(null);
   const [loading, setLoading] = useState(false);
   const [eventTickets, setEventTickets] = useState([]);
   const [isOwner, setIsOwner] = useState(false);
@@ -96,7 +96,36 @@ const TicketDashboard = ({ params }) => {
       setLoading(false);
     }
   };
+  const handleDelete = async (ticket) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("ticketdata")
+        .select("ticketStock, currentStock")
+        .eq("uuid", ticket.uuid)
+        .single();
 
+      if (error) throw error;
+
+      if (data.currentStock < data.ticketStock) {
+        alert("This ticket type cannot be deleted as tickets have already been sold.");
+      } else {
+        const { error: deleteError } = await supabase
+          .from("ticketdata")
+          .delete()
+          .eq("uuid", ticket.uuid);
+
+        if (deleteError) throw deleteError;
+
+        fetchTickets();
+      }
+    } catch (err) {
+      console.error("Error deleting ticket:", err);
+    } finally {
+      setActiveMenu(null);
+      setLoading(false);
+    }
+  };
   // Add a new ticket
   const addNewTicket = async (e) => {
     e.preventDefault();
@@ -250,15 +279,48 @@ const TicketDashboard = ({ params }) => {
                         <div className="flex justify-between items-center">
                           <span>{ticket.ticketName}</span>
                           {isOwner && (
+                            <div className="relative">
+                            {/* Kebab Menu Trigger */}
                             <button
-                              onClick={() => {
-                                setEditTicketId(ticket.uuid);
-                                setEditFormData(ticket);
-                              }}
-                              className="text-blue-500"
+                              onClick={() =>
+                                setActiveMenu(ticket.uuid === activeMenu ? null : ticket.uuid)
+                              }
+                              className="text-gray-900 text-2xl hover:text-black"
                             >
-                              Edit
+                              &#x22EE; {/* Vertical Ellipsis */}
                             </button>
+          
+                            {/* Dropdown Menu */}
+                            {activeMenu === ticket.uuid && (
+                              <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-300 shadow-md rounded-lg z-10">
+                                <button
+                                  onClick={() => {
+                                    setEditTicketId(ticket.uuid);
+                                    setEditFormData(ticket);
+                                    setActiveMenu(null);
+                                  }}
+                                  className="block px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    alert("Sell clicked!");
+                                    setActiveMenu(null);
+                                  }}
+                                  className="block px-4 py-2 w-full text-left text-gray-700 hover:bg-gray-100"
+                                >
+                                  Sell Out
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(ticket)}
+                                  className="block px-4 py-2 w-full text-left text-red-500 hover:bg-gray-100"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
                           )}
                         </div>
                       )}

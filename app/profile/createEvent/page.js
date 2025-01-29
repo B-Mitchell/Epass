@@ -6,6 +6,7 @@ import supabase from '@/app/supabase';
 import EventCreation from '@/app/modals/EventCreation';
 import { useMyContext } from '@/app/context/createContext';
 
+
 const Page = () => {
     const router = useRouter();
     const { createEventModal, setCreateEventModal } = useMyContext();
@@ -69,6 +70,7 @@ const Page = () => {
                 pricingType: pricingType,
                 ticketDescription: ticketDescription,
                 ticketStock: isUnlimited ? 'unlimited' : ticketStock,
+                currentStock:ticketStock,
                 purchaseLimit: ticketType === 'single' ? purchaseLimit : null,
                 groupSize: ticketType === 'group' ? groupSize : null,
             },
@@ -132,9 +134,11 @@ const Page = () => {
             pricingType: ticket.pricingType,
             ticketDescription: ticket.ticketDescription,
             ticketStock: ticket.ticketStock,
+            currentStock:ticket.ticketStock,
             purchaseLimit: ticket.purchaseLimit,
             groupSize: ticket.groupSize,
           }));
+        
         const eventData = activeTab === 'single' ? singleEventData : recurringEventData;
 
         try {
@@ -155,7 +159,8 @@ const Page = () => {
             if (ticketList.length > 0) {
                 const ticketData = ticketList.map((ticket) => ({
                     ...ticket,
-                    event_id: eventId, // Associate each ticket with the event ID
+                    event_id: eventId,
+                    user_id:userId, // Associate each ticket with the event ID
                 }));
 
                 const { error: ticketError } = await supabase
@@ -365,6 +370,7 @@ const Page = () => {
                             <span>Group Ticket</span>
                         </label>
                     </div>
+                    <label className='block text-lg font-medium mb-2'>Pricing Type:</label>
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                             <label className='flex items-center space-x-2'>
                                 <input
