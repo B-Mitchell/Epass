@@ -19,6 +19,7 @@ const TicketDashboard = ({ params }) => {
   const [editTicketId, setEditTicketId] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [EventData, setEventData] = useState(null);
+  const [calRevenue, setCalRevenue] = useState([]);  //this is to store the tickets to calculate revenue
   const [newTicket, setNewTicket] = useState({
     ticketName: "",
     ticketDescription: "",
@@ -62,6 +63,7 @@ const TicketDashboard = ({ params }) => {
       if (error) throw error;
 
       setEventTickets(data);
+      setCalRevenue(data);
       setIsOwner(data?.[0]?.user_id === userId);
       console.log(data);
     } catch (err) {
@@ -167,8 +169,37 @@ const TicketDashboard = ({ params }) => {
       setLoading(false);
     }
   };
+  
+  // handle rev calculation
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [realizedRevenue, setRealizedRevenue] = useState(0);
+  const calculateRevenue = async () => {
+    const { data, error } = await supabase.from("ticketdata").select("ticketStock, ticketPrice, currentStock").eq("event_id", ticketId);
+
+    if (error) {
+      console.log(error)
+      return;
+    }
+    let totalRevenueSum = 0;
+    let realizedRevenueSum = 0;
+  
+    data.forEach((ticket) => {
+      const ticketStock = ticket.ticketStock ?? 0;
+      const ticketPrice = ticket.ticketPrice ?? 0;
+      const currentStock = ticket.currentStock ?? 0;
+  
+      totalRevenueSum += (ticketStock - currentStock) * ticketPrice;
+      realizedRevenueSum += currentStock * ticketPrice;
+      console.log(ticketPrice)
+    });
+  
+    setTotalRevenue(totalRevenueSum);
+    setRealizedRevenue(realizedRevenueSum);
+  }
 
   useEffect(() => {
+    calculateRevenue();
+
     setTicketRoute(ticketId);
     fetchTickets();
     fetchEventData();
@@ -178,50 +209,57 @@ const TicketDashboard = ({ params }) => {
   return (
     <div className="p-4 w-[100%] block justify-between md:flex">
       <div className="p-4">
-      <h1 className="text-center text-2xl font-bold my-4">Event Details</h1>
+      <h1 className="text-center text-2xl font-bold my-2">Event Details</h1>
       {loading ? (
         <p></p>
       ) : (
-        <div className="border border-gray-300 rounded-lg p-6 md:w-4/5 w-full mx-auto bg-white">
-          {EventData ? (
-            <>
-              {/* Event Information */}
-              <div className="flex gap-4 mb-6">
-                <div className="w-full md:w-3/5 text-gray-800 space-y-4">
-                  <h2 className="text-xl font-bold text-blue-700">
-                    {EventData.title}
-                  </h2>
-                  <p>
-                    <strong>Address:</strong> {EventData.address}
-                  </p>
-                  <p>
-                    <strong>Time:</strong> {EventData.startTime} -{" "}
-                    {EventData.endTime}
-                  </p>
-                  <p>
-                    <strong>Date:</strong> {EventData.date}
-                  </p>
-                  <p>
-                    <strong>Event Type:</strong> {EventData.typeOfEvent}
-                  </p>
-                </div>
-                <div className="w-full md:w-2/5">
-                  <Image
-                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${EventData.user_id}_${EventData.image}`}
-                    alt="Event image"
-                    className="rounded-lg max-h-[20rem]"
-                    width={400}
-                    height={400}
-                  />
-                </div>
-              </div>
-            </>
-          ) : (
-            <p className="text-center text-gray-500 italic">
-              No event data available.
-            </p>
-          )}
+        <div className="bg-white shadow-lg rounded-xl p-6 md:w-3/4 w-full mx-auto">
+      {/* Event Details */}
+      <div className="bg-gray-100 p-6 rounded-lg">
+        {EventData ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            {/* Event Text Information */}
+            <div className="md:col-span-2 space-y-4">
+              <h2 className="text-2xl font-bold text-blue-700">{EventData.title}</h2>
+              <p className="text-gray-700">
+                <span className="font-semibold">📍 Address:</span> {EventData.address}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">⏰ Time:</span> {EventData.startTime} - {EventData.endTime}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">📅 Date:</span> {EventData.date}
+              </p>
+              <p className="text-gray-700">
+                <span className="font-semibold">🎭 Event Type:</span> {EventData.typeOfEvent}
+              </p>
+            </div>
+
+            {/* Event Image */}
+            <div className="flex justify-center max-h-[15rem]">
+              <Image
+                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${EventData.user_id}_${EventData.image}`}
+                alt="Event image"
+                className="rounded-lg shadow-md object-cover"
+                width={300}
+                height={100}
+              />
+            </div>
+          </div>
+        ) : (
+          <p className="text-center text-gray-500 italic">No event data available.</p>
+        )}
+      </div>
+
+      {/* Revenue Section */}
+      <div className="bg-blue-50 p-4 mt-6 rounded-lg shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-900">💰 Revenue</h3>
+        <div className="text-gray-800 mt-2 space-y-1">
+          <p>Total Potential Revenue: <span className="font-bold text-blue-600">NGN {totalRevenue}</span></p>
+          <p>Current Revenue: <span className="font-bold text-green-600">NGN {realizedRevenue}</span></p>
         </div>
+      </div>
+    </div>
       )}
     </div>
       {loading ? (
@@ -230,7 +268,7 @@ const TicketDashboard = ({ params }) => {
         <div className="border border-gray-300 rounded-lg p-6 md:w-4/5 w-full mx-auto bg-white">
           {eventTickets.length > 0 ? (
             <>
-              <div>
+              <div className="bg-gray-100 p-4 rounded-lg">
                 <h2 className="text-xl font-bold mb-4">Tickets</h2>
                 <ul>
                   {eventTickets.map((ticket) => (
@@ -342,7 +380,7 @@ const TicketDashboard = ({ params }) => {
               </div>
 
               {isOwner && (
-                <form className="mt-6" 
+                <form className="mt-6 bg-gray-100 p-4 rounded-lg" 
                 onSubmit={(e) => addNewTicket(e)} >
                   <h3 className="font-bold text-lg mb-2">Add New Ticket</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

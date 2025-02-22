@@ -4,6 +4,7 @@ import { FlutterWaveButton, closePaymentModal } from 'flutterwave-react-v3';
 import { useMyContext } from '@/app/context/createContext';
 import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
+import logo from '@/public/images/Epass.png'
 
 const ContactForm = () => {
   const [name, setName] = useState('');
@@ -29,7 +30,7 @@ const ContactForm = () => {
     customizations: {
       title: 'PAYMENT FOR TICKET',
       description: 'Payment for tickets',
-      logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+      logo: `${logo}`,
     },
   };
 
