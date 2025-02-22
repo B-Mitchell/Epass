@@ -208,14 +208,14 @@ const TicketDashboard = ({ params }) => {
 
   return (
     <div className="p-4 w-[100%] block justify-between md:flex">
-      <div className="p-4">
+      <div className="my-4 mb-6">
       <h1 className="text-center text-2xl font-bold my-2">Event Details</h1>
       {loading ? (
         <p></p>
       ) : (
-        <div className="bg-white shadow-lg rounded-xl p-6 md:w-3/4 w-full mx-auto">
+        <div className="bg-white shadow-lg rounded-lg p-4 md:w-3/4 w-full mx-auto">
       {/* Event Details */}
-      <div className="bg-gray-100 p-6 rounded-lg">
+      <div className="bg-gray-100 p-4 w-full rounded-lg">
         {EventData ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             {/* Event Text Information */}
@@ -252,7 +252,7 @@ const TicketDashboard = ({ params }) => {
       </div>
 
       {/* Revenue Section */}
-      <div className="bg-blue-50 p-4 mt-6 rounded-lg shadow-sm">
+      <div className="bg-blue-50 p-4 mt-4 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold text-gray-900">💰 Revenue</h3>
         <div className="text-gray-800 mt-2 space-y-1">
           <p>Total Potential Revenue: <span className="font-bold text-blue-600">NGN {totalRevenue}</span></p>
