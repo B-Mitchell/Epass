@@ -259,6 +259,10 @@ const TicketDashboard = ({ params }) => {
           <p>Current Revenue: <span className="font-bold text-green-600">NGN {realizedRevenue}</span></p>
         </div>
       </div>
+      <button 
+        className="mt-6 w-full py-2 bg-[#FFC0CB] text-white font-semibold cursor-pointer hover:bg-transparent hover:text-black border border-[#FFC0CB] transition rounded-2xl"
+        onClick={() => router.push(`/profile/${ticketId}/validate-payment`)}
+        >validate payments</button>
     </div>
       )}
     </div>

@@ -17,7 +17,8 @@ const ContactForm = () => {
   // const flutterwaveApiKey = process.env.FLUTTERWAVE_PUBLIC_KEY;
 
   const config = {
-    public_key: 'FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X',
+    // public_key: 'FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X',
+    public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
     tx_ref: Date.now(),
     amount: ticketPrice, // Ensure ticketPrice is valid or use a value
     currency: 'NGN',
@@ -39,14 +40,37 @@ const ContactForm = () => {
     text: 'Pay with Flutterwave!',
     callback: (response) => {
       console.log(response);
-      closePaymentModal(); // Close the modal programmatically
+      if (response.status === "successful") {
+        const txnData = {
+          name: response.customer.name,
+          email: response.customer.email,
+          phone_number: response.customer.phone_number,
+          transaction_id: response.transaction_id,
+          tx_ref: response.tx_ref,
+          charged_amount: response.charged_amount,
+          amount: response.amount,
+          event_id: ticketRoute
+        };
+        savetxn(txnData); //save details to supabase for easy retrieval
+        router.push(`/payment-success?transaction_id=${response.transaction_id}`);
+        return true;
+      }
+      closePaymentModal();
     },
     onClose: () => {
       updateStock();
       // email service
     },
   };
+  const savetxn = async (txnData) => {
+    const { data, error } = await supabase
+    .from('transactions')
+    .insert(txnData)
+    .select()
 
+    if (error) return error;
+    console.log(data);
+  }
   const checkData = () => {
     if (isNaN(ticketPrice)) {
       router.back();
@@ -63,8 +87,6 @@ const ContactForm = () => {
     checkData();
     checkIfTicketIsSoldOut();
   }, [ticketPrice, router]);
-  
- 
   //check if the ticket is sold out
   const checkIfTicketIsSoldOut = async () => {
     try {
