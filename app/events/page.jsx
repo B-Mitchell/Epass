@@ -15,6 +15,7 @@ const Page = () => {
       let { data, error } = await supabase
         .from('tickets')
         .select('*')
+        .eq('publishEvent', true)
         .order('created_at', { ascending: false });
       if (error) {
         console.log('error fetching tickets');

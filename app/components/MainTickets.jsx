@@ -42,7 +42,8 @@ const MainTickets = () => {
                 let { data: eventData, error: eventError } = await supabase
                     .from('tickets')
                     .select('*')
-                    .in('uuid', eventIds); // Fetch only events with matching .order('created_at', { ascending: false });
+                    .in('uuid', eventIds)
+                    .eq('publishEvent', true); // Fetch only events with matching .order('created_at', { ascending: false });
 
                     if (eventError) {
                         console.log('Error fetching event data:', eventError);
@@ -88,7 +89,8 @@ const MainTickets = () => {
                 let { data: eventData, error: eventError } = await supabase
                     .from('tickets')
                     .select('*')
-                    .in('uuid', eventIds); // Fetch only events with matching eventIds
+                    .in('uuid', eventIds)
+                    .eq('publishEvent', true); // Fetch only events with matching eventIds
 
                 if (eventError) {
                     console.error('Error fetching event data:', eventError);

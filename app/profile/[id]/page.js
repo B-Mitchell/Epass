@@ -169,7 +169,51 @@ const TicketDashboard = ({ params }) => {
       setLoading(false);
     }
   };
-  
+  const handlePublishToggle = async (e) => {
+    // Prevent default behavior if event is provided
+    if (e) e.preventDefault();
+    
+    try {
+        setLoading(true);
+        
+        // If trying to unpublish (currently published), check if any tickets have been sold
+        if (EventData.publishEvent) {
+            // Check if any tickets have been sold by looking at currentStock vs ticketStock
+            const { data, error } = await supabase
+                .from('ticketdata')
+                .select('currentStock, ticketStock')
+                .eq('event_id', ticketId);
+            
+            if (error) throw error;
+            
+            // Check if any ticket has been sold (currentStock is less than ticketStock)
+            const ticketsSold = data.some(ticket => 
+                (ticket.currentStock !== null && ticket.ticketStock !== null) && 
+                (ticket.currentStock < ticket.ticketStock)
+            );
+            
+            if (ticketsSold) {
+                alert('Cannot unpublish event as tickets have already been sold.');
+                return; // Exit early, don't unpublish
+            }
+        }
+        
+        // If no tickets sold or we're publishing (not unpublishing), proceed with the update
+        const { error } = await supabase
+            .from('tickets')
+            .update({ publishEvent: !EventData.publishEvent })
+            .eq('uuid', ticketId);
+
+        if (error) throw error;
+
+        // Update local state without refreshing the page
+        setEventData(prevData => ({ ...prevData, publishEvent: !prevData.publishEvent }));
+    } catch (err) {
+        console.error('Error toggling publish status:', err);
+    } finally {
+        setLoading(false);
+    }
+  };
   // handle rev calculation
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [realizedRevenue, setRealizedRevenue] = useState(0);
@@ -233,8 +277,23 @@ const TicketDashboard = ({ params }) => {
               <p className="text-gray-700">
                 <span className="font-semibold">🎭 Event Type:</span> {EventData.typeOfEvent}
               </p>
+              {isOwner && EventData && (
+                <div className="flex items-center space-x-2 mt-4">
+                    <button 
+                        onClick={handlePublishToggle}
+                        type="button" // Explicitly set type to button to prevent form submission
+                        className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                    >
+                        <div className={`w-11 h-6 relative rounded-full transition-colors ${EventData.publishEvent ? 'bg-[#FFC0CB]' : 'bg-gray-300'}`}>
+                            <div 
+                                className={`absolute top-0.5 left-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-transform ${EventData.publishEvent ? 'translate-x-5' : ''}`}
+                            ></div>
+                        </div>
+                        <span>{EventData.publishEvent ? 'Published' : 'Unpublished'}</span>
+                    </button>
+                </div>
+              )}
             </div>
-
             {/* Event Image */}
             <div className="flex justify-center max-h-[15rem]">
               <Image
