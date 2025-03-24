@@ -64,6 +64,7 @@ const PaymentConfirmation = () => {
             height={150}
             className='block m-auto'
           />
+          <p className="mt-2 text-gray-600 text-sm">transaction id: {transactionId}</p>
           <p className="mt-2 text-gray-600">please screenshot this QR Code, it would be used to validate payment at the event check in.</p>
         </div>
       )}

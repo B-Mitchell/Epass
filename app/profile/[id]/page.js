@@ -21,14 +21,14 @@ const TicketDashboard = ({ params }) => {
   const [EventData, setEventData] = useState(null);
   const [calRevenue, setCalRevenue] = useState([]);  //this is to store the tickets to calculate revenue
   const [newTicket, setNewTicket] = useState({
-    ticketName: "",
-    ticketDescription: "",
+    ticketName: '',
+    ticketDescription: '',
     ticketPrice: 0,
-    ticketStock: "",
-    ticketType: "",
+    ticketStock: '',
+    ticketType: '',
     groupSize: null,
-    pricingType: "free",
-    purchaseLimit: "",
+    pricingType: 'free',
+    purchaseLimit: '',
   });
   //fetch event details
   const fetchEventData = async () => {
@@ -138,31 +138,44 @@ const TicketDashboard = ({ params }) => {
     }
   };
   // Add a new ticket
-  const addNewTicket = async (e) => {
-    e.preventDefault();
+  const addNewTicket = async () => {
+    // e.preventDefault();
+    // Convert empty strings to NULL or default to 0 for numbers
+    const ticketToInsert = {
+      ...newTicket,
+      ticketPrice: newTicket.ticketPrice ? Number(newTicket.ticketPrice) : 0,  
+      ticketStock: newTicket.ticketStock ? Number(newTicket.ticketStock) : 0,  
+      groupSize: newTicket.groupSize ? Number(newTicket.groupSize) : null,  
+      purchaseLimit: newTicket.purchaseLimit ? Number(newTicket.purchaseLimit) : null,  
+      user_id: userId,
+      event_id: ticketId,
+    };
     try {
       setLoading(true);
-      const { error } = await supabase
-        .from("ticketdata")
-        .insert({
-          ...newTicket,
-          user_id: userId,
-          event_id: ticketId,
-        });
+      // const { data, error } = await supabase
+      //   .from("ticketdata")
+      //   .insert({
+      //     ...newTicket,
+      //     user_id: userId,
+      //     event_id: ticketId,
+      //   });
 
-      if (error) throw error;
+      // if (error) throw error;
+      console.log("Inserting ticket:", ticketToInsert); // Debugging log
+      const { data, error } = await supabase.from("ticketdata").insert(ticketToInsert);
 
       fetchTickets();
       setNewTicket({
-        ticketName: "",
-        ticketDescription: "",
-        ticketPrice: "",
-        ticketStock: "",
-        ticketType: "",
+        ticketName: '',
+        ticketDescription: '',
+        ticketPrice: '',
+        ticketStock: '',
+        ticketType: '',
         groupSize: null,
         pricingType: "free",
-        purchaseLimit: "",
+        purchaseLimit: '',
       });
+      console.log(data)
     } catch (err) {
       console.error("Error adding new ticket:", err);
     } finally {
@@ -443,8 +456,7 @@ const TicketDashboard = ({ params }) => {
               </div>
 
               {isOwner && (
-                <form className="mt-6 bg-gray-100 p-4 rounded-lg" 
-                onSubmit={(e) => addNewTicket(e)} >
+                <form className="mt-6 bg-gray-100 p-4 rounded-lg" onSubmit={(() => addNewTicket())}>
                   <h3 className="font-bold text-lg mb-2">Add New Ticket</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
