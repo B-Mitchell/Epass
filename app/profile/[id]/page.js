@@ -242,6 +242,38 @@ const TicketDashboard = ({ params }) => {
     setRealizedRevenue(realizedRevenueSum);
   }
 
+  // Format time to show only HH:MM
+  const formatTime = (timeString) => {
+    if (!timeString) return "";
+    
+    if (timeString.includes(':')) {
+      const parts = timeString.split(':');
+      if (parts.length >= 2) {
+        return `${parts[0]}:${parts[1]}`;
+      }
+    }
+    return timeString;
+  };
+  
+  // Format date to be more concise
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    
+    const datePart = dateString.split('T')[0];
+    if (datePart) {
+      try {
+        const [year, month, day] = datePart.split('-');
+        if (year && month && day) {
+          return `${day}/${month}/${year}`;
+        }
+      } catch (e) {
+        // If any error in parsing, return original date part
+      }
+      return datePart;
+    }
+    return dateString;
+  };
+
   useEffect(() => {
     calculateRevenue();
 
@@ -378,7 +410,7 @@ const TicketDashboard = ({ params }) => {
                           </svg>
                           <div>
                             <p className="font-medium text-gray-700">Date</p>
-                            <p className="text-gray-600">{EventData.date}</p>
+                            <p className="text-gray-600">{formatDate(EventData.date)}</p>
                           </div>
                         </div>
 
@@ -388,7 +420,7 @@ const TicketDashboard = ({ params }) => {
                           </svg>
                           <div>
                             <p className="font-medium text-gray-700">Time</p>
-                            <p className="text-gray-600">{EventData.startTime} - {EventData.endTime}</p>
+                            <p className="text-gray-600">{formatTime(EventData.startTime)} - {formatTime(EventData.endTime)}</p>
                           </div>
                         </div>
                         
