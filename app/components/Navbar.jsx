@@ -28,7 +28,15 @@ const NavBar = () => {
 
   return (
     <nav className='bg-[#1E1E1E] text-white w-full flex justify-between pb-3'>
-        <div className='mt-3 -mb-1 ml-6'><Image src={LogoImage} className='w-[100%] h-[100%]'/></div>
+        <div className='mt-5 -mb-1 ml-3 md:ml-6 relative w-[120px] h-[40px]'>
+            <Image 
+                src={LogoImage} 
+                alt="E-Pass Logo"
+                fill
+                className='object-contain'
+                priority
+            />
+        </div>
 
         {/* DESKTOP VIEW*/}
         <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>

@@ -42,7 +42,7 @@ const Page = () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('tickets') // Replace 'events' with the name of your event table
+        .from('tickets')
         .select('*')
         .eq('user_id', userId);
 
@@ -62,10 +62,29 @@ const Page = () => {
     router.push(`profile/${uuid}`);
   };
 
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    
+    const datePart = dateString.split('T')[0];
+    if (datePart) {
+      try {
+        const [year, month, day] = datePart.split('-');
+        if (year && month && day) {
+          return `${day}/${month}/${year}`;
+        }
+      } catch (e) {}
+      return datePart;
+    }
+    return dateString;
+  };
+
   return (
-    <div>
-      <div className='w-[90%] border border-[#FFCOCB] block m-auto mt-4 p-5 rounded-3xl'>
-        <h2 className='text-center font-bold text-[1.4rem]'>PROFILE</h2>
+    <div className="bg-gray-50 min-h-screen pb-24">
+      {/* Profile Card */}
+      <div className="max-w-6xl mx-auto pt-6 px-4">
+        <div className='w-[90%] border border-[#FFCOCB] block m-auto mt-4 p-5 rounded-3xl shadow-md bg-white'>
+          <h2 className='text-center font-bold text-[1.4rem] text-[#1E1E1E]'>PROFILE</h2>
         <p className='mt-3'>
           <span className='font-semibold'>Hello</span>, {first_name} {last_name}
         </p>
@@ -77,10 +96,10 @@ const Page = () => {
             <p>Organization: {organizer_name}</p>
             <p>Phone Number: {phone_number}</p>
           </div>
-          <div className='w-[20%]'>
+            <div className='md:w-[20%] w-auto'>
             <button
               onClick={handleLogout}
-              className='hover:bg-red-500 w-[100%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>
+                className='hover:bg-red-500 w-full block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110 text-sm md:text-base'>
               Logout
             </button>
           </div>
@@ -88,9 +107,12 @@ const Page = () => {
       </div>
 
       {/* Events Section */}
-      <div className='w-[96%] m-auto block mt-3 rounded-3xl pb-5'>
-        <div className='flex justify-between mb-3'>
-          <p className='text-center font-bold text-[1.4rem] mb-3'>Your Events</p>
+        <div className='w-[96%] m-auto block mt-7 rounded-3xl pb-5'>
+          <div className='flex justify-between items-center mb-6'>
+            <div className="flex items-center">
+              <div className="w-10 h-[2px] bg-[#FFC0CB] hidden md:block mr-3"></div>
+              <p className='font-bold text-[1.4rem] text-[#1E1E1E]'>Your Events</p>
+            </div>
           <button
             className='font-bold border-[#FFCOCB] border rounded-lg p-2 hover:bg-[#FFCOCB] transition px-3'
             onClick={() => router.push('/profile/userInfo')}>
@@ -99,46 +121,82 @@ const Page = () => {
         </div>
 
         {loading ? (
+            <div className="flex justify-center my-12">
           <LoadingAnimation />
+            </div>
         ) : events.length > 0 ? (
-          <div className='grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6 w-[100%] m-auto p-4'>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   {events.map((event) => (
     <div
       key={event.id}
-      className='cursor-pointer border border-gray-200 p-6 rounded-xl hover:shadow-xl transition-all bg-white relative group flex justify-between'>
-        <div >
-          {/* Event Title */}
-      <h3 className='font-bold text-lg text-black capitalize mb-2 group-hover:uppercase transition'>
+                  className="bg-white border border-gray-100 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 flex flex-col"
+                >
+                  <div className="flex p-3 pb-0 items-center gap-3">
+                    <div className="relative w-[80px] h-[80px] flex-shrink-0 rounded-lg overflow-hidden">
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${event.user_id}_${event.image}`}
+                        alt={event.title}
+                        className="object-cover"
+                        fill
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="bg-white/90 px-2 py-0.5 rounded-full border border-gray-100">
+                          <span className="text-xs font-medium text-[#8B5E3C]">{event.typeOfEvent}</span>
+                        </div>
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
+                          {event.publishEvent ? 'Published' : 'Draft'}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-[#1E1E1E] line-clamp-2 pr-1">
         {event.title}
       </h3>
-      {/* Event CTA */}
-      <div className='mt-4'>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 pt-3 flex-1 flex flex-col">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center text-sm text-gray-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#FFC0CB] mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span>{formatDate(event.date)}</span>
+                      </div>
+                      
+                      <div className="flex items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#FFC0CB] mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span className="text-sm text-gray-600 line-clamp-2">{event.address}</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-3 border-t border-gray-100 mt-3">
         <button
         onClick={() => handleEventClick(event.uuid)}
-          className='hover:bg-transparent bg-[#FFC0CB] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black hover:scale-110 '>
+                        className="bg-[#FFC0CB] text-white w-full py-2 rounded-lg hover:bg-[#FFC0CB]/90 transition shadow-sm hover:shadow-md font-medium">
           View Details
         </button>
       </div>
         </div>
-        <div className="w-[40%] md:w-2/5">
-        <Image
-          src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${event.user_id}_${event.image}`}
-          alt="Event image"
-          className="rounded-lg max-h-[6rem]"
-          width={200}
-          height={100}
-          />
-      </div>
-      
     </div>
   ))}
 </div>
-
-        ) : (
-          <p className='text-center mt-5 text-red-600'>You haven't created any events yet</p>
-        )}
+          ) : (
+            <div className="text-center bg-white rounded-xl shadow-sm p-8 mt-5">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 8l-7 7-7-7M16 8h5a2 2 0 012 2v8a2 2 0 01-2 2h-5" />
+              </svg>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">No events found</h3>
+              <p className="text-gray-500 mb-4">You haven't created any events yet</p>
+            </div>
+          )}
+        </div>
       </div>
 
+      {/* Fixed Create Event Button */}
       <button
         className='hover:bg-transparent bg-[#FFC0CB] w-[40%] md:w-[20%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black hover:scale-110 fixed bottom-8 right-3'
         onClick={() => {
