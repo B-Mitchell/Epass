@@ -347,7 +347,7 @@ const Page = () => {
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Twitter Handle:</label>
-                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
+                        <input type='text' required className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
                     </div>
 
                     <div>
@@ -441,7 +441,7 @@ const Page = () => {
                 {ticketType === 'single' && (
                     <div className='mb-4'>
                         <label className='block text-lg font-medium mb-2'>Purchase Limit:</label>
-                        <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
+                        <input required type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
                     </div>
                 )}
 
