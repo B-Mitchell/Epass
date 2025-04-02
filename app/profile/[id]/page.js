@@ -30,6 +30,7 @@ const TicketDashboard = ({ params }) => {
     groupSize: null,
     pricingType: "free",
     purchaseLimit: "",
+    isUnlimited: false,
   });
   //fetch event details
   const fetchEventData = async () => {
@@ -141,15 +142,29 @@ const TicketDashboard = ({ params }) => {
   // Add a new ticket
   const addNewTicket = async (e) => {
     e.preventDefault();
+    
+    // Validate all required fields and focus on any missing fields
+    if (!validateAndFocusOnMissingField()) {
+      return; // Stop if validation fails
+    }
+    
+    // If we get here, all required fields are filled - proceed with data submission
+    const ticketData = {
+      ...newTicket,
+      user_id: userId,
+      event_id: ticketId,
+      ticketPrice: newTicket.pricingType === 'free' ? 0 : parseFloat(newTicket.ticketPrice),
+      ticketStock: newTicket.isUnlimited ? 'unlimited' : parseInt(newTicket.ticketStock),
+      currentStock: newTicket.isUnlimited ? 999999 : parseInt(newTicket.ticketStock),
+      purchaseLimit: newTicket.ticketType === 'single' ? parseInt(newTicket.purchaseLimit) : null,
+      groupSize: newTicket.ticketType === 'group' ? parseInt(newTicket.groupSize) : null,
+    };
+    
     try {
       setLoading(true);
       const { error } = await supabase
         .from("ticketdata")
-        .insert({
-          ...newTicket,
-          user_id: userId,
-          event_id: ticketId,
-        });
+        .insert(ticketData);
 
       if (error) throw error;
 
@@ -163,9 +178,12 @@ const TicketDashboard = ({ params }) => {
         groupSize: null,
         pricingType: "free",
         purchaseLimit: "",
+        isUnlimited: false,
       });
+      setSelectedOption("");
     } catch (err) {
       console.error("Error adding new ticket:", err);
+      alert("Failed to add ticket: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -272,6 +290,111 @@ const TicketDashboard = ({ params }) => {
       return datePart;
     }
     return dateString;
+  };
+
+  // Helper function to check if all required fields are filled
+  const validateAndFocusOnMissingField = () => {
+    // Basic required fields for all ticket types
+    if (!newTicket.ticketType) {
+      const element = document.querySelector('input[name="ticketType"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('Please select a Ticket Type');
+      } else {
+        alert('Please select a Ticket Type');
+      }
+      return false;
+    }
+    
+    if (!newTicket.ticketName) {
+      const element = document.querySelector('input[name="ticketName"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please enter a Ticket Name');
+      } else {
+        alert('Please enter a Ticket Name');
+      }
+      return false;
+    }
+    
+    if (!newTicket.ticketDescription) {
+      const element = document.querySelector('textarea[name="ticketDescription"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please provide a Ticket Description');
+      } else {
+        alert('Please provide a Ticket Description');
+      }
+      return false;
+    }
+    
+    // Check ticket stock if not unlimited
+    if (!newTicket.isUnlimited && !newTicket.ticketStock) {
+      const element = document.querySelector('input[name="ticketStock"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please specify the Ticket Stock');
+      } else {
+        alert('Please specify the Ticket Stock');
+      }
+      return false;
+    }
+    
+    // Check single ticket purchase limit
+    if (newTicket.ticketType === 'single' && !newTicket.purchaseLimit) {
+      const element = document.querySelector('input[name="purchaseLimit"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please specify a Purchase Limit for single tickets');
+      } else {
+        alert('Please specify a Purchase Limit for single tickets');
+      }
+      return false;
+    }
+    
+    // Check group ticket group size
+    if (newTicket.ticketType === 'group' && !newTicket.groupSize) {
+      const element = document.querySelector('input[name="groupSize"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please specify the Group Size');
+      } else {
+        alert('Please specify the Group Size');
+      }
+      return false;
+    }
+    
+    // Check pricing selection
+    if (!selectedOption) {
+      const element = document.querySelector('input[name="pricing"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        alert('Please select a Pricing Type (Free or Paid)');
+      } else {
+        alert('Please select a Pricing Type (Free or Paid)');
+      }
+      return false;
+    }
+    
+    // Check price for paid tickets
+    if (selectedOption === 'paid' && !newTicket.ticketPrice) {
+      const element = document.querySelector('input[name="ticketPrice"]');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.focus();
+        alert('Please specify the Ticket Price');
+      } else {
+        alert('Please specify the Ticket Price');
+      }
+      return false;
+    }
+    
+    return true; // All required fields are filled
   };
 
   useEffect(() => {
@@ -667,15 +790,46 @@ const TicketDashboard = ({ params }) => {
                       <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Ticket</h3>
                       
                       <form onSubmit={addNewTicket} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Ticket Type Selection */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Ticket Type</label>
+                          <div className="flex space-x-4 mb-4">
+                            <label className="flex items-center space-x-2">
+                              <input 
+                                type="radio" 
+                                name="ticketType" 
+                                value="single" 
+                                checked={newTicket.ticketType === 'single'} 
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="text-[#FFC0CB] focus:ring-[#FFC0CB]" 
+                                required
+                              />
+                              <span>Single Ticket</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input 
+                                type="radio" 
+                                name="ticketType" 
+                                value="group" 
+                                checked={newTicket.ticketType === 'group'} 
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="text-[#FFC0CB] focus:ring-[#FFC0CB]" 
+                                required
+                              />
+                              <span>Group Ticket</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Name</label>
-                    <input
-                      type="text"
-                      name="ticketName"
+                            <input
+                              type="text"
+                              name="ticketName"
                               placeholder="e.g. VIP, Regular, Early Bird"
-                      value={newTicket.ticketName}
-                      onChange={(e) => handleInputChange(e, setNewTicket)}
+                              value={newTicket.ticketName}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
                               className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                               required
                             />
@@ -683,31 +837,81 @@ const TicketDashboard = ({ params }) => {
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Stock</label>
-                            <input
-                              type="number"
-                              name="ticketStock"
-                              placeholder="Number of tickets available"
-                              value={newTicket.ticketStock}
-                              onChange={(e) => handleInputChange(e, setNewTicket)}
-                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
-                      required
-                    />
+                            <div className="flex flex-col space-y-2">
+                              <input
+                                type="number"
+                                name="ticketStock"
+                                placeholder="Number of tickets available"
+                                value={newTicket.ticketStock}
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                                disabled={newTicket.isUnlimited}
+                                required={!newTicket.isUnlimited}
+                              />
+                              <label className="flex items-center space-x-2 mt-1">
+                                <input 
+                                  type="checkbox" 
+                                  name="isUnlimited"
+                                  checked={newTicket.isUnlimited}
+                                  onChange={(e) => setNewTicket(prev => ({
+                                    ...prev,
+                                    isUnlimited: e.target.checked,
+                                    ticketStock: e.target.checked ? 'unlimited' : prev.ticketStock
+                                  }))}
+                                  className="text-[#FFC0CB] focus:ring-[#FFC0CB]"
+                                />
+                                <span className="text-sm">Unlimited</span>
+                              </label>
+                            </div>
                           </div>
                         </div>
                         
+                        {/* Ticket Description */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea
-                      name="ticketDescription"
+                          <textarea
+                            name="ticketDescription"
                             placeholder="Describe what this ticket includes"
-                      value={newTicket.ticketDescription}
-                      onChange={(e) => handleInputChange(e, setNewTicket)}
+                            value={newTicket.ticketDescription}
+                            onChange={(e) => handleInputChange(e, setNewTicket)}
                             className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                             rows="3"
-                      required
-                    />
+                            required
+                          />
                         </div>
                         
+                        {/* Conditional fields based on ticket type */}
+                        {newTicket.ticketType === 'single' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Limit</label>
+                            <input
+                              type="number"
+                              name="purchaseLimit"
+                              placeholder="Maximum tickets per purchase"
+                              value={newTicket.purchaseLimit}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required
+                            />
+                          </div>
+                        )}
+                        
+                        {newTicket.ticketType === 'group' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Size</label>
+                            <input
+                              type="number"
+                              name="groupSize"
+                              placeholder="Number of people in each group"
+                              value={newTicket.groupSize}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required
+                            />
+                          </div>
+                        )}
+                        
+                        {/* Pricing Type */}
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">Pricing Type</label>
                           <div className="flex space-x-4">
