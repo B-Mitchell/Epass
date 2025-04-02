@@ -73,7 +73,6 @@ const Page = () => {
       }
     };
   }, []);
-
   // Fetch a single transaction based on scanned ID
   useEffect(() => {
     const fetchTransaction = async () => {
@@ -167,6 +166,7 @@ const Page = () => {
                   <p className="font-medium text-gray-700">{txn.name}</p>
                   <p className="text-gray-500 text-sm">{txn.email}</p>
                   <p className="text-gray-500 text-sm">txn ref: {txn.tx_ref}</p>
+                  <p className="text-gray-500 text-sm">quantity: {txn.ticketsbought}</p>
                 </div>
                 {txn.confirmed ? (
                   <span className="text-green-600 font-bold flex items-center">
@@ -216,6 +216,10 @@ const Page = () => {
                   <div>
                     <p className="font-medium text-gray-700">Amount:</p>
                     <p className="text-gray-900">${transactionData.charged_amount}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-700">quantity:</p>
+                    <p className="text-gray-900">${transactionData.ticketsbought}</p>
                   </div>
                   <div>
                     <p className="font-medium text-gray-700">Status:</p>

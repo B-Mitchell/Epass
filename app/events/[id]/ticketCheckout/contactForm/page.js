@@ -10,7 +10,7 @@ const ContactForm = () => {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const { ticketPrice,  ticketRoute , setTicketRoute,ticketCheckoutData } = useMyContext();
+  const { ticketPrice,  ticketRoute , setTicketRoute, ticketCheckoutData, numberOfTickets } = useMyContext();
   const router = useRouter();
   // state handling if ticket is sold out
   const [isSoldOut, setIsSoldOut] = useState(false);
@@ -49,7 +49,8 @@ const ContactForm = () => {
           tx_ref: response.tx_ref,
           charged_amount: response.charged_amount,
           amount: response.amount,
-          event_id: ticketRoute
+          event_id: ticketRoute,
+          ticketsbought: numberOfTickets
         };
         savetxn(txnData); //save details to supabase for easy retrieval
         router.push(`/payment-success?transaction_id=${response.transaction_id}`);

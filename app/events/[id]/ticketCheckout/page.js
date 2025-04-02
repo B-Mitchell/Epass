@@ -16,6 +16,7 @@ const CheckoutPage = () => {
   const [error, setError] = useState('');
   const router = useRouter();
   // Fetch ticket options using the event UUID (route)
+
   useEffect(() => {
     const fetchTickets = async () => {
       if (id) {
@@ -71,6 +72,24 @@ const CheckoutPage = () => {
   const totalFees = subtotal > 0 ? subtotal * 0.05 + 100 : 0;  // 5% of subtotal + 100 Naira fixed fee
   const total = subtotal + totalFees; // Total is subtotal + fees
   
+  const handleProceedToCheckout = () => {
+    if (isAnyTicketSelected()) {
+      setTicketCheckoutData(selectedTickets);
+  
+      // Calculate total number of tickets bought
+      const totalTicketsBought = Object.values(selectedTickets).reduce((sum, quantity) => sum + quantity, 0);
+      
+      // Store it in context
+      setNumberOfTickets(totalTicketsBought);
+  
+      if (total === 0) {
+        router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
+      } else {
+        setTicketPrice(total);
+        router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
+      }
+    }
+  };
   
   return (
     <div className="flex flex-col lg:flex-row justify-between max-w-7xl mx-auto p-6 space-y-8 lg:space-y-0 lg:space-x-8">
@@ -153,20 +172,7 @@ const CheckoutPage = () => {
         <button 
             className="mt-6 w-full py-2 bg-[#FFC0CB] text-white font-semibold cursor-pointer hover:bg-transparent hover:text-black border border-[#FFC0CB] transition rounded-2xl"
             disabled={!isAnyTicketSelected()} // Disable if no tickets are selected
-            onClick={() => {
-              if (isAnyTicketSelected()) {
-                setTicketCheckoutData(selectedTickets)
-                if(total === 0){
-                  
-                  router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
-                }else{
-                  setTicketPrice(total)
-                router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`); 
-                }
-                
-              }
-            }}
-        >
+            onClick={() => handleProceedToCheckout()}>
             Proceed to Checkout
         </button>
 

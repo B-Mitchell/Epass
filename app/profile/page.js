@@ -5,9 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
 import supabase from '../supabase';
 import LoadingAnimation from '../components/LoadingAnimation';
-import { IoMail, IoPhoneLandscape, IoSettingsOutline } from 'react-icons/io5';
+import { IoSettingsOutline } from 'react-icons/io5';
 import Image from 'next/image';
-import { FaPhoneSlash } from 'react-icons/fa';
 
 const Page = () => {
   const router = useRouter();
@@ -101,7 +100,7 @@ const Page = () => {
             <div className='md:w-[20%] w-auto'>
             <button
               onClick={handleLogout}
-                className='bg-red-500 w-full block m-auto mt-7 text-white p-2 transition rounded-2xl hover:text-red-500 hover:bg-transparent hover:scale-110 border hover:border-red-500 text-sm md:text-base'>
+                className='bg-red-500 w-full block m-auto mt-7 text-white p-2 transition rounded-2xl hover:text-red-500 hover:bg-transparent hover:scale-105 border hover:border-red-500 text-sm md:text-base'>
               Logout
             </button>
           </div>
