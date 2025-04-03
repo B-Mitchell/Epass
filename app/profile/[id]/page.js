@@ -862,7 +862,7 @@ const TicketDashboard = ({ params }) => {
                 <div className="p-6">
                   <h2 className="text-xl font-bold mb-6 text-gray-900">Manage Tickets</h2>
                   
-          {eventTickets.length > 0 ? (
+                  {eventTickets.length > 0 ? (
                     <div className="mb-8">
                       <div className="overflow-hidden shadow-sm border border-gray-200 rounded-lg">
                         {eventTickets.map((ticket, index) => (
@@ -870,31 +870,31 @@ const TicketDashboard = ({ params }) => {
                             key={ticket.uuid} 
                             className={`bg-white p-4 ${index !== eventTickets.length - 1 ? 'border-b border-gray-200' : ''}`}
                           >
-                      {editTicketId === ticket.uuid ? (
-                        <form className="space-y-4">
+                            {editTicketId === ticket.uuid ? (
+                              <form className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Name</label>
-                          <input
-                            type="text"
-                            name="ticketName"
-                            value={editFormData.ticketName || ""}
-                            onChange={(e) => handleInputChange(e, setEditFormData)}
+                                    <input
+                                      type="text"
+                                      name="ticketName"
+                                      value={editFormData.ticketName || ""}
+                                      onChange={(e) => handleInputChange(e, setEditFormData)}
                                       className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
-                            required
-                          />
+                                      required
+                                    />
                                   </div>
                                   
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                          <input
-                            type="number"
-                            name="ticketPrice"
-                            value={editFormData.ticketPrice || ""}
-                            onChange={(e) => handleInputChange(e, setEditFormData)}
+                                    <input
+                                      type="number"
+                                      name="ticketPrice"
+                                      value={editFormData.ticketPrice || ""}
+                                      onChange={(e) => handleInputChange(e, setEditFormData)}
                                       className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
-                            required
-                          />
+                                      required
+                                    />
                                   </div>
                                 </div>
                                 
@@ -903,11 +903,11 @@ const TicketDashboard = ({ params }) => {
                                   <textarea
                                     name="ticketDescription"
                                     value={editFormData.ticketDescription || ""}
-                            onChange={(e) => handleInputChange(e, setEditFormData)}
+                                    onChange={(e) => handleInputChange(e, setEditFormData)}
                                     className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                                     rows="3"
-                            required
-                          />
+                                    required
+                                  />
                                 </div>
                                 
                                 <div className="flex items-center justify-end space-x-3 pt-2">
@@ -918,19 +918,19 @@ const TicketDashboard = ({ params }) => {
                                   >
                                     Cancel
                                   </button>
-                          <button
+                                  <button
                                     type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            saveTicketEdits(ticket.uuid);
-                          }}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      saveTicketEdits(ticket.uuid);
+                                    }}
                                     className="px-4 py-2 text-sm font-medium text-white bg-[#FFC0CB] rounded-lg hover:bg-[#FFC0CB]/90"
-                          >
+                                  >
                                     Save Changes
-                          </button>
+                                  </button>
                                 </div>
-                        </form>
-                      ) : (
+                              </form>
+                            ) : (
                               <div className="flex justify-between items-start">
                                 <div>
                                   <h3 className="font-semibold text-gray-900">{ticket.ticketName}</h3>
@@ -946,41 +946,41 @@ const TicketDashboard = ({ params }) => {
                                   </div>
                                 </div>
                                 
-                          {isOwner && (
-                            <div className="relative">
-                            <button
+                                {isOwner && (
+                                  <div className="relative">
+                                    <button
                                       onClick={() => setActiveMenu(ticket.uuid === activeMenu ? null : ticket.uuid)}
                                       className="p-2 text-gray-500 hover:text-gray-700 focus:outline-none"
                                     >
                                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
                                       </svg>
-                            </button>
+                                    </button>
           
-                            {activeMenu === ticket.uuid && (
+                                    {activeMenu === ticket.uuid && (
                                       <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                                <button
-                                  onClick={() => {
-                                    setEditTicketId(ticket.uuid);
-                                    setEditFormData(ticket);
-                                    setActiveMenu(null);
-                                  }}
+                                        <button
+                                          onClick={() => {
+                                            setEditTicketId(ticket.uuid);
+                                            setEditFormData(ticket);
+                                            setActiveMenu(null);
+                                          }}
                                           className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                         >
                                           Edit Ticket
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(ticket)}
+                                        </button>
+                                        <button
+                                          onClick={() => handleDelete(ticket)}
                                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                                >
+                                        >
                                           Delete Ticket
-                                </button>
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             )}
-                          </div>
-                          )}
-                        </div>
-                      )}
                           </div>
                         ))}
                       </div>
@@ -992,7 +992,190 @@ const TicketDashboard = ({ params }) => {
                       </svg>
                       <h3 className="text-lg font-medium text-gray-900 mb-2">No Tickets Available</h3>
                       <p className="text-gray-500 mb-6">Create your first ticket to start selling</p>
-              </div>
+                    </div>
+                  )}
+
+                  {isOwner && (
+                    <div className="mt-8 bg-gray-50 rounded-lg border border-gray-200 p-6">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Ticket</h3>
+                      
+                      <form onSubmit={addNewTicket} className="space-y-4">
+                        {/* Ticket Type Selection */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Ticket Type</label>
+                          <div className="flex space-x-4 mb-4">
+                            <label className="flex items-center space-x-2">
+                              <input 
+                                type="radio" 
+                                name="ticketType" 
+                                value="single" 
+                                checked={newTicket.ticketType === 'single'} 
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="text-[#FFC0CB] focus:ring-[#FFC0CB]" 
+                                required
+                              />
+                              <span>Single Ticket</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input 
+                                type="radio" 
+                                name="ticketType" 
+                                value="group" 
+                                checked={newTicket.ticketType === 'group'} 
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="text-[#FFC0CB] focus:ring-[#FFC0CB]" 
+                                required
+                              />
+                              <span>Group Ticket</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Name</label>
+                            <input
+                              type="text"
+                              name="ticketName"
+                              placeholder="e.g. VIP, Regular, Early Bird"
+                              value={newTicket.ticketName}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Ticket Stock</label>
+                            <div className="flex flex-col space-y-2">
+                              <input
+                                type="number"
+                                name="ticketStock"
+                                placeholder="Number of tickets available"
+                                value={newTicket.ticketStock}
+                                onChange={(e) => handleInputChange(e, setNewTicket)}
+                                className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                                disabled={newTicket.isUnlimited}
+                                required={!newTicket.isUnlimited}
+                              />
+                              <label className="flex items-center space-x-2 mt-1">
+                                <input 
+                                  type="checkbox" 
+                                  name="isUnlimited"
+                                  checked={newTicket.isUnlimited}
+                                  onChange={(e) => setNewTicket(prev => ({
+                                    ...prev,
+                                    isUnlimited: e.target.checked,
+                                    ticketStock: e.target.checked ? 'unlimited' : prev.ticketStock
+                                  }))}
+                                  className="text-[#FFC0CB] focus:ring-[#FFC0CB]"
+                                />
+                                <span className="text-sm">Unlimited</span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Ticket Description */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                          <textarea
+                            name="ticketDescription"
+                            placeholder="Describe what this ticket includes"
+                            value={newTicket.ticketDescription}
+                            onChange={(e) => handleInputChange(e, setNewTicket)}
+                            className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                            rows="3"
+                            required
+                          />
+                        </div>
+                        
+                        {/* Conditional fields based on ticket type */}
+                        {newTicket.ticketType === 'single' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Purchase Limit</label>
+                            <input
+                              type="number"
+                              name="purchaseLimit"
+                              placeholder="Maximum tickets per purchase"
+                              value={newTicket.purchaseLimit}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required
+                            />
+                          </div>
+                        )}
+                        
+                        {newTicket.ticketType === 'group' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Group Size</label>
+                            <input
+                              type="number"
+                              name="groupSize"
+                              placeholder="Number of people in each group"
+                              value={newTicket.groupSize}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required
+                            />
+                          </div>
+                        )}
+                        
+                        {/* Pricing Type */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">Pricing Type</label>
+                          <div className="flex space-x-4">
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                name="pricing"
+                                value="free"
+                                checked={selectedOption === "free"}
+                                onChange={() => handleOptionClick("free")}
+                                className="h-4 w-4 text-[#FFC0CB] focus:ring-[#FFC0CB] border-gray-300"
+                              />
+                              <span className="ml-2 text-gray-700">Free</span>
+                            </label>
+
+                            <label className="inline-flex items-center">
+                              <input
+                                type="radio"
+                                name="pricing"
+                                value="paid"
+                                checked={selectedOption === "paid"}
+                                onChange={() => handleOptionClick("paid")}
+                                className="h-4 w-4 text-[#FFC0CB] focus:ring-[#FFC0CB] border-gray-300"
+                              />
+                              <span className="ml-2 text-gray-700">Paid</span>
+                            </label>
+                          </div>
+                        </div>
+                        
+                        {selectedOption === "paid" && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Price (NGN)</label>
+                            <input
+                              type="number"
+                              name="ticketPrice"
+                              placeholder="Ticket price in NGN"
+                              value={newTicket.ticketPrice}
+                              onChange={(e) => handleInputChange(e, setNewTicket)}
+                              className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
+                              required={selectedOption === "paid"}
+                            />
+                          </div>
+                        )}
+                        
+                        <div className="pt-4">
+                          <button
+                            type="submit"
+                            className="w-full py-3 bg-[#FFC0CB] text-white font-semibold rounded-lg hover:bg-[#FFC0CB]/90 transition shadow-md"
+                          >
+                            Add Ticket
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   )}
                 </div>
               )}
