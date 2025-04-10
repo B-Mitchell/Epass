@@ -15,7 +15,9 @@ const ContactForm = () => {
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
-  const paymentTimeout = 7 * 60 * 1000; // 7 minutes timeout
+  const paymentTimeout = 3 * 60 * 1000; // 3 minutes timeout
+  const [timeLeft, setTimeLeft] = useState(paymentTimeout / 1000); // in seconds
+  const countdownInterval = useRef(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTicketsLocked, setIsTicketsLocked] = useState(false);
   const paymentTimeoutId = useRef(null);
@@ -53,6 +55,9 @@ const ContactForm = () => {
     return () => {
       if (paymentTimeoutId.current) {
         clearTimeout(paymentTimeoutId.current); // Clear timeout
+      }
+      if (countdownInterval.current) {
+        clearInterval(countdownInterval.current);
       }
       window.removeEventListener('beforeunload', handleBeforeUnload);
       if (isTicketsLocked && paymentPending) {
@@ -282,6 +287,18 @@ const ContactForm = () => {
               setPaymentPending(true);
               paymentPendingRef.current = true;
 
+              // Start countdown
+              setTimeLeft(paymentTimeout / 1000); // Reset countdown
+              countdownInterval.current = setInterval(() => {
+                setTimeLeft(prev => {
+                  if (prev <= 1) {
+                    clearInterval(countdownInterval.current);
+                    return 0;
+                  }
+                  return prev - 1;
+                });
+              }, 1000);
+
               // Set payment timeout only after successful lock
               paymentTimeoutId.current = setTimeout(() => {
                   if (paymentPending && isTicketsLocked) {
@@ -402,7 +419,7 @@ const ContactForm = () => {
               clipRule="evenodd"
             />
           </svg>
-          Tickets Locked! Pay within 7 minutes.
+          Tickets Locked! Pay within {Math.floor(timeLeft / 60)}m {timeLeft % 60}s.
         </div>
       )}
     </div> : null}
