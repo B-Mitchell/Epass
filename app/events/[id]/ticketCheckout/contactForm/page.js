@@ -344,8 +344,8 @@ const ContactForm = () => {
 
   const startTimer = () => {
     cleanupTimer();
-    const paymentTimeout = 10 * 1000; // 10 seconds
-    setTimeLeft(10);
+    const paymentTimeout = 4 * 60 * 1000; // 4 minutes
+    setTimeLeft(240); //240 secs
 
     countdownRef.current = setInterval(() => {
       setTimeLeft((prev) => {
