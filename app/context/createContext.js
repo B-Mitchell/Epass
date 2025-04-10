@@ -12,6 +12,7 @@ export const MyContextProvider = ({ children }) => {
   const [ticketRoute , setTicketRoute] = useState('');
   const [ticketCheckoutData,setTicketCheckoutData]= useState([])
   const [numberOfTickets, setNumberOfTickets]= useState()
+  const [selectedTickets, setSelectedTickets] = useState({}); // To store selected quantities.
 
   const contextData = {
     createEventModal,
@@ -25,7 +26,9 @@ export const MyContextProvider = ({ children }) => {
     ticketCheckoutData,
     setTicketCheckoutData,
     numberOfTickets,
-    setNumberOfTickets
+    setNumberOfTickets,
+    selectedTickets,
+    setSelectedTickets
   }
 
   // Provide the context value to the children components

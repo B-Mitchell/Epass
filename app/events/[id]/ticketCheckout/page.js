@@ -4,20 +4,25 @@ import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import supabase from '@/app/supabase';
 import { useMyContext } from '@/app/context/createContext';
+import { toast } from 'react-toastify';
 
 const CheckoutPage = () => {
   const params = useParams();
   const { id } = params; //fetched the ticket ID from the url, it doesn't lose state
-  const { ticketRoute, setTicketPrice, setTicketCheckoutData} = useMyContext();
+  const { ticketRoute, setTicketPrice, setTicketCheckoutData, setNumberOfTickets, selectedTickets, setSelectedTickets} = useMyContext();
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
-  const [selectedTickets, setSelectedTickets] = useState({}); // To store selected quantities.
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
+  const [ isProcessing, setIsProcessing ] = useState(false);
   // Fetch ticket options using the event UUID (route)
 
   useEffect(() => {
+    if (ticketRoute === "") {
+      router.push('/events');
+    }
+    console.log("ticket route:" + ticketRoute);
     const fetchTickets = async () => {
       if (id) {
         try {
@@ -43,7 +48,7 @@ const CheckoutPage = () => {
           }
         } catch (err) {
           console.error('An error occurred while fetching tickets:', err);
-          setError('An error occurred. Please try again.');
+          toast.error('An error occurred. Please try again.');
         }
       }
       setLoading(false);
@@ -71,25 +76,26 @@ const CheckoutPage = () => {
 
   const totalFees = subtotal > 0 ? subtotal * 0.05 + 100 : 0;  // 5% of subtotal + 100 Naira fixed fee
   const total = subtotal + totalFees; // Total is subtotal + fees
-  
-  const handleProceedToCheckout = () => {
+
+  const handleProceedToCheckout = async () => {
     if (isAnyTicketSelected()) {
       setTicketCheckoutData(selectedTickets);
-  
       // Calculate total number of tickets bought
-      const totalTicketsBought = Object.values(selectedTickets).reduce((sum, quantity) => sum + quantity, 0);
-      
-      // Store it in context
+      const totalTicketsBought = Object.values(selectedTickets).reduce(
+        (sum, quantity) => sum + quantity,
+        0
+      );
+      // Store the number of tickets in context
       setNumberOfTickets(totalTicketsBought);
-  
+      }
       if (total === 0) {
         router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
       } else {
         setTicketPrice(total);
         router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);
       }
-    }
   };
+  
   
   return (
     <div className="flex flex-col lg:flex-row justify-between max-w-7xl mx-auto p-6 space-y-8 lg:space-y-0 lg:space-x-8">
@@ -169,13 +175,15 @@ const CheckoutPage = () => {
           <p>₦{total?.toLocaleString()}</p>
         </div>
 
-        <button 
-            className="mt-6 w-full py-2 bg-[#FFC0CB] text-white font-semibold cursor-pointer hover:bg-transparent hover:text-black border border-[#FFC0CB] transition rounded-2xl"
+        {isProcessing ? 
+          <button className="mt-6 w-full py-2 bg-gray-600 text-white font-semibold cursor-pointer hover:bg-transparent hover:text-black border border-[#FFC0CB] rounded-2xl animate-pulse transition">processing...</button> 
+        : 
+          <button className={`mt-6 w-full py-2 ${isAnyTicketSelected() ? 'bg-[#FFC0CB]' : 'bg-gray-500 border-gray-500 text-black'} text-white font-semibold cursor-pointer hover:bg-transparent hover:text-black border transition rounded-2xl border-[#FFC0CB]`}
             disabled={!isAnyTicketSelected()} // Disable if no tickets are selected
             onClick={() => handleProceedToCheckout()}>
             Proceed to Checkout
-        </button>
-
+          </button>
+        }
       </div>
     </div>
   );
