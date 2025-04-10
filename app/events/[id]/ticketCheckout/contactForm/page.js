@@ -15,16 +15,28 @@ const ContactForm = () => {
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
-  const paymentTimeout = 3 * 60 * 1000; // 3 minutes timeout
-  const [timeLeft, setTimeLeft] = useState(paymentTimeout / 1000); // in seconds
-  const countdownInterval = useRef(null);
+  const [timeLeft, setTimeLeft] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTicketsLocked, setIsTicketsLocked] = useState(false);
-  const paymentTimeoutId = useRef(null);
+  const isTicketsLockedRef = useRef(false);
   const paymentPendingRef = useRef(false);
+  const timerRef = useRef(null);
+  const countdownRef = useRef(null);
 
   useEffect(() => {
-    // Validation checks moved here
+    console.log('ContactForm mounted');
+    return () => {
+      console.log('ContactForm unmounted');
+      cleanupTimer();
+      if (isTicketsLockedRef.current && paymentPendingRef.current) {
+        console.log('Unmount cleanup: Releasing tickets');
+        releaseLockedTickets();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('useEffect for validation - ticketPrice:', ticketPrice, 'selectedTickets:', selectedTickets);
     if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
       console.error('Invalid ticket price.');
       toast.error('Invalid ticket price.');
@@ -36,77 +48,49 @@ const ContactForm = () => {
       console.error('No tickets selected.');
       toast.error('No tickets selected. Redirecting...');
       setTimeout(() => router.back(), 1000);
-
       return;
     }
 
     checkIfTicketIsSoldOut();
-
-    // Release tickets on unmount and beforeunload
-    const handleBeforeUnload = () => {
-      if (isTicketsLocked && paymentPending) {
-        console.log('User leaving page, releasing locked tickets.');
-        releaseLockedTickets();
-      }
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      if (paymentTimeoutId.current) {
-        clearTimeout(paymentTimeoutId.current); // Clear timeout
-      }
-      if (countdownInterval.current) {
-        clearInterval(countdownInterval.current);
-      }
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      if (isTicketsLocked && paymentPending) {
-        console.log('Component unmounted, releasing locked tickets.');
-        releaseLockedTickets();
-      }
-    };
   }, [ticketPrice, router, selectedTickets]);
 
   const validateForm = () => {
     if (!name.trim()) {
-        toast.error('Please enter your name.');
-        return false;
+      toast.error('Please enter your name.');
+      return false;
     }
     if (!phoneNumber.trim()) {
-        toast.error('Please enter your phone number.');
-        return false;
+      toast.error('Please enter your phone number.');
+      return false;
     }
-    // Basic phone number format check (you might want a more robust one)
     if (!/^\d+$/.test(phoneNumber.trim())) {
-        toast.error('Please enter a valid phone number (numbers only).');
-        return false;
+      toast.error('Please enter a valid phone number (numbers only).');
+      return false;
     }
     if (!email.trim()) {
-        toast.error('Please enter your email address.');
-        return false;
+      toast.error('Please enter your email address.');
+      return false;
     }
-    // Basic email format check
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-        toast.error('Please enter a valid email address.');
-        return false;
+      toast.error('Please enter a valid email address.');
+      return false;
     }
     return true;
-};
+  };
 
   const lockTickets = async () => {
-    if (validateForm()) { // First, validate the form data
-        if (!isTicketsLocked && Object.keys(selectedTickets).length > 0) {
-            await handleLockingTickets();
-        } else {
-            toast.error("An issue occurred while trying to lock the selected tickets. Please ensure you have selected tickets and try again.");
-        }
+    console.log('lockTickets called - Current state:', { isTicketsLocked, paymentPending });
+    if (validateForm()) {
+      if (!isTicketsLocked && Object.keys(selectedTickets).length > 0) {
+        await handleLockingTickets();
+      } else {
+        toast.error("An issue occurred while trying to lock the selected tickets. Please ensure you have selected tickets and try again.");
+      }
     }
-    // If validation fails, validateForm() will show a toast error, and this function will simply return.
-};
+  };
 
   const config = {
-    // public_key: 'FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X',
-    public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X', // Ensure this is your correct public key
+    public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
     tx_ref: Date.now(),
     amount: ticketPrice,
     currency: 'NGN',
@@ -119,20 +103,20 @@ const ContactForm = () => {
     customizations: {
       title: 'PAYMENT FOR TICKET',
       description: 'Payment for tickets',
-      logo: '/images/Epass.png', // Corrected logo path
+      logo: '/images/Epass.png',
     },
   };
 
   const releaseLockedTickets = async () => {
-    if (isTicketsLocked) {
-      console.log('Releasing locked tickets...');
+    console.log('releaseLockedTickets called - Current state:', { isTicketsLocked, isTicketsLockedRef: isTicketsLockedRef.current });
+    if (isTicketsLockedRef.current) {
       try {
-        // Transform selectedTickets into the required format
         const ticketsToRelease = Object.entries(selectedTickets).map(([ticketId, quantity]) => ({
           ticket_uuid: ticketId,
           quantity: quantity,
         }));
 
+        console.log('Releasing tickets:', ticketsToRelease);
         const { error } = await supabase.rpc('release_locked_tickets', {
           tickets_to_release: ticketsToRelease,
         });
@@ -141,15 +125,19 @@ const ContactForm = () => {
           console.error('Error releasing locked tickets:', error);
           toast.error('Failed to release locked tickets.');
         } else {
-          console.log('Locked tickets released.');
+          console.log('Locked tickets released successfully.');
           toast.success('Locked tickets released.');
         }
       } catch (error) {
         console.error('Error calling release_locked_tickets RPC:', error);
         toast.error('Error releasing locked tickets.');
       } finally {
-        setIsTicketsLocked(false); // Update local state on release attempt
+        setIsTicketsLocked(false);
+        isTicketsLockedRef.current = false;
+        console.log('releaseLockedTickets completed - State:', { isTicketsLocked, isTicketsLockedRef: isTicketsLockedRef.current });
       }
+    } else {
+      console.log('releaseLockedTickets skipped - No tickets locked');
     }
   };
 
@@ -157,12 +145,10 @@ const ContactForm = () => {
     ...config,
     text: 'Pay with Flutterwave!',
     callback: async (response) => {
-      console.log(response);
+      console.log('Payment callback - Response:', response);
+      cleanupTimer();
       setPaymentPending(false);
       paymentPendingRef.current = false;
-      if (paymentTimeoutId.current) {
-        clearTimeout(paymentTimeoutId.current);
-      }
 
       if (response.status === 'successful') {
         setPaymentPending(true);
@@ -192,7 +178,6 @@ const ContactForm = () => {
           if (confirmError) {
             console.error('Error confirming purchase:', confirmError);
             toast.error('Error confirming purchase.');
-            // Handle error (e.g., alert user, log error)
           } else {
             console.log('Purchase confirmed successfully.');
             toast.success('Purchase confirmed successfully.');
@@ -200,11 +185,9 @@ const ContactForm = () => {
         } catch (error) {
           console.error('Error calling confirm_purchase RPC:', error);
           toast.error('Error processing purchase.');
-          // Handle error
         }
 
         router.push(`/payment-success?transaction_id=${response.transaction_id}`);
-        return true;
       } else {
         await releaseLockedTickets();
         toast.error('Payment failed. Please try again.');
@@ -213,173 +196,139 @@ const ContactForm = () => {
       closePaymentModal();
     },
     onClose: async () => {
-      if (paymentPendingRef.current && isTicketsLocked) {
-        console.log('User closed the payment modal without paying.');
+      if (paymentPendingRef.current && isTicketsLockedRef.current) {
+        cleanupTimer();
         await releaseLockedTickets();
-        setIsTicketsLocked(false);
-        if (paymentTimeoutId.current) {
-          clearTimeout(paymentTimeoutId.current);
-        }
+        setPaymentPending(false);
+        paymentPendingRef.current = false;
+        toast.info('Payment cancelled. Tickets have been released.');
       }
-
-      // Email service
     },
   };
 
   const savetxn = async (txnData) => {
     const { data, error } = await supabase.from('transactions').insert(txnData).select();
-
     if (error) {
       console.error('Error saving transaction:', error);
       toast.error('Error saving transaction.');
     }
-    console.log(data);
+    console.log('Transaction saved:', data);
   };
 
-  //check if the ticket is sold out
   const checkIfTicketIsSoldOut = async () => {
     try {
       let { data: queryData, error: queryError } = await supabase.from('ticketdata').select('currentStock').eq('event_id', ticketRoute);
       if (queryError) {
-        console.log(queryError);
-      } else {
-        // check if ticket is sold out and update state
-        if (queryData && queryData.length > 0) {
-          const currentStock = queryData[0].currentStock;
-          if (currentStock === 0) {
-            setIsSoldOut(true);
-            toast.error('Tickets have been sold out! redirecting...');
-            setTimeout(() => router.back(), 1000);
-          }
+        console.log('Sold out check error:', queryError);
+      } else if (queryData && queryData.length > 0) {
+        const currentStock = queryData[0].currentStock;
+        if (currentStock <= 0) {
+          setIsSoldOut(true);
+          toast.error('Tickets have been sold out! Redirecting...');
+          setTimeout(() => router.back(), 1000);
         }
       }
     } catch (err) {
-      console.log('your error is: ' + err);
+      console.log('Sold out check exception:', err);
     }
   };
 
-  // Add this function to your ContactForm component
-    const handleLockingTickets = async () => {
-      try {
-          setIsProcessing(true);
+  const handleLockingTickets = async () => {
+    console.log('handleLockingTickets called');
+    try {
+      setIsProcessing(true);
+      await checkIfTicketIsSoldOut();
 
-          await checkIfTicketIsSoldOut();
-
-          console.log('Attempting to lock tickets...');
-          let allTicketsLocked = true; // Flag to track overall success
-          for (let ticketId in selectedTickets) {
-              const quantity = selectedTickets[ticketId];
-              if (quantity > 0) {
-                  const { data, error } = await supabase.rpc('purchase_tickets', {
-                      ticket_uuid: ticketId,
-                      quantity: quantity,
-                  });
-                  if (error) {
-                      allTicketsLocked = false; // Set flag to false if any error occurs
-                      throw new Error(`Error purchasing ticket ${ticketId}: ${error.message}`);
-                  }
-              }
+      console.log('Attempting to lock tickets...', { selectedTickets });
+      let allTicketsLocked = true;
+      for (let ticketId in selectedTickets) {
+        const quantity = selectedTickets[ticketId];
+        if (quantity > 0) {
+          console.log(`Locking ticket ${ticketId} with quantity ${quantity}`);
+          const { data, error } = await supabase.rpc('purchase_tickets', {
+            ticket_uuid: ticketId,
+            quantity: quantity,
+          });
+          if (error) {
+            allTicketsLocked = false;
+            console.log(`Error locking ticket ${ticketId}:`, error);
+            throw new Error(`Error purchasing ticket ${ticketId}: ${error.message}`);
           }
-
-          if (allTicketsLocked) {
-              console.log('Tickets locked successfully!');
-              setIsTicketsLocked(true);
-              setPaymentPending(true);
-              paymentPendingRef.current = true;
-
-              // Start countdown
-              setTimeLeft(paymentTimeout / 1000); // Reset countdown
-              countdownInterval.current = setInterval(() => {
-                setTimeLeft(prev => {
-                  if (prev <= 1) {
-                    clearInterval(countdownInterval.current);
-                    return 0;
-                  }
-                  return prev - 1;
-                });
-              }, 1000);
-
-              // Set payment timeout only after successful lock
-              paymentTimeoutId.current = setTimeout(() => {
-                  if (paymentPending && isTicketsLocked) {
-                      console.log('Payment time expired.');
-                      setPaymentPending(false);
-                      paymentPendingRef.current = false;
-                      setIsTicketsLocked(false);
-                      releaseLockedTickets();
-                      toast.warn('Your payment session has expired. Please try again.');
-                      router.back();
-                  }
-              }, paymentTimeout);
-              return true;
-          } else {
-              // If not all tickets locked, release them
-              await releaseLockedTickets();
-              toast.error("Couldn't reserve all tickets. Please try again.");
-              return false;
-          }
-      } catch (error) {
-          console.error('Payment process error:', error);
-          toast.error(`Couldn't reserve tickets: ${error.message}`);
-          setIsTicketsLocked(false);
-          return false;
-      } finally {
-          setIsProcessing(false);
+        }
       }
+
+      if (allTicketsLocked) {
+        console.log('Tickets locked successfully!');
+        setIsTicketsLocked(true);
+        isTicketsLockedRef.current = true;
+        setPaymentPending(true);
+        paymentPendingRef.current = true;
+        
+        startTimer();
+        return true;
+      } else {
+        await releaseLockedTickets();
+        toast.error("Couldn't reserve all tickets. Please try again.");
+        return false;
+      }
+    } catch (error) {
+      console.error('Payment process error:', error);
+      toast.error(`Couldn't reserve tickets: ${error.message}`);
+      setIsTicketsLocked(false);
+      isTicketsLockedRef.current = false;
+      console.log('State after error:', { isTicketsLocked, paymentPending });
+      return false;
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const updateStock = async () => {
     try {
-        setIsProcessing(true); // Indicate processing
+      setIsProcessing(true);
+      for (const ticketId in selectedTickets) {
+        const quantityToDecrement = selectedTickets[ticketId];
+        if (quantityToDecrement > 0) {
+          const { data: currentTicketData, error: fetchError } = await supabase
+            .from('ticketdata')
+            .select('currentStock')
+            .eq('uuid', ticketId)
+            .single();
 
-        for (const ticketId in selectedTickets) {
-            const quantityToDecrement = selectedTickets[ticketId];
-            if (quantityToDecrement > 0) {
-                // Fetch the current stock
-                const { data: currentTicketData, error: fetchError } = await supabase
-                    .from('ticketdata')
-                    .select('currentStock')
-                    .eq('uuid', ticketId)
-                    .single();
+          if (fetchError) {
+            console.error('Error fetching current stock:', fetchError);
+            toast.error('Error fetching data, Please try again.');
+            return;
+          }
 
-                if (fetchError) {
-                    console.error('Error fetching current stock:', fetchError);
-                    toast.error('Error fetching data, Please try again.');
-                    return;
-                }
+          if (currentTicketData) {
+            const newStock = currentTicketData.currentStock - quantityToDecrement;
+            const { error: updateError } = await supabase
+              .from('ticketdata')
+              .update({ currentStock: newStock })
+              .eq('uuid', ticketId);
 
-                if (currentTicketData) {
-                    const newStock = currentTicketData.currentStock - quantityToDecrement;
-
-                    // Update the stock
-                    const { error: updateError } = await supabase
-                        .from('ticketdata')
-                        .update({ currentStock: newStock })
-                        .eq('uuid', ticketId);
-
-                    if (updateError) {
-                        console.error('Error updating stock:', updateError);
-                        toast.error('Error registering ticket. Please try again.');
-                        return;
-                    }
-                } else {
-                    console.warn(`Ticket with UUID ${ticketId} not found.`);
-                    toast.warn(`Could not find ticket information. Please try again.`);
-                    return;
-                }
+            if (updateError) {
+              console.error('Error updating stock:', updateError);
+              toast.error('Error registering ticket. Please try again.');
+              return;
             }
+          } else {
+            console.warn(`Ticket with UUID ${ticketId} not found.`);
+            toast.warn(`Could not find ticket information. Please try again.`);
+            return;
+          }
         }
-
-        
-        console.log('Ticket stock updated successfully.');
-        toast.success('Free ticket acquired successfully!');
+      }
+      console.log('Ticket stock updated successfully.');
+      toast.success('Free ticket acquired successfully!');
     } catch (error) {
-        console.error('Error updating stock:', error);
-        toast.error('An unexpected error occurred during registration.');
+      console.error('Error updating stock:', error);
+      toast.error('An unexpected error occurred during registration.');
     } finally {
-        setIsProcessing(false); // Reset processing state
+      setIsProcessing(false);
     }
-};
+  };
 
   const handleFreeTicket = async () => {
     try {
@@ -393,36 +342,104 @@ const ContactForm = () => {
     }
   };
 
+  const startTimer = () => {
+    cleanupTimer();
+    const paymentTimeout = 10 * 1000; // 10 seconds
+    setTimeLeft(10);
+
+    countdownRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 0) {
+          clearInterval(countdownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    timerRef.current = setTimeout(() => {
+      console.log('Timeout triggered after 10 seconds');
+      handleTimeout();
+    }, paymentTimeout);
+  };
+
+  const handleTimeout = async () => {
+    cleanupTimer();
+
+    if (isTicketsLockedRef.current || paymentPendingRef.current) {
+      try {
+        setPaymentPending(false);
+        paymentPendingRef.current = false;
+        if (isTicketsLockedRef.current) {
+          await releaseLockedTickets(); // Call release first
+          setIsTicketsLocked(false);
+          isTicketsLockedRef.current = false; // Reset after release
+          console.log('Tickets released due to timeout');
+        } else {
+          console.log('Tickets were already released or never locked');
+        }
+        toast.warn('Payment session expired.');
+        router.back();
+      } catch (error) {
+        console.error('Timeout cleanup failed:', error);
+        toast.error('Error during timeout cleanup');
+      }
+    } else {
+      console.log('Timeout skipped - No tickets locked or payment pending');
+      toast.info('Session expired, but no action needed.');
+      router.back();
+    }
+  };
+
+  const cleanupTimer = () => {
+    console.log('Cleaning up timer');
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+    setTimeLeft(null);
+  };
+
   return (
     <div>
-      {ticketPrice > 0 ? 
-      <div className="mb-4 p-4 border rounded-md bg-gray-100">
-      <p className="font-semibold text-gray-700 mb-2">Secure Your Tickets:</p>
-      {!isTicketsLocked ? (
-        <button
-          onClick={lockTickets}
-          className="bg-[#FFC0CB] hover:bg-transparent hover:text-black rounded-2xl hover:scale-110 transition border border-[#FFC0CB] text-white font-normal py-2 px-4"
-          disabled={isProcessing}
-        >
-          {isProcessing ? (
-            <span className="animate-pulse">Locking Tickets...</span>
+      {ticketPrice > 0 && (
+        <div className="mb-4 p-4 border rounded-md bg-gray-100">
+          <p className="font-semibold text-gray-700 mb-2">Secure Your Tickets:</p>
+          {!isTicketsLocked ? (
+            <button
+              onClick={lockTickets}
+              className="bg-[#FFC0CB] hover:bg-transparent hover:text-black rounded-2xl hover:scale-110 transition border border-[#FFC0CB] text-white font-normal py-2 px-4"
+              disabled={isProcessing}
+            >
+              {isProcessing ? (
+                <span className="animate-pulse">Locking Tickets...</span>
+              ) : (
+                'Lock Tickets'
+              )}
+            </button>
           ) : (
-            'Lock Tickets'
+            <div className="flex items-center bg-green-100 text-green-700 p-3 rounded-md">
+              <svg className="w-5 h-5 mr-2 fill-current" viewBox="0 0 20 20">
+                  <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                  />
+              </svg>
+              Tickets reserved! Pay within{' '}
+              <span className="text-red-600 font-semibold text-[1.2rem]">
+                {timeLeft !== null
+                  ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
+                  : '0:10'}
+              </span>
+            </div>
           )}
-        </button>
-      ) : (
-        <div className="flex items-center bg-green-100 text-green-700 p-3 rounded-md">
-          <svg className="w-5 h-5 mr-2 fill-current" viewBox="0 0 20 20">
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-              clipRule="evenodd"
-            />
-          </svg>
-          Tickets reserved! Pay within <span className='text-red-600 font-semibold text-[1.2rem]'>{Math.floor(timeLeft / 60)}m {timeLeft % 60}</span>s.
         </div>
       )}
-    </div> : null}
 
       <p className="text-center font-bold text-[1.4rem] my-4">Fill the form with your contact details.</p>
       <form onSubmit={(e) => e.preventDefault()} className="border border-[#FFC0CB] md:w-[60%] w-[80%] m-auto rounded-xl p-6 mb-8">
@@ -459,14 +476,19 @@ const ContactForm = () => {
           </button>
         ) : ticketPrice === 0 ? (
           <button
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110" disabled={isProcessing || isSoldOut}
+            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+            disabled={isProcessing || isSoldOut}
             onClick={handleFreeTicket}
           >
             Register
           </button>
         ) : (
-          <FlutterWaveButton className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110 " disabled={isProcessing || isSoldOut}
-          {...fwConfig} title="Secure payment with Flutterwave" />
+          <FlutterWaveButton
+            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+            disabled={isProcessing || isSoldOut}
+            {...fwConfig}
+            title="Secure payment with Flutterwave"
+          />
         )}
       </form>
     </div>
