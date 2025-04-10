@@ -24,7 +24,7 @@ export default function Home() {
           <h1 className='md:text-[2.5rem] text-[1.75rem] font-bold text-[#1E1E1E] leading-normal md:leading-normal mt-4 md:mt-6'>DISCOVER & <br/>ATTEND<br /> EVENTS WITH EASE</h1>
           <p className='text-[#8B5E3C] md:text-[1rem] text-[0.875rem] font-semibold lg:mt-6 mb-4 leading-tight md:leading-normal'>E-Pass is a website for purchasing, organizing and selling event tickets <br/>throughout Africa using a mobile device.</p>
           <div className='lg:mt-10 md:mb-2'>
-            <button className='bg-[#8B5E3C] text-white rounded-[1rem] p-3 hover:bg-transparent hover:text-[#8B5E3C] border-[.15rem] hover:border-[#8B5E3C] transition text-sm md:text-base'>Learn More</button>
+            <button className='bg-[#8B5E3C] text-white rounded-[1rem] p-3 hover:bg-transparent hover:text-[#8B5E3C] border-[.15rem] hover:border-[#8B5E3C] transition text-sm md:text-base' onClick={() => router.push('/about')}>Learn More</button>
             <button className='text-[#8B5E3C] border-[.15rem] border-[#8B5E3C] hover:text-white hover:bg-[#8B5E3C] rounded-[1rem] p-3 ml-4 transition text-sm md:text-base' onClick={() => handleCreateEvent()}>Create Event</button>
           </div>
         </div>

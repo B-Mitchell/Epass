@@ -41,9 +41,10 @@ const NavBar = () => {
         {/* DESKTOP VIEW*/}
         <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>
             <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/')}}>Home</li>
+            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/events')}}>Events</li>
+            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/about')}}>About</li>
+            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/pricing')}}>Pricing</li>
             <li  className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {userId ? null : alert('please login'); router.push('/profile')}}>Profile</li>
-            {/* ONLY LOGGED IN USERS SHOULD BE ABLE TO ACCESS THE EVENTA PAGE */}
-            {userId ? <li  className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/events')}}>Events</li> : null}
             <li  className={`cursor-pointer transition ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#FFCOCB]'}`} onClick={() => {handleLoginOut()}}>{loginOut}</li>
             {
                 loginOut == 'login' ? 
@@ -60,12 +61,10 @@ const NavBar = () => {
           active ?
          <ul className={`md:hidden block absolute m-0 w-[100%] mt-[4.56rem] bg-[#1E1E1E] text-center pb-5 z-50`}>
               <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-3 text-[1.3rem]' onClick={() => {router.push('/') ; setIsActive(!active)}}>Home</li>
-
+              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/events'); setIsActive(!active)}}>Events</li>
+              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/about'); setIsActive(!active)}}>About</li>
+              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/pricing'); setIsActive(!active)}}>Pricing</li>
               <li  className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {userId ? null : alert('please login'); router.push('/profile'); setIsActive(!active)}}>Profile</li>
-
-              {/* ONLY LOGGED IN USERS SHOULD BE ABLE TO ACCESS THE EVENTA PAGE */}
-              {userId ? <li  className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/events'); setIsActive(!active)}}>Events</li> : null}
-
               <li  className={`cursor-pointer transition mt-6 text-[1.3rem] ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#FFCOCB]'}`} onClick={() => {
                 handleLoginOut(); 
                 setIsActive(!active)}

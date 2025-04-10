@@ -36,6 +36,13 @@ const CheckoutPage = () => {
             setError('Failed to fetch tickets. Please try again later.');
           } else {
             console.log('successful');
+            console.log('Ticket data received:', data);
+            
+            // Log each ticket's currentStock and purchaseLimit
+            data.forEach(ticket => {
+              console.log(`Fetched ticket ${ticket.ticketName}: currentStock=${ticket.currentStock}, purchaseLimit=${ticket.purchaseLimit}`);
+            });
+            
             setTicketOptions(data); // Set the entire fetched data to ticketOptions.
 
             // Initialize selectedTickets with 0 quantities for each ticket.
@@ -117,23 +124,55 @@ const CheckoutPage = () => {
                       <span className="text-sm text-gray-500">includes ₦{totalFees.toFixed(2)} fee</span>
                     </p>
                     <p className="mt-2 text-gray-600">{ticket.ticketDescription}</p>
+                    {/* Show remaining tickets if 10 or fewer */}
+                    {parseInt(ticket.currentStock) <= 10 && (
+                      <p className={`mt-1 text-sm ${parseInt(ticket.currentStock) <= 3 ? 'text-red-500 font-medium' : 'text-orange-500'}`}>
+                        {parseInt(ticket.currentStock) === 0 
+                          ? 'Sold Out!' 
+                          : `${parseInt(ticket.currentStock)} ticket${parseInt(ticket.currentStock) > 1 ? 's' : ''} remaining`}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor={`ticket-${ticket.uuid}`} className="block text-sm">
                       Quantity
                     </label>
+                    {console.log(`Ticket ${ticket.ticketName}: currentStock=${ticket.currentStock}, purchaseLimit=${ticket.purchaseLimit}`)}
                     <select
-                      id={`ticket-${ticket.uuid}`} // Use uuid here
-                      value={selectedTickets[ticket.uuid]} // And here
-                      onChange={(e) => handleTicketQuantityChange(ticket.uuid, parseInt(e.target.value))} // And here
+                      id={`ticket-${ticket.uuid}`} 
+                      value={selectedTickets[ticket.uuid]} 
+                      onChange={(e) => handleTicketQuantityChange(ticket.uuid, parseInt(e.target.value))} 
                       className="border p-2 rounded-md"
                     >
-                      {/* Checks if the ticketType is 'group', if so limit the max value to 1 */}
-                      {[...Array(ticket.ticketType === 'group' ? 2 : ticket.purchaseLimit + 1).keys()].map((num) => (
-                        <option key={num} value={num}>
-                          {num}
-                        </option>
-                      ))}
+                      {(() => {
+                        // Ensure we have the correct values
+                        const maxLimit = parseInt(ticket.purchaseLimit) || 10;
+                        const availableStock = parseInt(ticket.currentStock) || 0;
+                        
+                        // Important: Use strict comparison to ensure we get the right minimum
+                        let maxOptions;
+                        if (ticket.ticketType === 'group') {
+                          maxOptions = 2; // 0 or 1 for group tickets
+                        } else {
+                          // Make explicit calculation for clarity
+                          const limitPlusOne = maxLimit + 1;
+                          const stockPlusOne = availableStock + 1;
+                          maxOptions = limitPlusOne < stockPlusOne ? limitPlusOne : stockPlusOne;
+                        }
+                        
+                        console.log(`Generating options for ${ticket.ticketName}: maxOptions=${maxOptions}, from min(${maxLimit + 1}, ${availableStock + 1})`);
+                        
+                        // Generate array manually to avoid any issues
+                        const options = [];
+                        for (let i = 0; i < maxOptions; i++) {
+                          options.push(
+                            <option key={i} value={i}>
+                              {i}
+                            </option>
+                          );
+                        }
+                        return options;
+                      })()}
                     </select>
                   </div>
                 </div>
