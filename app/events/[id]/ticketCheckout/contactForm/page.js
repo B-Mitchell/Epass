@@ -419,7 +419,7 @@ const ContactForm = () => {
               clipRule="evenodd"
             />
           </svg>
-          Tickets reserved! Pay within {Math.floor(timeLeft / 60)}m {timeLeft % 60}s.
+          Tickets reserved! Pay within <span className='text-red-600 font-semibold text-[1.2rem]'>{Math.floor(timeLeft / 60)}m {timeLeft % 60}</span>s.
         </div>
       )}
     </div> : null}
