@@ -164,7 +164,37 @@ const ContactForm = () => {
           ticketsbought: numberOfTickets,
         };
         await savetxn(txnData);
-
+        const qrCode = await QRCode.toDataURL(response.transaction_id);
+        try {
+          const emailResponse = await fetch('/api/send-ticket', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: response.customer.email,
+              ticketDetails: {
+                ticketName: selectedTickets.ticketName,
+                quantity: numberOfTickets,
+                ticketPrice: response.amount
+              },
+              eventDetails: {
+                title: eventData.title,
+                date: eventData.date,
+                startTime: eventData.startTime,
+                endTime: eventData.endTime,
+                address: eventData.address
+              },
+              qrCodeUrl: qrCode
+            })
+          });
+    
+          if (!emailResponse.ok) {
+            console.error('Failed to send ticket email');
+          }
+        } catch (error) {
+          console.error('Error sending ticket email:', error);
+        }
         const ticketsToConfirm = Object.entries(selectedTickets).map(([ticketId, quantity]) => ({
           ticket_uuid: ticketId,
           quantity: quantity,
@@ -333,15 +363,65 @@ const ContactForm = () => {
   const handleFreeTicket = async () => {
     try {
       if (validateForm()) {
-        await updateStock();
-        return;
+        try {
+          // First fetch event data
+          const { data: eventData, error: eventError } = await supabase
+            .from('tickets')
+            .select('*')
+            .eq('uuid', ticketRoute)
+            .single();
+  
+          if (eventError) {
+            console.error('Error fetching event data:', eventError);
+            toast.error('Error fetching event data. Please try again.');
+            return;
+          }
+  
+          // Update stock
+          await updateStock();
+          
+          // Send email without QR code
+          const emailResponse = await fetch('/api/send-ticket', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: email,
+              ticketDetails: {
+                ticketName: selectedTickets.ticketName,
+                quantity: numberOfTickets,
+                ticketPrice: 0
+              },
+              eventDetails: {
+                title: eventData.title,
+                date: eventData.date,
+                startTime: eventData.startTime,
+                endTime: eventData.endTime,
+                address: eventData.address
+              }
+              // No qrCodeUrl sent for free tickets
+            })
+          });
+  
+          if (!emailResponse.ok) {
+            console.error('Failed to send ticket email');
+            toast.error('Failed to send ticket email. Please try again.');
+            return;
+          }
+  
+          toast.success('Free ticket registered successfully! Check your email for confirmation.');
+          router.push('/payment-success'); // Redirect without transaction_id
+        } catch (error) {
+          console.error('Error processing free ticket:', error);
+          toast.error('An error occurred while processing your ticket. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Error handling free ticket:', error);
       toast.error('An error occurred while processing your ticket. Please try again.');
     }
   };
-
   const startTimer = () => {
     cleanupTimer();
     const paymentTimeout = 4 * 60 * 1000; // 4 minutes
