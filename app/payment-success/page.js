@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import supabase from '@/app/supabase';
 import Image from 'next/image';
+import { Resend } from 'resend';
 import QRCode from 'qrcode';
 
 const PaymentConfirmation = () => {
@@ -14,7 +15,7 @@ const PaymentConfirmation = () => {
   const [copied, setCopied] = useState(false); // State for copy feedback
   // QR CODE
   const [qrCodeUrl, setQrCodeUrl] = useState('');
-
+  
   const generateQRCode = async () => {
     try {
       const url = transactionId; // Get the current URL
