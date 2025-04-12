@@ -11,7 +11,7 @@ const ContactForm = () => {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const { ticketPrice, ticketRoute, setTicketRoute, ticketCheckoutData, numberOfTickets, selectedTickets } = useMyContext();
+  const { ticketPrice, ticketRoute, setTicketRoute, ticketCheckoutData, namedTicketCounts, numberOfTickets, selectedTickets } = useMyContext();
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
@@ -22,6 +22,9 @@ const ContactForm = () => {
   const paymentPendingRef = useRef(false);
   const timerRef = useRef(null);
   const countdownRef = useRef(null);
+
+  // payment success flag
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false); // New state
 
   useEffect(() => {
     console.log('ContactForm mounted');
@@ -36,7 +39,8 @@ const ContactForm = () => {
   }, []);
 
   useEffect(() => {
-    console.log('useEffect for validation - ticketPrice:', ticketPrice, 'selectedTickets:', selectedTickets);
+    // console.log('useEffect for validation - ticketPrice:', ticketPrice, 'selectedTickets:', selectedTickets);
+    console.log(namedTicketCounts);
     if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
       console.error('Invalid ticket price.');
       toast.error('Invalid ticket price.');
@@ -150,9 +154,14 @@ const ContactForm = () => {
       setPaymentPending(false);
       paymentPendingRef.current = false;
 
-      if (response.status === 'successful') {
+      try {
+        if (response.status === 'successful') {
+          setPaymentSuccessful(true);
         setPaymentPending(true);
         paymentPendingRef.current = true;
+        // const stringifiedNamedTickets = namedTicketCounts.map(ticket =>
+        //   JSON.stringify(ticket)
+        // );
         const txnData = {
           name: response.customer.name,
           email: response.customer.email,
@@ -162,6 +171,7 @@ const ContactForm = () => {
           charged_amount: response.amount,
           event_id: ticketRoute,
           ticketsbought: numberOfTickets,
+          ticketsInfo: namedTicketCounts
         };
         await savetxn(txnData);
 
@@ -189,14 +199,19 @@ const ContactForm = () => {
 
         router.push(`/payment-success?transaction_id=${response.transaction_id}`);
       } else {
+        setPaymentSuccessful(false); // Set the flag
         await releaseLockedTickets();
         toast.error('Payment failed. Please try again.');
         router.back();
       }
-      closePaymentModal();
+      } catch (error) {
+        console.error(error);
+      } finally {
+        closePaymentModal()
+      };
     },
     onClose: async () => {
-      if (paymentPendingRef.current && isTicketsLockedRef.current) {
+      if (!paymentSuccessful && paymentPendingRef.current && isTicketsLockedRef.current) {
         cleanupTimer();
         await releaseLockedTickets();
         setPaymentPending(false);
@@ -207,13 +222,35 @@ const ContactForm = () => {
   };
 
   const savetxn = async (txnData) => {
-    const { data, error } = await supabase.from('transactions').insert(txnData).select();
+    // Check if transaction ID already exists (server-side check is better)
+    const { data: existingTxn, error: existingTxnError } = await supabase
+      .from('transactions')
+      .select('*')
+      .eq('transaction_id', txnData.transaction_id);
+
+    if (existingTxnError) {
+      console.error('Error checking existing transaction:', existingTxnError);
+      toast.error('Error checking transaction.');
+      return;
+    }
+
+    if (existingTxn && existingTxn.length > 0) {
+      console.warn('Duplicate transaction detected. Skipping save.');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert(txnData)
+      .select();
+
     if (error) {
       console.error('Error saving transaction:', error);
       toast.error('Error saving transaction.');
     }
     console.log('Transaction saved:', data);
   };
+
 
   const checkIfTicketIsSoldOut = async () => {
     try {

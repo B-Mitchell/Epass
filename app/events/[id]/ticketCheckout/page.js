@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 const CheckoutPage = () => {
   const params = useParams();
   const { id } = params; //fetched the ticket ID from the url, it doesn't lose state
-  const { ticketRoute, setTicketPrice, setTicketCheckoutData, setNumberOfTickets, selectedTickets, setSelectedTickets} = useMyContext();
+  const { ticketRoute, setTicketPrice, setTicketCheckoutData, setNumberOfTickets, selectedTickets, setSelectedTickets, setNamedTicketCounts} = useMyContext();
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
   const [loading, setLoading] = useState(true);
@@ -94,6 +94,17 @@ const CheckoutPage = () => {
       );
       // Store the number of tickets in context
       setNumberOfTickets(totalTicketsBought);
+        // New part: map UUIDs to names and quantities
+        const nameQuantityMap = {};
+        ticketOptions.forEach(ticket => {
+          const quantity = selectedTickets[ticket.uuid];
+          if (quantity > 0) {
+            nameQuantityMap[ticket.ticketName.toLowerCase()] = quantity;
+          }
+        });
+
+       // Save this to context or state
+        setNamedTicketCounts([nameQuantityMap]);
       }
       if (total === 0) {
         router.push(`/events/${ticketRoute}/ticketCheckout/contactForm`);

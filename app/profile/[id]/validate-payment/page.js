@@ -15,6 +15,7 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const scannerRef = useRef(null);
+  const [ticketsInfo, setTicketsInfo] = useState([]);
   // search functionality
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -155,38 +156,58 @@ const Page = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      <div className="bg-white shadow-lg p-4 rounded-lg">
-        {loading ? <p>Loading attendee list...</p> : null}
-        {filteredTransactions.length > 0 ? (
-          <ul className="divide-y divide-gray-300">
+      <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        {loading ? (
+          <div className="p-6 text-gray-600 italic">Loading attendee list...</div>
+        ) : filteredTransactions.length > 0 ? (
+          <ul className="divide-y divide-gray-200">
             {filteredTransactions.map((txn) => (
-              <li key={txn.transaction_id} className="py-3 flex items-center">
-                <FaUser className="text-blue-500 mr-3" />
-                <div className="flex-1 text-left">
-                  <p className="font-medium text-gray-700">{txn.name}</p>
-                  <p className="text-gray-500 text-sm">{txn.email}</p>
-                  <p className="text-gray-500 text-sm">txn ref: {txn.tx_ref}</p>
-                  <p className="text-gray-500 text-sm">quantity: {txn.ticketsbought}</p>
+              <li key={txn.transaction_id} className="px-4 py-4 sm:px-6 flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="rounded-full bg-blue-100 text-blue-500 h-8 w-8 flex items-center justify-center">
+                      <FaUser className="h-4 w-4" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{txn.name}</p>
+                    <p className="text-sm text-gray-500 truncate">{txn.email}</p>
+                    <p className="text-xs text-gray-500">Txn: {txn.tx_ref}</p>
+                    <p className="text-xs text-gray-500">Quantity: {txn.ticketsbought}</p>
+                    <p className="text-xs text-gray-500">Amount: <span className="text-green-600">NGN</span>{txn.charged_amount}</p>
+                    {txn.ticketsInfo && Array.isArray(txn.ticketsInfo) && txn.ticketsInfo.length > 0 && (
+                      <div className="mt-1 text-xs text-gray-600">
+                        {txn.ticketsInfo.map((ticket, index) => (
+                          <p key={index}>
+                            {Object.entries(ticket)
+                              .map(([ticketName, quantity]) => `${ticketName}: ${quantity}`)
+                              .join(', ')}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-                {txn.confirmed ? (
-                  <span className="text-green-600 font-bold flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => confirmTransaction(txn.transaction_id)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-lg"
-                  >
-                    Confirm
-                  </button>
-                )}
+                <div>
+                  {txn.confirmed ? (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <FaCheckCircle className="mr-1 h-3 w-3 fill-current" />
+                      Confirmed
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => confirmTransaction(txn.transaction_id)}
+                      className="inline-flex items-center px-3 py-2 border border-blue-500 rounded-md shadow-sm text-sm font-medium text-blue-500 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Confirm
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-gray-600">No attendees match your search.</p>
+          <div className="p-6 text-gray-600 italic">No attendees match your search.</div>
         )}
       </div>
 
@@ -220,6 +241,28 @@ const Page = () => {
                   <div>
                     <p className="font-medium text-gray-700">quantity:</p>
                     <p className="text-gray-900">${transactionData.ticketsbought}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-700">Charged Amount:</p>
+                    <p className="text-gray-900">${transactionData.charged_amount}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-700">Ticket Info:</p>
+                    <ul className="text-gray-900">
+                      {transactionData.ticketsInfo && Array.isArray(transactionData.ticketsInfo) ? (
+                        transactionData.ticketsInfo.map((ticket, index) => (
+                          <li key={index} className="flex justify-between">
+                            <span>
+                              {Object.entries(ticket)
+                                .map(([ticketName, quantity]) => `${ticketName}: ${quantity}`)
+                                .join(', ')}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li>No ticket information available</li>
+                      )}
+                    </ul>
                   </div>
                   <div>
                     <p className="font-medium text-gray-700">Status:</p>
