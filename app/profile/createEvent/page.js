@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
 import EventCreation from '@/app/modals/EventCreation';
 import { useMyContext } from '@/app/context/createContext';
-import ReactQuill from "react-quill";
+import dynamic from 'next/dynamic';
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
 const Page = () => {

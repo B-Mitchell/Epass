@@ -7,7 +7,9 @@ import { useMyContext } from "@/app/context/createContext";
 import LoadingAnimation from "@/app/components/LoadingAnimation";
 import Image from "next/image";
 import ProgressCircle from "@/app/components/ProgressCircle";
-import ReactQuill from "react-quill";
+import dynamic from "next/dynamic";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
 const TicketDashboard = ({ params }) => {
