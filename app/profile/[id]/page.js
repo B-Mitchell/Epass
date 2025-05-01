@@ -7,6 +7,8 @@ import { useMyContext } from "@/app/context/createContext";
 import LoadingAnimation from "@/app/components/LoadingAnimation";
 import Image from "next/image";
 import ProgressCircle from "@/app/components/ProgressCircle";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const TicketDashboard = ({ params }) => {
   const userId = useSelector((state) => state.user.user_id);
@@ -39,7 +41,8 @@ const TicketDashboard = ({ params }) => {
     address: "",
     date: "",
     startTime: "",
-    endTime: ""
+    endTime: "",
+    eventDescription: ""
   });
   //fetch event details
   const fetchEventData = async () => {
@@ -55,6 +58,8 @@ const TicketDashboard = ({ params }) => {
         router.back();
       } else if (data.length > 0) {
         setEventData(data[0]);
+        // Check if the current user is the owner of the event
+        setIsOwner(data[0].user_id === userId);
         // Reset edit form when new data is fetched
         if (isEditingEvent) {
           setEditEventData({
@@ -62,7 +67,8 @@ const TicketDashboard = ({ params }) => {
             address: data[0].address || "",
             date: data[0].date ? new Date(data[0].date).toISOString().split('T')[0] : "",
             startTime: data[0].startTime || "",
-            endTime: data[0].endTime || ""
+            endTime: data[0].endTime || "",
+            eventDescription: data[0].eventDescription || ""
           });
         }
       }
@@ -85,7 +91,6 @@ const TicketDashboard = ({ params }) => {
 
       setEventTickets(data);
       setCalRevenue(data);
-      setIsOwner(data?.[0]?.user_id === userId);
       console.log(data);
     } catch (err) {
       console.error("Error fetching tickets:", err);
@@ -432,7 +437,8 @@ const TicketDashboard = ({ params }) => {
           address: editEventData.address || EventData.address,
           date: formattedDate,
           startTime: editEventData.startTime || EventData.startTime,
-          endTime: editEventData.endTime || EventData.endTime
+          endTime: editEventData.endTime || EventData.endTime,
+          eventDescription: editEventData.eventDescription || EventData.eventDescription
         })
         .eq("uuid", ticketId);
 
@@ -459,7 +465,8 @@ const TicketDashboard = ({ params }) => {
       address: EventData.address || "",
       date: EventData.date ? new Date(EventData.date).toISOString().split('T')[0] : "",
       startTime: EventData.startTime || "",
-      endTime: EventData.endTime || ""
+      endTime: EventData.endTime || "",
+      eventDescription: EventData.eventDescription || ""
     });
     setIsEditingEvent(true);
   };
@@ -651,7 +658,58 @@ const TicketDashboard = ({ params }) => {
                             </div>
                           </div>
                           
-                          <div className="flex justify-end space-x-3 pt-2">
+                          <div className="mt-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Event Description</label>
+                            <div className="border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-[#FFC0CB] overflow-hidden">
+                              <style jsx global>{`
+                                .quill {
+                                  border: none;
+                                }
+                                .ql-container {
+                                  border: none !important;
+                                  font-size: 16px;
+                                }
+                                .ql-toolbar {
+                                  border: none !important;
+                                  border-bottom: 1px solid #e5e7eb !important;
+                                  flex-wrap: wrap;
+                                }
+                                .ql-toolbar .ql-formats {
+                                  margin-right: 8px;
+                                  margin-bottom: 4px;
+                                }
+                                @media (max-width: 640px) {
+                                  .ql-snow .ql-toolbar {
+                                    padding: 4px;
+                                  }
+                                  .ql-toolbar .ql-formats {
+                                    margin-right: 4px;
+                                    margin-bottom: 4px;
+                                  }
+                                  .ql-editor {
+                                    min-height: 120px !important;
+                                    padding: 8px;
+                                  }
+                                }
+                              `}</style>
+                              <ReactQuill 
+                                value={editEventData.eventDescription} 
+                                onChange={(content) => setEditEventData({...editEventData, eventDescription: content})}
+                                style={{ minHeight: '150px' }}
+                                modules={{
+                                  toolbar: [
+                                    [{ 'header': [1, 2, 3, false] }],
+                                    ['bold', 'italic', 'underline', 'strike'],
+                                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                    ['link'],
+                                    ['clean']
+                                  ]
+                                }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-end space-x-3 pt-2 mt-6">
                             <button
                               type="button"
                               onClick={() => setIsEditingEvent(false)}
@@ -700,6 +758,67 @@ const TicketDashboard = ({ params }) => {
                               <p className="text-gray-600">{formatTime(EventData.startTime)} - {formatTime(EventData.endTime)}</p>
                             </div>
                           </div>
+
+                          {/* Event Description Section */}
+                          {EventData.eventDescription && (
+                            <div className="flex flex-col md:flex-row md:items-start mt-4">
+                              <div className="flex items-center mb-2 md:mb-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-[#FFC0CB] mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                                </svg>
+                                <p className="font-medium text-gray-700 md:hidden">Description</p>
+                              </div>
+                              <div className="w-full md:w-auto md:flex-1">
+                                <p className="font-medium text-gray-700 hidden md:block mb-1">Description</p>
+                                <div className="text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100 w-full">
+                                  {typeof EventData.eventDescription === 'string' && EventData.eventDescription.includes('<') ? (
+                                    <div className="event-description-content" dangerouslySetInnerHTML={{ __html: EventData.eventDescription }} />
+                                  ) : (
+                                    <p>{EventData.eventDescription}</p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Global style for event description content */}
+                          <style jsx global>{`
+                            .event-description-content {
+                              word-break: break-word;
+                              overflow-wrap: break-word;
+                            }
+                            .event-description-content p {
+                              margin-bottom: 0.75rem;
+                            }
+                            .event-description-content h1,
+                            .event-description-content h2,
+                            .event-description-content h3 {
+                              margin-top: 1rem;
+                              margin-bottom: 0.5rem;
+                              font-weight: 600;
+                            }
+                            .event-description-content ul,
+                            .event-description-content ol {
+                              margin-left: 1.5rem;
+                              margin-bottom: 0.75rem;
+                            }
+                            .event-description-content img {
+                              max-width: 100%;
+                              height: auto;
+                            }
+                            /* Mobile specific styles */
+                            @media (max-width: 640px) {
+                              .event-description-content h1 {
+                                font-size: 1.25rem;
+                              }
+                              .event-description-content h2 {
+                                font-size: 1.125rem;
+                              }
+                              .event-description-content h3 {
+                                font-size: 1rem;
+                              }
+                            }
+                          `}</style>
                         </div>
                       )}
                     </div>

@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import supabase from '@/app/supabase';
 import EventCreation from '@/app/modals/EventCreation';
 import { useMyContext } from '@/app/context/createContext';
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const Page = () => {
     const router = useRouter();
@@ -16,6 +17,7 @@ const Page = () => {
     const [eventImage, setEventImage] = useState(null);
     const [imageFileName, setImageFileName] = useState(null);
     const [eventTitle, setEventTitle] = useState('');
+    const [eventDescription,setEventDescription] = useState('')
     const [selectedOption, setSelectedOption] = useState('');
     const [eventAddress, setEventAddress] = useState('');
     const [eventDate, setEventDate] = useState('');
@@ -99,6 +101,7 @@ const Page = () => {
         const commonData = {
             user_id: userId,
             title: eventTitle,
+            eventDescription:eventDescription,
             typeOfEvent: selectedOption,
             address: eventAddress,
             image: imageFileName?.name || '',
@@ -250,6 +253,39 @@ const Page = () => {
                     <label className='block text-lg font-medium mb-2'>Title:</label>
                     <input type='text' placeholder='e.g., "Sonic Fusion"' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventTitle(e.target.value) }} value={eventTitle} />
                 </div>
+                <div>
+                <label className='block text-lg font-medium mb-2'>Event Description</label>
+                <div className='border border-gray-300 rounded-xl focus-within:ring-2 focus-within:ring-[#FFC0CB] overflow-hidden'>
+                    <style jsx global>{`
+                        .quill {
+                            border: none;
+                        }
+                        .ql-container {
+                            border: none !important;
+                            font-size: 16px;
+                        }
+                        .ql-toolbar {
+                            border: none !important;
+                            border-bottom: 1px solid #e5e7eb !important;
+                        }
+                    `}</style>
+                    <ReactQuill 
+                        value={eventDescription} 
+                        onChange={setEventDescription}
+                        style={{ minHeight: '200px', border: 'none' }}
+                        modules={{
+                            toolbar: [
+                                [{ 'header': [1, 2, 3, false] }],
+                                ['bold', 'italic', 'underline', 'strike'],
+                                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                                ['link'],
+                                ['clean']
+                            ]
+                        }}
+                    />
+                </div>
+                </div>
+
 
                 <div className='mb-4'>
                     <label className='block text-lg font-medium mb-2'>Event Type:</label>
