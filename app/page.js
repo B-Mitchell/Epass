@@ -70,7 +70,7 @@ export default function Home() {
             
             {/* Image container - simplified */}
             <div className={`relative w-full md:w-[45%] mt-6 md:mt-0 transition-all duration-700 delay-100 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="relative rounded-xl overflow-hidden border-0 md:border md:border-[#FFC0CB]/20 shadow">
+              <div className="relative rounded-xl overflow-hidden border-0 ">
                 <div className="w-full h-[300px] md:h-[400px]">
             <Image 
                     className='w-full h-full object-cover' 
