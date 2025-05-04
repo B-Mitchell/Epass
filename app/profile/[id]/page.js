@@ -8,6 +8,7 @@ import LoadingAnimation from "@/app/components/LoadingAnimation";
 import Image from "next/image";
 import ProgressCircle from "@/app/components/ProgressCircle";
 import dynamic from "next/dynamic";
+import GuestList from "@/app/components/GuestList";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
@@ -26,6 +27,7 @@ const TicketDashboard = ({ params }) => {
   const [EventData, setEventData] = useState(null);
   const [calRevenue, setCalRevenue] = useState([]);  //this is to store the tickets to calculate revenue
   const [activeTab, setActiveTab] = useState('details'); // New state for navigation tabs
+  const [transactions, setTransactions] = useState([]);  // State for guests/transactions
   const [newTicket, setNewTicket] = useState({
     ticketName: "",
     ticketDescription: "",
@@ -473,12 +475,34 @@ const TicketDashboard = ({ params }) => {
     setIsEditingEvent(true);
   };
 
+  // Fetch transactions (guests) for the event
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('event_id', ticketId);
+
+      if (error) {
+        console.error('Error fetching transactions:', error);
+      } else {
+        setTransactions(data);
+      }
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     calculateRevenue();
 
     setTicketRoute(ticketId);
     fetchTickets();
     fetchEventData();
+    fetchTransactions(); // Fetch transactions for guest list
   }, []);
 
 
@@ -509,50 +533,77 @@ const TicketDashboard = ({ params }) => {
               </div>
             )}
 
-            {/* Navigation Tabs */}
-            <div className="border-b border-gray-200 mb-8">
-              <nav className="flex -mb-px">
-                <button
-                  onClick={() => setActiveTab('details')}
-                  className={`py-4 px-6 text-sm font-medium ${
-                    activeTab === 'details'
-                      ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
-                      : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Event Details
-                </button>
-                <button
-                  onClick={() => setActiveTab('sales')}
-                  className={`py-4 px-6 text-sm font-medium ${
-                    activeTab === 'sales'
-                      ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
-                      : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Sales
-                </button>
-                <button
-                  onClick={() => setActiveTab('scan')}
-                  className={`py-4 px-6 text-sm font-medium ${
-                    activeTab === 'scan'
-                      ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
-                      : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Scan Ticket
-                </button>
-                <button
-                  onClick={() => setActiveTab('tickets')}
-                  className={`py-4 px-6 text-sm font-medium ${
-                    activeTab === 'tickets'
-                      ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
-                      : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Tickets
-                </button>
-              </nav>
+            {/* Navigation Tabs - Compact design for mobile */}
+            <div className="mb-8">
+              <div className="border-b border-gray-200">
+                <nav className="grid grid-cols-5 -mb-px">
+                  <button
+                    onClick={() => setActiveTab('details')}
+                    className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                      activeTab === 'details'
+                        ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Details</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('sales')}
+                    className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                      activeTab === 'sales'
+                        ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Sales</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('guests')}
+                    className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                      activeTab === 'guests'
+                        ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span>Guests</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('scan')}
+                    className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                      activeTab === 'scan'
+                        ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                    </svg>
+                    <span>Scan</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('tickets')}
+                    className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                      activeTab === 'tickets'
+                        ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                        : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                    <span>Tickets</span>
+                  </button>
+                </nav>
+              </div>
             </div>
 
             {/* Content based on active tab */}
@@ -951,6 +1002,29 @@ const TicketDashboard = ({ params }) => {
                           );
                         })}
                       </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Guest List Tab Content */}
+              {activeTab === 'guests' && (
+                <div className="p-6">
+                  <h2 className="text-xl font-bold mb-6 text-gray-900">Guest List</h2>
+                  
+                  {loading ? (
+                    <div className="flex justify-center my-8">
+                      <LoadingAnimation />
+                    </div>
+                  ) : transactions.length > 0 ? (
+                    <GuestList transactions={transactions} />
+                  ) : (
+                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                      <h3 className="text-lg font-medium text-gray-900 mb-2">No Guests Yet</h3>
+                      <p className="text-gray-500">Your guest list will appear here once tickets are purchased</p>
                     </div>
                   )}
                 </div>
