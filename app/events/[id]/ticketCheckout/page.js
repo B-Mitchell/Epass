@@ -135,8 +135,8 @@ const CheckoutPage = () => {
                       <span className="text-sm text-gray-500">includes ₦{totalFees.toFixed(2)} fee</span>
                     </p>
                     <p className="mt-2 text-gray-600">{ticket.ticketDescription}</p>
-                    {/* Show remaining tickets if 10 or fewer */}
-                    {parseInt(ticket.currentStock) <= 10 && (
+                    {/* Show remaining tickets if 5 or fewer */}
+                    {parseInt(ticket.currentStock) <= 5 && (
                       <p className={`mt-1 text-sm ${parseInt(ticket.currentStock) <= 3 ? 'text-red-500 font-medium' : 'text-orange-500'}`}>
                         {parseInt(ticket.currentStock) === 0 
                           ? 'Sold Out!' 
