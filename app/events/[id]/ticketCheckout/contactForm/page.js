@@ -587,7 +587,7 @@ const ContactForm = () => {
           onChange={(e) => setEmail(e.target.value)}
           className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition"
         />
-        {isSoldOut ? (
+        {/* {isSoldOut ? (
           <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
             SOLD OUT!
           </button>
@@ -602,11 +602,38 @@ const ContactForm = () => {
         ) : (
           <FlutterWaveButton
             className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
-            disabled={isProcessing || isSoldOut}
+            disabled={isProcessing || isSoldOut || !isTicketsLocked}
             {...fwConfig}
             title="Secure payment with Flutterwave"
           />
-        )}
+        )} */}
+        {isSoldOut ? (
+  <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
+    SOLD OUT!
+  </button>
+) : ticketPrice === 0 ? (
+  <button
+    className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+    disabled={isProcessing || isSoldOut}
+    onClick={handleFreeTicket}
+  >
+    Register
+  </button>
+) : !isTicketsLocked ? (
+  <button
+    className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black mb-1 hover:scale-110 opacity-50 cursor-not-allowed"
+    onClick={() => toast.error('Please lock your tickets before proceeding to payment.')}
+  >
+    LOCK TICKETS FIRST
+  </button>
+) : (
+  <FlutterWaveButton
+    className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+    disabled={isProcessing || isSoldOut}
+    {...fwConfig}
+    title="Secure payment with Flutterwave"
+  />
+)}
       </form>
     </div>
   );
