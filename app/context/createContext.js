@@ -33,7 +33,6 @@ export const MyContextProvider = ({ children }) => {
     namedTicketCounts,
     setNamedTicketCounts
   }
-
   // Provide the context value to the children components
   return (
     <MyContext.Provider value={contextData}>

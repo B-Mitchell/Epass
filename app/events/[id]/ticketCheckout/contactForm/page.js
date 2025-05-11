@@ -11,7 +11,7 @@ const ContactForm = () => {
   const [name, setName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const { ticketPrice, ticketRoute, setTicketRoute, ticketCheckoutData, namedTicketCounts, numberOfTickets, selectedTickets } = useMyContext();
+  const { ticketPrice, ticketRoute, setTicketRoute, setTicketPrice, namedTicketCounts, numberOfTickets, selectedTickets } = useMyContext();
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
@@ -300,14 +300,66 @@ const ContactForm = () => {
     }
   };
 
+  // const handleLockingTickets = async () => {
+  //   console.log('handleLockingTickets called');
+  //   try {
+  //     setIsProcessing(true);
+  //     await checkIfTicketIsSoldOut();
+
+  //     console.log('Attempting to lock tickets...', { selectedTickets });
+  //     let allTicketsLocked = true;
+  //     for (let ticketId in selectedTickets) {
+  //       const quantity = selectedTickets[ticketId];
+  //       if (quantity > 0) {
+  //         console.log(`Locking ticket ${ticketId} with quantity ${quantity}`);
+  //         const { data, error } = await supabase.rpc('purchase_tickets', {
+  //           ticket_uuid: ticketId,
+  //           quantity: quantity,
+  //         });
+  //         if (error) {
+  //           allTicketsLocked = false;
+  //           console.log(`Error locking ticket ${ticketId}:`, error);
+  //           throw new Error(`Error purchasing ticket ${ticketId}: ${error.message}`);
+  //         }
+  //       }
+  //     }
+
+  //     if (allTicketsLocked) {
+  //       console.log('Tickets locked successfully!');
+  //       setIsTicketsLocked(true);
+  //       isTicketsLockedRef.current = true;
+  //       setPaymentPending(true);
+  //       paymentPendingRef.current = true;
+        
+  //       startTimer();
+  //       return true;
+  //     } else {
+  //       await releaseLockedTickets();
+  //       toast.error("Couldn't reserve all tickets. Please try again.");
+  //       return false;
+  //     }
+  //   } catch (error) {
+  //     console.error('Payment process error:', error);
+  //     toast.error(`Couldn't reserve tickets: ${error.message}`);
+  //     setIsTicketsLocked(false);
+  //     isTicketsLockedRef.current = false;
+  //     console.log('State after error:', { isTicketsLocked, paymentPending });
+  //     return false;
+  //   } finally {
+  //     setIsProcessing(false);
+  //   }
+  // };
+
   const handleLockingTickets = async () => {
     console.log('handleLockingTickets called');
     try {
       setIsProcessing(true);
       await checkIfTicketIsSoldOut();
-
+  
       console.log('Attempting to lock tickets...', { selectedTickets });
       let allTicketsLocked = true;
+      const sessionId = crypto.randomUUID(); // Generate unique session ID
+  
       for (let ticketId in selectedTickets) {
         const quantity = selectedTickets[ticketId];
         if (quantity > 0) {
@@ -315,22 +367,46 @@ const ContactForm = () => {
           const { data, error } = await supabase.rpc('purchase_tickets', {
             ticket_uuid: ticketId,
             quantity: quantity,
+            session_id: sessionId,
           });
+  
           if (error) {
             allTicketsLocked = false;
             console.log(`Error locking ticket ${ticketId}:`, error);
+            if (error.message === 'Ticket not found') {
+              toast.error('Ticket not found. Please try again.');
+            } else {
+              toast.error('An error occurred while locking tickets.');
+            }
             throw new Error(`Error purchasing ticket ${ticketId}: ${error.message}`);
+          } else if (data === false) {
+            allTicketsLocked = false;
+            // Check if failure was due to existing lock
+            const { data: ticketData, error: checkError } = await supabase
+              .from('ticketdata')
+              .select('is_locked')
+              .eq('uuid', ticketId)
+              .single();
+  
+            if (checkError) {
+              console.log(`Error checking lock status for ticket ${ticketId}:`, checkError);
+              toast.error('Failed to check ticket status.');
+            } else if (ticketData?.is_locked) {
+              toast.error('These tickets are currently locked by another user. Please try again later.');
+            } else {
+              toast.error('Not enough tickets available. Please try again.');
+            }
+            throw new Error(`Failed to lock ticket ${ticketId}`);
           }
         }
       }
-
+  
       if (allTicketsLocked) {
         console.log('Tickets locked successfully!');
         setIsTicketsLocked(true);
         isTicketsLockedRef.current = true;
         setPaymentPending(true);
         paymentPendingRef.current = true;
-        
         startTimer();
         return true;
       } else {
@@ -340,7 +416,7 @@ const ContactForm = () => {
       }
     } catch (error) {
       console.error('Payment process error:', error);
-      toast.error(`Couldn't reserve tickets: ${error.message}`);
+      toast.error(`Couldn't reserve tickets`);
       setIsTicketsLocked(false);
       isTicketsLockedRef.current = false;
       console.log('State after error:', { isTicketsLocked, paymentPending });
@@ -507,7 +583,23 @@ const ContactForm = () => {
       router.back();
     }
   };
-
+  const unlockTickets = async () => {
+    console.log('unlockTickets called');
+    try {
+      setIsProcessing(true);
+      await releaseLockedTickets();
+      cleanupTimer();
+      setPaymentPending(false);
+      paymentPendingRef.current = false;
+      setIsTicketsLocked(false);
+      isTicketsLockedRef.current = false;
+      router.back();
+    } catch (error) {
+      console.error('Error unlocking tickets:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   const cleanupTimer = () => {
     console.log('Cleaning up timer');
     if (timerRef.current) {
@@ -523,29 +615,16 @@ const ContactForm = () => {
 
   return (
     <div>
-      {ticketPrice > 0 && (
+      {ticketPrice > 0 && isTicketsLocked && (
         <div className="mb-4 p-4 border rounded-md bg-gray-100">
-          <p className="font-semibold text-gray-700 mb-2">Secure Your Tickets:</p>
-          {!isTicketsLocked ? (
-            <button
-              onClick={lockTickets}
-              className="bg-[#FFC0CB] hover:bg-transparent hover:text-black rounded-2xl hover:scale-110 transition border border-[#FFC0CB] text-white font-normal py-2 px-4"
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <span className="animate-pulse">Locking Tickets...</span>
-              ) : (
-                'Lock Tickets'
-              )}
-            </button>
-          ) : (
+          <div className="flex flex-col gap-2">
             <div className="flex items-center bg-green-100 text-green-700 p-3 rounded-md">
               <svg className="w-5 h-5 mr-2 fill-current" viewBox="0 0 20 20">
-                  <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                  />
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
               Tickets reserved! Pay within{' '}
               <span className="text-red-600 font-semibold text-[1.2rem]">
@@ -554,77 +633,102 @@ const ContactForm = () => {
                   : '0:10'}
               </span>
             </div>
-          )}
+            <button
+              onClick={unlockTickets}
+              className="bg-[#FFC0CB] hover:bg-transparent hover:text-black rounded-2xl hover:scale-110 transition border border-[#FFC0CB] text-white font-normal py-2 px-4 w-[70%] md:w-[50%] mx-auto"
+              disabled={isProcessing}
+            >
+              Unlock Tickets
+            </button>
+          </div>
         </div>
       )}
-
       <p className="text-center font-bold text-[1.4rem] my-4">Fill the form with your contact details.</p>
-      <form onSubmit={(e) => e.preventDefault()} className="border border-[#FFC0CB] md:w-[60%] w-[80%] m-auto rounded-xl p-6 mb-8">
-        <p className="text-[1.2rem] my-2">Name:</p>
-        <input
-          type="text"
-          placeholder="eg: John Doe"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
-        />
-        <p className="text-[1.2rem] my-2">Phone Number:</p>
-        <input
-          type="text"
-          placeholder="eg: 81********65"
-          required
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
-        />
-        <p className="text-[1.2rem] my-2">Email:</p>
-        <input
-          type="email"
-          placeholder="eg: johnDoe@gmail.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition"
-        />
-        {/* {isSoldOut ? (
-          <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
-            SOLD OUT!
-          </button>
-        ) : ticketPrice === 0 ? (
-          <button
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
-            disabled={isProcessing || isSoldOut}
-            onClick={handleFreeTicket}
-          >
-            Register
-          </button>
+
+<form onSubmit={(e) => e.preventDefault()} className="border border-[#FFC0CB] md:w-[60%] w-[80%] m-auto rounded-xl p-6 mb-8">
+  <p className="text-[1.2rem] my-2">Name:</p>
+  <input
+    type="text"
+    placeholder="eg: John Doe"
+    required
+    value={name}
+    onChange={(e) => setName(e.target.value)}
+    className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
+  />
+  <p className="text-[1.2rem] my-2">Phone Number:</p>
+  <input
+    type="text"
+    placeholder="eg: 81********65"
+    required
+    value={phoneNumber}
+    onChange={(e) => setPhoneNumber(e.target.value)}
+    className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
+  />
+  <p className="text-[1.2rem] my-2">Email:</p>
+  <input
+    type="email"
+    placeholder="eg: johnDoe@gmail.com"
+    required
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition"
+  />
+  {/* {isSoldOut ? (
+    <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
+      SOLD OUT!
+    </button>
+  ) : ticketPrice === 0 ? (
+    <button
+      className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+      disabled={isProcessing || isSoldOut}
+      onClick={handleFreeTicket}
+    >
+      Register
+    </button>
+  ) : !isTicketsLocked ? (
+    <button
+      className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black mb-1 hover:scale-110"
+      onClick={lockTickets}
+      disabled={isProcessing}
+    >
+      {isProcessing ? (
+          <span className="animate-pulse">Locking Tickets...</span>
         ) : (
-          <FlutterWaveButton
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
-            disabled={isProcessing || isSoldOut || !isTicketsLocked}
-            {...fwConfig}
-            title="Secure payment with Flutterwave"
-          />
-        )} */}
-        {isSoldOut ? (
+          'Lock Tickets'
+        )}
+    </button>
+  ) : (
+    <FlutterWaveButton
+      className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+      disabled={isProcessing || isSoldOut}
+      {...fwConfig}
+      title="Secure payment with Flutterwave"
+    />
+  )} */}
+
+{isSoldOut && ticketPrice > 0 ? ( // Only show "SOLD OUT!" for paid tickets
   <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
     SOLD OUT!
   </button>
 ) : ticketPrice === 0 ? (
   <button
     className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
-    disabled={isProcessing || isSoldOut}
+    disabled={isProcessing}
     onClick={handleFreeTicket}
   >
     Register
   </button>
 ) : !isTicketsLocked ? (
   <button
-    className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black mb-1 hover:scale-110 opacity-50 cursor-not-allowed"
-    onClick={() => toast.error('Please lock your tickets before proceeding to payment.')}
+    className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black mb-1 hover:scale-110"
+    onClick={lockTickets}
+    disabled={isProcessing}
   >
-    LOCK TICKETS FIRST
+    {isProcessing ? (
+      <span className="animate-pulse">Locking Tickets...</span>
+    ) : (
+      'Lock Tickets'
+    )}
   </button>
 ) : (
   <FlutterWaveButton
@@ -634,7 +738,8 @@ const ContactForm = () => {
     title="Secure payment with Flutterwave"
   />
 )}
-      </form>
+
+</form>
     </div>
   );
 };
