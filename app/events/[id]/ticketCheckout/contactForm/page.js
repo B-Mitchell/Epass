@@ -8,9 +8,9 @@ import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 
 const ContactForm = () => {
-  const [name, setName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
+  const [contacts, setContacts] = useState([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+  const [useSingleEmail, setUseSingleEmail] = useState(false);
+  const [ticketOptions, setTicketOptions] = useState([]);
   const { ticketPrice, ticketRoute, setTicketPrice, namedTicketCounts, numberOfTickets, selectedTickets, setSelectedTickets } = useMyContext();
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
@@ -19,35 +19,27 @@ const ContactForm = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTicketsLocked, setIsTicketsLocked] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
+  const [isTransactionComplete, setIsTransactionComplete] = useState(false);
   const isTicketsLockedRef = useRef(false);
   const paymentPendingRef = useRef(false);
   const timerRef = useRef(null);
   const countdownRef = useRef(null);
-  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
-  // Add a flag to track successful transactions
-  const [isTransactionComplete, setIsTransactionComplete] = useState(false);
   const sessionIdRef = useRef(null);
 
   useEffect(() => {
     sessionIdRef.current = sessionId;
   }, [sessionId]);
 
-  // Monitor network status
-  const [networkStatus, setNetworkStatus] = useState('');
   useEffect(() => {
     const handleOnline = () => {
-      setNetworkStatus('online');
       toast.success('Network connection restored');
     };
-    
     const handleOffline = () => {
-      setNetworkStatus('offline');
       toast.error('Network connection lost');
     };
-    
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-    
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -55,86 +47,138 @@ const ContactForm = () => {
   }, []);
 
   useEffect(() => {
-    console.log('ContactForm mounted');
-    return () => {
-      console.log('ContactForm unmounted');
-      (async () => {
-        cleanupTimer();
-        if (isTicketsLockedRef.current && paymentPendingRef.current && sessionId) {
-          console.log('Unmount cleanup: Releasing tickets');
-          await releaseLockedTickets(sessionId);
-        }
-      })();
-    };
-  }, [sessionId]);
-
-  useEffect(() => {
-    console.log('ContactForm mounted');
-    console.log('Current state:', { ticketPrice, selectedTickets, isTransactionComplete });
     if (!isTransactionComplete) {
       if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
-        console.error('Invalid ticket price:', ticketPrice);
         toast.error('Invalid ticket price.');
         router.back();
         return;
       }
       if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
-        console.error('No tickets selected.');
         toast.error('No tickets selected. Redirecting...');
-        setTimeout(() => router.back(), 1000);
+        setTimeout(() => router.back(), 100);
         return;
       }
       checkIfTicketIsSoldOut();
+      fetchTicketOptions();
     }
     return () => {
-      console.log('ContactForm unmounted');
       (async () => {
         cleanupTimer();
         if (isTicketsLockedRef.current && paymentPendingRef.current && sessionId) {
-          console.log('Unmount cleanup: Releasing tickets');
           await releaseLockedTickets(sessionId);
         }
       })();
     };
   }, [ticketPrice, selectedTickets, sessionId, isTransactionComplete]);
 
+  const fetchTicketOptions = async () => {
+    try {
+      const ticketIds = Object.keys(selectedTickets).filter((id) => selectedTickets[id] > 0);
+      const { data, error } = await supabase
+        .from('ticketdata')
+        .select('uuid, ticketName')
+        .in('uuid', ticketIds);
+      if (error) throw error;
+      setTicketOptions(data.map((t) => ({ uuid: t.uuid, name: t.ticketName })));
+    } catch (error) {
+      console.error('Error fetching ticket options:', error);
+      toast.error('Error loading ticket types.');
+    }
+  };
+
   const validateForm = () => {
-    if (!name.trim()) {
-      toast.error('Please enter your name.');
+    if (useSingleEmail && contacts.length !== 1) {
+      toast.error('Please provide one contact for single email delivery.');
       return false;
     }
-    if (!phoneNumber.trim()) {
-      toast.error('Please enter your phone number.');
+    if (!useSingleEmail && contacts.length !== numberOfTickets) {
+      toast.error(`Please provide contact details for all ${numberOfTickets} tickets.`);
       return false;
     }
-    if (!/^\d+$/.test(phoneNumber.trim())) {
-      toast.error('Please enter a valid phone number (numbers only).');
-      return false;
+
+    for (let i = 0; i < contacts.length; i++) {
+      const { name, phoneNumber, email, ticket_uuid } = contacts[i];
+      if (!name.trim()) {
+        toast.error(`Please enter a name for contact ${i + 1}.`);
+        return false;
+      }
+      if (!phoneNumber.trim()) {
+        toast.error(`Please enter a phone number for contact ${i + 1}.`);
+        return false;
+      }
+      if (!/^\d+$/.test(phoneNumber.trim())) {
+        toast.error(`Please enter a valid phone number (numbers only) for contact ${i + 1}.`);
+        return false;
+      }
+      if (!email.trim()) {
+        toast.error(`Please enter an email address for contact ${i + 1}.`);
+        return false;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        toast.error(`Please enter a valid email address for contact ${i + 1}.`);
+        return false;
+      }
+      if (!useSingleEmail && !ticket_uuid) {
+        toast.error(`Please select a ticket type for contact ${i + 1}.`);
+        return false;
+      }
     }
-    if (!email.trim()) {
-      toast.error('Please enter your email address.');
-      return false;
+
+    if (!useSingleEmail) {
+      const ticketCounts = {};
+      contacts.forEach((contact) => {
+        ticketCounts[contact.ticket_uuid] = (ticketCounts[contact.ticket_uuid] || 0) + 1;
+      });
+      for (const ticketId in selectedTickets) {
+        const selectedCount = ticketCounts[ticketId] || 0;
+        if (selectedCount !== selectedTickets[ticketId]) {
+          toast.error(`Selected ${selectedCount} ${ticketOptions.find((t) => t.uuid === ticketId)?.name || 'tickets'}, but ${selectedTickets[ticketId]} were purchased.`);
+          return false;
+        }
+      }
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      toast.error('Please enter a valid email address.');
-      return false;
-    }
+
     return true;
   };
 
+  const handleAddContact = () => {
+    if (useSingleEmail) {
+      toast.error('Cannot add more contacts when using single email delivery.');
+      return;
+    }
+    if (contacts.length < numberOfTickets) {
+      setContacts([...contacts, { name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+    } else {
+      toast.error(`Cannot add more contacts. You have selected ${numberOfTickets} tickets.`);
+    }
+  };
+
+  const handleContactChange = (index, field, value) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[index][field] = value;
+    setContacts(updatedContacts);
+  };
+
+  const handleSingleEmailToggle = () => {
+    setUseSingleEmail(!useSingleEmail);
+    if (!useSingleEmail) {
+      setContacts([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+    } else if (contacts.length === 1) {
+      setContacts([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+    }
+  };
+
   const lockTickets = async () => {
-    console.log('lockTickets called - Current state:', { isTicketsLocked, paymentPending });
     if (validateForm()) {
       if (!isTicketsLocked && Object.keys(selectedTickets).length > 0) {
         await handleLockingTickets();
       } else {
-        toast.error("An issue occurred while trying to lock the selected tickets. Please ensure you have selected tickets and try again.");
+        toast.error("An issue occurred while trying to lock the selected tickets.");
       }
     }
   };
 
   const handleLockingTickets = async () => {
-    console.log('handleLockingTickets called', { selectedTickets });
     try {
       setIsProcessing(true);
       await checkIfTicketIsSoldOut();
@@ -145,44 +189,33 @@ const ContactForm = () => {
       const sessionId = crypto.randomUUID();
       setSessionId(sessionId);
       sessionIdRef.current = sessionId;
-  
-      // Build tickets array
+
       const tickets = Object.entries(selectedTickets)
         .filter(([_, quantity]) => quantity > 0)
         .map(([ticketId, quantity]) => ({
           ticket_uuid: ticketId,
           quantity,
         }));
-  
+
       if (tickets.length === 0) {
         throw new Error('No tickets selected');
       }
-  
-      console.log('Reserving tickets:', { tickets, sessionId });
-  
+
       const { data, error } = await supabase.rpc('reserve_tickets', {
         p_tickets: tickets,
         p_session_id: sessionId,
       });
-  
+
       if (error) {
-        console.error('Error reserving tickets:', error);
-        if (error.message.includes('Ticket not found')) {
-          toast.error(`One or more tickets not found. Please try again.`);
-        } else if (error.message.includes('Insufficient stock')) {
-          toast.error('Not enough tickets available. Please try again.');
-        } else {
-          toast.error('An error occurred while reserving tickets.');
-        }
+        toast.error(error.message.includes('Ticket not found') ? 'One or more tickets not found.' : 'Not enough tickets available.');
         throw new Error(`Error reserving tickets: ${error.message}`);
       }
-  
+
       if (data === false) {
-        toast.error('Not enough tickets available. Please try again.');
+        toast.error('Not enough tickets available.');
         throw new Error('Failed to reserve tickets');
       }
-  
-      console.log('Tickets reserved successfully!');
+
       setIsTicketsLocked(true);
       isTicketsLockedRef.current = true;
       setPaymentPending(true);
@@ -190,7 +223,6 @@ const ContactForm = () => {
       startTimer();
       return true;
     } catch (error) {
-      console.error('Reservation process error:', error);
       await releaseLockedTickets(sessionId);
       toast.error("Couldn't reserve tickets");
       setIsTicketsLocked(false);
@@ -203,7 +235,6 @@ const ContactForm = () => {
   };
 
   const releaseLockedTickets = async (sessionId) => {
-    console.log('releaseLockedTickets called', { sessionId, isTicketsLocked: isTicketsLockedRef.current });
     if (isTicketsLockedRef.current && sessionId) {
       try {
         const retry = async (fn, retries = 3, delay = 1000) => {
@@ -212,30 +243,24 @@ const ContactForm = () => {
               return await fn();
             } catch (err) {
               console.warn(`Retry ${i + 1}/${retries} failed:`, err);
-              if (i < retries - 1) {
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                continue;
-              }
-              throw err;
+              if (i < retries - 1) await new Promise((resolve) => setTimeout(resolve, delay));
+              else throw err;
             }
           }
         };
-  
+        
         const { data, error } = await retry(async () => {
           return await supabase.rpc('release_tickets', {
             p_session_id: sessionId,
           });
         });
-  
+
         if (error) {
-          console.error('Error releasing tickets:', error);
           toast.error(`Failed to release tickets: ${error.message}`);
         } else {
-          console.log(`Tickets released successfully. Deleted ${data} reservations.`);
           toast.success(`Tickets released. Freed ${data} reservation(s).`);
         }
       } catch (error) {
-        console.error('Error calling release_tickets RPC:', error);
         toast.error('Error releasing tickets.');
       } finally {
         setIsTicketsLocked(false);
@@ -244,21 +269,19 @@ const ContactForm = () => {
         paymentPendingRef.current = false;
         setSessionId(null);
       }
-    } else {
-      console.log('Skipping release: Tickets not locked or no sessionId');
     }
   };
 
   const config = {
     public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
-    tx_ref: Date.now(),
+    tx_ref: Date.now().toString(),
     amount: ticketPrice,
     currency: 'NGN',
     payment_options: 'card,mobilemoney,ussd',
     customer: {
-      email,
-      phone_number: phoneNumber,
-      name,
+      email: contacts[0].email,
+      phone_number: contacts[0].phoneNumber,
+      name: contacts[0].name,
     },
     customizations: {
       title: 'PAYMENT FOR TICKET',
@@ -271,7 +294,6 @@ const ContactForm = () => {
     ...config,
     text: 'Pay with Flutterwave!',
     callback: async (response) => {
-      console.log('Payment callback - Response:', response);
       cleanupTimer();
       setPaymentPending(false);
       paymentPendingRef.current = false;
@@ -301,211 +323,284 @@ const ContactForm = () => {
     },
   };
 
+  const savetxn = async (txnData) => {
+    const { data: existingTxn, error: existingTxnError } = await supabase
+      .from('transactions')
+      .select('transaction_id')
+      .eq('transaction_id', txnData.transaction_id);
+    if (existingTxnError) {
+      console.error('Error checking transaction:', existingTxnError);
+      toast.error('Error checking transaction.');
+      return null;
+    }
+    if (existingTxn && existingTxn.length > 0) {
+      console.warn('Duplicate transaction detected. Skipping save.');
+      return null;
+    }
 
-  const handlePaymentSuccess = async (response) => {
-    console.log('handlePaymentSuccess called', { response, selectedTickets, sessionId });
-    try {
-      // Make sure sessionId is valid before proceeding
-      if (!sessionId) {
-        console.error('No valid session ID for purchase confirmation');
-        toast.error('Payment session expired. Please try again.');
-        throw new Error('Invalid session ID');
+    const { data, error } = await supabase
+      .from('transactions')
+      .insert(txnData)
+      .select('transaction_id')
+      .single();
+    if (error) {
+      console.error('Error saving transaction:', error);
+      toast.error('Error saving transaction.');
+      return null;
+    }
+    console.log('Transaction saved:', data);
+    return data.transaction_id;
+  };
+
+  const retry = async (fn, retries = 3, delay = 1000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fn();
+      } catch (err) {
+        console.warn(`Retry ${i + 1}/${retries} failed:`, {
+          message: err.message,
+          details: err.details,
+          hint: err.hint
+        });
+        if (i < retries - 1) await new Promise((resolve) => setTimeout(resolve, delay));
+        else throw err;
       }
-  
-      // Build tickets_purchased array - FIXED FORMAT
-      const tickets_purchased = Object.entries(selectedTickets)
-      .filter(([_, quantity]) => quantity > 0)
-      .map(([ticketId, quantity]) => ({
-        ticket_uuid: ticketId,
-        quantity,
-        session_id: sessionId,
-      }));
+    }
+  };
+
+const handlePaymentSuccess = async (response) => {
+  try {
+      console.log('Flutterwave response:', {
+          transaction_id: response.transaction_id,
+          type: typeof response.transaction_id,
+          tx_ref: response.tx_ref,
+          amount: response.amount,
+      });
+      if (!sessionIdRef.current) {
+          toast.error('Payment session expired. Please try again.');
+          throw new Error('Invalid session ID');
+      }
+
+      // Validate session_id format
+      if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(sessionIdRef.current)) {
+          console.error('Invalid session_id:', sessionIdRef.current);
+          toast.error('Invalid session ID format. Please try again.');
+          throw new Error(`Invalid session ID format: ${sessionIdRef.current}`);
+      }
+
+      const tickets_purchased = useSingleEmail
+          ? Object.entries(selectedTickets)
+              .filter(([_, quantity]) => quantity > 0)
+              .flatMap(([ticketId, quantity]) =>
+                  Array.from({ length: quantity }, () => ({
+                      ticket_uuid: ticketId,
+                      quantity: 1,
+                      email: contacts[0].email,
+                  }))
+              )
+          : contacts.map((contact) => ({
+              ticket_uuid: contact.ticket_uuid,
+              quantity: 1,
+              email: contact.email,
+          }));
 
       if (tickets_purchased.length === 0) {
-        console.error('No tickets selected for confirmation');
-        toast.error('No tickets to confirm. Please try again.');
-        throw new Error('No tickets selected');
+          toast.error('No tickets selected. Please try again.');
+          throw new Error('No tickets selected');
       }
-  
-      // Fetch event data
-      const { data: eventData, error: eventError } = await supabase
-        .from('tickets')
-        .select('*')
-        .eq('uuid', ticketRoute)
-        .single();
-      if (eventError) {
-        console.error('Error fetching event data:', eventError);
-        toast.error('Error processing payment.');
-        throw new Error('Error fetching event data');
-      }
-  
-      // Save transaction first to ensure we record the payment
-      const txnData = {
-        name: response.customer.name,
-        email: response.customer.email,
-        phone_number: response.customer.phone_number,
-        transaction_id: response.transaction_id,
-        tx_ref: response.tx_ref,
-        charged_amount: response.amount,
-        event_id: ticketRoute,
-        ticketsbought: numberOfTickets,
-        ticketsInfo: namedTicketCounts,
-      };
-      await savetxn(txnData);
-  
-      // Generate QR code
-      // const qrCode = await QRCode.toDataURL(response.transaction_id);
-      
-      // Confirm purchase
-      console.log('Confirming purchase:', { tickets_purchased, sessionId });
-  
-      console.log('Payload for confirm_purchase:', JSON.stringify(tickets_purchased, null, 2));
 
-      //attempt 3 times incase of network issues
-      const retry = async (fn, retries = 3, delay = 1000) => {
-        for (let i = 0; i < retries; i++) {
-          try {
-            return await fn();
-          } catch (err) {
-            console.warn(`Retry ${i + 1}/${retries} failed:`, err);
-            if (i < retries - 1) {
-              await new Promise((resolve) => setTimeout(resolve, delay));
-              continue;
-            }
-            throw err;
+      // Validate ticket_uuid format
+      tickets_purchased.forEach((ticket, index) => {
+          if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(ticket.ticket_uuid)) {
+              console.error(`Invalid ticket_uuid at index ${index}:`, ticket.ticket_uuid);
+              throw new Error(`Invalid ticket UUID format: ${ticket.ticket_uuid}`);
           }
-        }
-      };
-      const { deletedCount } = await retry(() => confirmPurchase(tickets_purchased));
-  
-      if (!deletedCount || deletedCount === 0) {
-        console.warn('No reservations deleted for session_id:', tickets_purchased[0].session_id);
-        toast.error('No reservations found.');
-        return;
-      }
-      
-  
-      // Send ticket email
-      // const emailResponse = await fetch('/api/send-ticket', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     email: response.customer.email,
-      //     ticketDetails: {
-      //       ticketName: namedTicketCounts?.[Object.keys(selectedTickets)[0]] || 'General Admission',
-      //       quantity: numberOfTickets,
-      //       ticketPrice: response.amount,
-      //     },
-      //     eventDetails: {
-      //       title: eventData.title,
-      //       date: eventData.date,
-      //       startTime: eventData.startTime,
-      //       endTime: eventData.endTime,
-      //       address: eventData.address,
-      //     },
-      //     qrCodeUrl: qrCode,
-      //     transaction_id: response.transaction_id,
-      //   }),
-      // });
-  
-      // if (!emailResponse.ok) {
-      //   console.error('Failed to send ticket email');
-      //   toast.warn('Purchase confirmed, but failed to send ticket email. Please check your email later.');
-      // }
-  
-      console.log(`Purchase confirmed. Deleted ${deletedCount} reservations.`);
-      toast.success(`Purchase confirmed! Processed ${deletedCount} ticket(s).`);
+      });
 
-      // Set transaction complete flag
+      console.log('Tickets purchased for confirm_purchase:', JSON.stringify(tickets_purchased, null, 2));
+
+      const { data: eventData, error: eventError } = await supabase
+          .from('tickets')
+          .select('*')
+          .eq('uuid', ticketRoute)
+          .single();
+      if (eventError) {
+          toast.error('Error processing payment.');
+          throw new Error('Error fetching event data');
+      }
+
+      const ticketDetails = await Promise.all(
+          Object.entries(selectedTickets)
+              .filter(([_, quantity]) => quantity > 0)
+              .map(async ([ticketId, quantity]) => {
+                  const { data: ticketData, error: ticketError } = await supabase
+                      .from('ticketdata')
+                      .select('ticketName, ticketPrice')
+                      .eq('uuid', ticketId)
+                      .single();
+                  if (ticketError) throw new Error(`Error fetching ticket data: ${ticketError.message}`);
+                  return { ticketName: ticketData.ticketName, quantity, ticketPrice: ticketData.ticketPrice, ticket_uuid: ticketId };
+              })
+      );
+
+      const individualTickets = tickets_purchased.map((ticket, index) => ({
+          unique_ticket_id: crypto.randomUUID(),
+          ticket_uuid: ticket.ticket_uuid,
+          ticketName: ticketDetails.find((t) => t.ticket_uuid === ticket.ticket_uuid)?.ticketName || 'Unknown',
+          contact: useSingleEmail ? contacts[0] : contacts[index],
+      }));
+
+      const txnData = {
+          name: contacts[0].name,
+          email: contacts[0].email,
+          phone_number: contacts[0].phoneNumber,
+          transaction_id: parseInt(response.transaction_id),
+          tx_ref: response.tx_ref,
+          charged_amount: response.amount,
+          event_id: ticketRoute,
+          ticketsbought: numberOfTickets,
+          ticketsInfo: individualTickets.map((t) => ({
+              unique_ticket_id: t.unique_ticket_id,
+              ticketName: t.ticketName,
+              email: t.contact.email,
+          })),
+      };
+
+      const transactionId = await savetxn(txnData);
+      if (!transactionId) throw new Error('Failed to save transaction');
+
+      const { data: ticketsCreated, error: createError } = await retry(async () => {
+          return await supabase.rpc('create_ticket_instances', {
+              p_tickets_purchased: tickets_purchased,
+              p_transaction_id: transactionId,
+              p_email: contacts[0].email,
+          });
+      });
+      if (createError) {
+          console.error('Create ticket instances error:', createError.message, createError.details, createError.hint);
+          toast.error(`Failed to create tickets: ${createError.message}`);
+          throw new Error(`Failed to create ticket instances: ${createError.message}`);
+      }
+
+      const { deletedCount } = await retry(async () => {
+          console.log('Calling confirm_purchase with:', {
+              p_tickets_purchased: JSON.stringify(tickets_purchased, null, 2),
+              p_session_id: sessionIdRef.current,
+          });
+          const { data, error } = await supabase.rpc('confirm_purchase', {
+              p_tickets_purchased: tickets_purchased,
+              p_session_id: sessionIdRef.current,
+          });
+          if (error) {
+              console.error('Confirm purchase error:', {
+                  message: error.message,
+                  details: error.details,
+                  hint: error.hint,
+                  code: error.code,
+              });
+              throw new Error(`Failed to confirm purchase: ${error.message}`);
+          }
+          return { deletedCount: data || 0 };
+      });
+      if (deletedCount === 0) {
+          console.warn('No reservations deleted. Checking reservations table...');
+          const { data: reservations, error: resError } = await supabase
+              .from('reservations')
+              .select('*')
+              .eq('session_id', sessionIdRef.current)
+              .gt('expires_at', new Date().toISOString());
+          console.log('Current reservations:', reservations, 'Error:', resError);
+          toast.error('No valid reservations found. Tickets may have expired or been released.');
+          throw new Error('No reservations found');
+      }
+
+      // Email sending commented out for testing
+      /*
+      await Promise.all(individualTickets.map(async (ticket) => {
+          try {
+              const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
+              const emailBody = {
+                  email: ticket.contact.email,
+                  ticketDetails: {
+                      ticketName: ticket.ticketName,
+                      quantity: 1,
+                      ticketPrice: ticketDetails.find((t) => t.ticketName === ticket.ticketName)?.ticketPrice || 0,
+                      uniqueTicketId: ticket.unique_ticket_id,
+                  },
+                  eventDetails: {
+                      title: eventData.title,
+                      date: eventData.date,
+                      startTime: eventData.startTime,
+                      endTime: eventData.endTime,
+                      address: eventData.address,
+                  },
+                  qrCodeUrl: qrCode,
+                  transaction_id: response.transaction_id,
+              };
+              console.log('Sending email to:', ticket.contact.email, 'with body:', JSON.stringify(emailBody, null, 2));
+              const emailResponse = await fetch('/api/send-ticket', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(emailBody),
+              });
+              if (!emailResponse.ok) {
+                  const errorText = await emailResponse.text();
+                  console.warn(`Failed to send email to ${ticket.contact.email}:`, {
+                      status: emailResponse.status,
+                      statusText: emailResponse.statusText,
+                      error: errorText,
+                  });
+                  toast.warn(`Purchase confirmed, but failed to send email to ${ticket.contact.email}.`);
+              }
+          } catch (err) {
+              console.error(`Error sending email to ${ticket.contact.email}:`, err);
+          }
+      }));
+      */
+
+      toast.success(`Purchase confirmed! Processed ${ticketsCreated} ticket(s).`);
       setIsTransactionComplete(true);
       setPaymentSuccessful(true);
-
-      // Redirect to confirmation page
-      console.log('Redirecting to payment-success with transaction_id:', response.transaction_id);
       await router.push(`/payment-success?transaction_id=${response.transaction_id}`);
-
-      // Clear state after redirection
       setIsTicketsLocked(false);
       isTicketsLockedRef.current = false;
       setPaymentPending(false);
       paymentPendingRef.current = false;
       setSessionId(null);
       setSelectedTickets({});
-
-      return true;
-    } catch (error) {
-      console.error('Purchase confirmation error:', error);
-      toast.error('Failed to confirm purchase. Please contact support with transaction ID: ' + response?.transaction_id);
-      
-      // Despite the error, we should still set payment as successful to prevent auto-release of tickets
-      // This ensures we don't release tickets that were actually confirmed but had some other error
+      setContacts([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+  } catch (error) {
+      console.error('Error confirming purchase:', error.message, error.stack);
+      toast.error(`Failed to confirm purchase. Contact support with transaction ID: ${response?.transaction_id}`);
       setPaymentSuccessful(true);
-      
-      return false;
-    }
   }
+};
 
   const confirmPurchase = async (tickets_purchased) => {
-    // Validate tickets_purchased before sending
     if (!tickets_purchased || tickets_purchased.length === 0) {
-      console.error('Invalid tickets_purchased array:', tickets_purchased);
       throw new Error('No tickets selected for confirmation');
     }
-  
-    // Validate session_id consistency
+
     const sessionIds = tickets_purchased.map((ticket) => ticket.session_id);
     const uniqueSessionIds = [...new Set(sessionIds)];
     if (uniqueSessionIds.length > 1) {
-      console.error('Multiple session_ids found:', uniqueSessionIds);
       throw new Error('All tickets must have the same session_id');
     }
-  
+
     if (!sessionIds[0]) {
-      console.error('Missing session_id in tickets_purchased');
       throw new Error('Session ID cannot be null or empty');
     }
-  
-    console.log('Calling confirm_purchase with:', { tickets_purchased });
-  
+
     const { data, error } = await supabase.rpc('confirm_purchase', {
       tickets_purchased,
     });
-  
+
     if (error) {
-      console.error('confirm_purchase RPC error:', error);
       throw new Error(`Failed to confirm purchase: ${error.message}`);
     }
-  
-    const deletedCount = data || 0; // Fallback to 0 if data is null
-  
-    return { deletedCount };
-  };
 
-  const savetxn = async (txnData) => {
-    const { data: existingTxn, error: existingTxnError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('transaction_id', txnData.transaction_id);
-    if (existingTxnError) {
-      console.error('Error checking existing transaction:', existingTxnError);
-      toast.error('Error checking transaction.');
-      return;
-    }
-    if (existingTxn && existingTxn.length > 0) {
-      console.warn('Duplicate transaction detected. Skipping save.');
-      return;
-    }
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert(txnData)
-      .select();
-    if (error) {
-      console.error('Error saving transaction:', error);
-      toast.error('Error saving transaction.');
-    }
-    console.log('Transaction saved:', data);
+    const deletedCount = data || 0;
+    return { deletedCount };
   };
 
   const checkIfTicketIsSoldOut = async () => {
@@ -515,24 +610,22 @@ const ContactForm = () => {
         .select('currentStock, ticketPrice')
         .eq('event_id', ticketRoute);
       if (queryError) {
-        console.log('Sold out check error:', queryError);
         toast.error('Error checking ticket availability.');
         return;
       }
-  
+
       if (queryData && queryData.length > 0) {
-        const isFreeTicket = queryData.some((ticket) => ticket.price === 0);
+        const isFreeTicket = queryData.some((ticket) => ticket.ticketPrice === 0);
         const currentStock = queryData[0].currentStock;
-  
-        // Get total reserved quantity
+
         const { data: reservations, error: resError } = await supabase
           .from('reservations')
           .select('quantity')
           .eq('ticket_uuid', queryData[0].uuid)
           .gt('expires_at', new Date().toISOString());
-  
+
         const reservedQuantity = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0;
-  
+
         if (currentStock - reservedQuantity <= 0 && !isFreeTicket) {
           setIsSoldOut(true);
           toast.error('Tickets have been sold out! Redirecting...');
@@ -542,7 +635,6 @@ const ContactForm = () => {
         }
       }
     } catch (err) {
-      console.log('Sold out check exception:', err);
       toast.error('Error checking ticket availability.');
     }
   };
@@ -559,7 +651,6 @@ const ContactForm = () => {
             .eq('uuid', ticketId)
             .single();
           if (fetchError) {
-            console.error('Error fetching current stock:', fetchError);
             toast.error('Error fetching data, Please try again.');
             return;
           }
@@ -570,21 +661,17 @@ const ContactForm = () => {
               .update({ currentStock: newStock })
               .eq('uuid', ticketId);
             if (updateError) {
-              console.error('Error updating stock:', updateError);
               toast.error('Error registering ticket. Please try again.');
               return;
             }
           } else {
-            console.warn(`Ticket with UUID ${ticketId} not found.`);
             toast.warn(`Could not find ticket information. Please try again.`);
             return;
           }
         }
       }
-      console.log('Ticket stock updated successfully.');
       toast.success('Free ticket acquired successfully!');
     } catch (error) {
-      console.error('Error updating stock:', error);
       toast.error('An unexpected error occurred during registration.');
     } finally {
       setIsProcessing(false);
@@ -594,53 +681,120 @@ const ContactForm = () => {
   const handleFreeTicket = async () => {
     try {
       if (validateForm()) {
-        try {
-          const { data: eventData, error: eventError } = await supabase
-            .from('tickets')
-            .select('*')
-            .eq('uuid', ticketRoute)
-            .single();
-          if (eventError) {
-            console.error('Error fetching event data:', eventError);
-            toast.error('Error fetching event data. Please try again.');
-            return;
-          }
-          await updateStock();
+        const { data: eventData, error: eventError } = await supabase
+          .from('tickets')
+          .select('*')
+          .eq('uuid', ticketRoute)
+          .single();
+        if (eventError) {
+          toast.error('Error fetching event data. Please try again.');
+          return;
+        }
+
+        const ticketDetails = await Promise.all(
+          Object.entries(selectedTickets)
+            .filter(([_, quantity]) => quantity > 0)
+            .map(async ([ticketId, quantity]) => {
+              const { data: ticketData, error: ticketError } = await supabase
+                .from('ticketdata')
+                .select('ticketName')
+                .eq('uuid', ticketId)
+                .single();
+              if (ticketError) throw new Error(`Error fetching ticket data: ${ticketError.message}`);
+              return { ticketName: ticketData.ticketName, quantity, ticket_uuid: ticketId };
+            })
+        );
+
+        const individualTickets = useSingleEmail
+          ? Object.entries(selectedTickets)
+              .filter(([_, quantity]) => quantity > 0)
+              .flatMap(([ticketId, quantity]) => {
+                const ticketName = ticketDetails.find((t) => t.ticket_uuid === ticketId)?.ticketName || 'Unknown';
+                return Array.from({ length: quantity }, () => ({
+                  unique_ticket_id: crypto.randomUUID(),
+                  ticket_uuid: ticketId,
+                  ticketName,
+                  contact: contacts[0],
+                }));
+              })
+          : contacts.map((contact) => ({
+              unique_ticket_id: crypto.randomUUID(),
+              ticket_uuid: contact.ticket_uuid,
+              ticketName: ticketDetails.find((t) => t.ticket_uuid === contact.ticket_uuid)?.ticketName || 'Unknown',
+              contact,
+            }));
+
+        const tickets_purchased = individualTickets.map((ticket) => ({
+          ticket_uuid: ticket.ticket_uuid,
+          session_id: crypto.randomUUID(),
+          quantity: 1,
+          email: ticket.contact.email,
+        }));
+
+        const txnData = {
+          name: contacts[0].name,
+          email: contacts[0].email,
+          phone_number: contacts[0].phoneNumber,
+          transaction_id: parseInt(Date.now()),
+          tx_ref: 'FREE_' + Date.now(),
+          charged_amount: 0,
+          event_id: ticketRoute,
+          ticketsbought: numberOfTickets,
+          ticketsInfo: individualTickets.map((t) => ({
+            unique_ticket_id: t.unique_ticket_id,
+            ticketName: t.ticketName,
+            email: t.contact.email,
+          })),
+        };
+
+        const transactionId = await savetxn(txnData);
+        if (!transactionId) throw new Error('Failed to save transaction');
+
+        const { data: ticketsCreated, error: createError } = await supabase.rpc('create_ticket_instances', {
+          p_tickets_purchased: tickets_purchased,
+          p_transaction_id: transactionId,
+          p_email: contacts[0].email,
+        });
+        if (createError) {
+          toast.error('Failed to create tickets.');
+          throw new Error(`Failed to create ticket instances: ${createError.message}`);
+        }
+
+        await updateStock();
+
+        for (const ticket of individualTickets) {
+          const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
           const emailResponse = await fetch('/api/send-ticket', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email: email,
+              email: ticket.contact.email,
               ticketDetails: {
-                ticketName: selectedTickets.ticketName,
-                quantity: numberOfTickets,
-                ticketPrice: 0
+                ticketName: ticket.ticketName,
+                quantity: 1,
+                ticketPrice: 0,
+                uniqueTicketId: ticket.unique_ticket_id,
               },
               eventDetails: {
                 title: eventData.title,
                 date: eventData.date,
                 startTime: eventData.startTime,
                 endTime: eventData.endTime,
-                address: eventData.address
-              }
-            })
+                address: eventData.address,
+              },
+              qrCodeUrl: qrCode,
+            }),
           });
           if (!emailResponse.ok) {
-            console.error('Failed to send ticket email');
-            toast.error('Failed to send ticket email. Please try again.');
-            return;
+            toast.warn(`Failed to send ticket email to ${ticket.contact.email}.`);
           }
-          toast.success('Free ticket registered successfully! Check your email for confirmation.');
-          router.push('/payment-success');
-        } catch (error) {
-          console.error('Error processing free ticket:', error);
-          toast.error('An error occurred while processing your ticket. Please try again.');
         }
+
+        toast.success('Free ticket registered successfully! Check your email for confirmation.');
+        router.push('/payment-success');
       }
     } catch (error) {
-      console.error('Error handling free ticket:', error);
+      console.error('Error processing free ticket:', error);
       toast.error('An error occurred while processing your ticket. Please try again.');
     }
   };
@@ -659,7 +813,6 @@ const ContactForm = () => {
       });
     }, 1000);
     timerRef.current = setTimeout(() => {
-      console.log('Timeout triggered after 4 minutes');
       handleTimeout();
     }, paymentTimeout);
   };
@@ -674,25 +827,19 @@ const ContactForm = () => {
           await releaseLockedTickets(sessionIdRef.current);
           setIsTicketsLocked(false);
           isTicketsLockedRef.current = false;
-          console.log('Tickets released due to timeout');
-        } else {
-          console.log('Tickets were already released or never locked');
         }
         toast.warn('Payment session expired.');
         router.back();
       } catch (error) {
-        console.error('Timeout cleanup failed:', error);
         toast.error('Error during timeout cleanup');
       }
     } else {
-      console.log('Timeout skipped - No tickets locked or payment pending');
       toast.info('Session expired, but no action needed.');
       router.back();
     }
   };
 
   const unlockTickets = async () => {
-    console.log('unlockTickets called');
     try {
       setIsProcessing(true);
       await releaseLockedTickets(sessionId);
@@ -710,7 +857,6 @@ const ContactForm = () => {
   };
 
   const cleanupTimer = () => {
-    console.log('Cleaning up timer');
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
@@ -723,99 +869,216 @@ const ContactForm = () => {
   };
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
+      {/* Header Section */}
+      <div className="mb-8 text-center">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {useSingleEmail
+            ? 'Ticket Reservation'
+            : `Reserve ${numberOfTickets} Ticket${numberOfTickets > 1 ? 's' : ''}`}
+        </h2>
+        <p className="text-gray-600 mt-1">
+          {useSingleEmail
+            ? 'Provide your contact details for ticket delivery'
+            : 'Assign tickets to individual attendees'}
+        </p>
+      </div>
+
+      {/* Reservation Timer */}
       {ticketPrice > 0 && isTicketsLocked && (
-        <div className="mb-4 p-4 border rounded-md bg-gray-100">
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center bg-green-100 text-green-700 p-3 rounded-md">
-              <svg className="w-5 h-5 mr-2 fill-current" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Tickets reserved! Pay within{' '}
-              <span className="text-red-600 font-semibold text-[1.2rem]">
-                {timeLeft !== null
-                  ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
-                  : '0:00'}
-              </span>
+        <div className="mb-6 p-4 rounded-lg bg-gray-50 border border-gray-100 shadow-sm">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between bg-green-50 text-green-700 p-4 rounded-lg border border-green-100">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Tickets reserved!</span>
+              </div>
+              <div className="bg-white px-3 py-1 rounded-md shadow-sm border border-green-100">
+                <span className="mr-1 text-gray-600 text-sm">Pay within:</span>
+                <span className="text-red-600 font-semibold text-lg">
+                  {timeLeft !== null
+                    ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(2, '0')}`
+                    : '0:00'}
+                </span>
+              </div>
             </div>
+            
             <button
               onClick={unlockTickets}
-              className="bg-[#FFC0CB] hover:bg-transparent hover:text-black rounded-2xl hover:scale-110 transition border border-[#FFC0CB] text-white font-normal py-2 px-4 w-[70%] md:w-[50%] mx-auto"
+              className="bg-white text-gray-700 hover:bg-gray-50 rounded-lg py-2 px-4 border border-gray-300 transition-all shadow-sm hover:shadow font-medium text-sm flex items-center justify-center"
               disabled={isProcessing}
             >
+              <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+              </svg>
               Unlock Tickets
             </button>
           </div>
         </div>
       )}
-      <p className="text-center font-bold text-[1.4rem] my-4">Fill the form with your contact details.</p>
-      <form onSubmit={(e) => e.preventDefault()} className="border border-[#FFC0CB] md:w-[60%] w-[80%] m-auto rounded-xl p-6 mb-8">
-        <p className="text-[1.2rem] my-2">Name:</p>
-        <input
-          type="text"
-          placeholder="eg: John Doe"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
-        />
-        <p className="text-[1.2rem] my-2">Phone Number:</p>
-        <input
-          type="text"
-          placeholder="eg: 81********65"
-          required
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition mb-2"
-        />
-        <p className="text-[1.2rem] my-2">Email:</p>
-        <input
-          type="email"
-          placeholder="eg: johnDoe@gmail.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="border border-[#FFC0CB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition"
-        />
+
+      {/* Email Toggle Option */}
+      <div className="mb-6 bg-blue-50 p-4 rounded-lg">
+        <label className="flex items-center cursor-pointer">
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={useSingleEmail}
+              onChange={handleSingleEmailToggle}
+              className="sr-only"
+            />
+            <div className={`block w-10 h-6 rounded-full transition-colors ${useSingleEmail ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition transform ${useSingleEmail ? 'translate-x-4' : 'translate-x-0'}`}></div>
+          </div>
+          <span className="ml-3 text-blue-900 font-medium">Send all tickets to one email</span>
+        </label>
+      </div>
+
+      {/* Contact Forms */}
+      <div className="space-y-6">
+        {contacts.map((contact, index) => (
+          <div 
+            key={index} 
+            className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+          >
+            <div className="bg-gray-50 p-3 border-b border-gray-200">
+              <h3 className="font-medium text-gray-700">
+                {useSingleEmail ? 'Contact Information' : `Attendee ${index + 1}`}
+              </h3>
+            </div>
+            
+            <form onSubmit={(e) => e.preventDefault()} className="p-4 grid gap-4">
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  placeholder="Enter full name"
+                  required
+                  value={contact.name}
+                  onChange={(e) => handleContactChange(index, 'name', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                <input
+                  type="text"
+                  placeholder="Enter phone number"
+                  required
+                  value={contact.phoneNumber}
+                  onChange={(e) => handleContactChange(index, 'phoneNumber', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <label className="text-sm font-medium text-gray-700">Email Address</label>
+                <input
+                  type="email"
+                  placeholder="Enter email address"
+                  required
+                  value={contact.email}
+                  onChange={(e) => handleContactChange(index, 'email', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                />
+              </div>
+              
+              {!useSingleEmail && (
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-gray-700">Ticket Type</label>
+                  <select
+                    value={contact.ticket_uuid}
+                    onChange={(e) => handleContactChange(index, 'ticket_uuid', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    required
+                  >
+                    <option value="">Select Ticket Type</option>
+                    {ticketOptions.map((option) => (
+                      <option key={option.uuid} value={option.uuid}>
+                        {option.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </form>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Contact Button */}
+      {!useSingleEmail && contacts.length < numberOfTickets && (
+        <button
+          onClick={handleAddContact}
+          className="mt-6 w-full flex items-center justify-center text-blue-600 bg-blue-50 hover:bg-blue-100 py-3 px-4 rounded-lg border border-blue-100 transition-all"
+        >
+          <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Add Another Attendee
+        </button>
+      )}
+
+      {/* Action Buttons */}
+      <div className="mt-8">
         {isSoldOut && ticketPrice > 0 ? (
-          <button className="hover:bg-transparent bg-[red] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110">
-            SOLD OUT!
+          <button className="w-full bg-red-500 text-white py-4 px-6 rounded-lg font-bold text-lg uppercase cursor-not-allowed opacity-80">
+            Sold Out
           </button>
         ) : ticketPrice === 0 ? (
           <button
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+            className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-4 px-6 rounded-lg shadow-md hover:shadow-lg transition-all font-bold text-lg"
             disabled={isProcessing}
             onClick={handleFreeTicket}
           >
-            Register
+            Register Now
           </button>
         ) : !isTicketsLocked ? (
           <button
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-black mb-1 hover:scale-110"
+            className="w-full bg-gradient-to-r transition from-[#FFC0CB] to-black hover:from-black hover:to-[#FFC0CB] text-white py-4 px-6 rounded-lg shadow-md hover:shadow-lg font-bold text-lg"
             onClick={lockTickets}
             disabled={isProcessing}
           >
             {isProcessing ? (
-              <span className="animate-pulse">Locking Tickets...</span>
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Reserving Tickets...
+              </div>
             ) : (
-              'Lock Tickets'
+              'Reserve Tickets'
             )}
           </button>
         ) : (
           <FlutterWaveButton
-            className="hover:bg-transparent bg-[#FFC0CB] w-[70%] md:w-[50%] block m-auto mt-7 p-2 py-3 border border-[#FFC0CB] transition rounded-2xl hover:text-black text-white mb-1 hover:scale-110"
+            className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white py-4 px-6 rounded-lg shadow-md hover:shadow-lg transition-all font-bold text-lg flex items-center justify-center"
             disabled={isProcessing || isSoldOut}
             {...fwConfig}
-            title="Secure payment with Flutterwave"
-          />
+          >
+            <svg className="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Complete Secure Payment
+          </FlutterWaveButton>
         )}
-      </form>
+      </div>
+
+      {/* Additional Info */}
+      {ticketPrice > 0 && !isSoldOut && (
+        <div className="mt-4 text-center text-gray-500 text-sm">
+          {isTicketsLocked ? 
+            "Complete your payment to secure your tickets" : 
+            "Tickets will be reserved for 10 minutes after locking"}
+        </div>
+      )}
     </div>
   );
 };
 
 export default ContactForm;
+
