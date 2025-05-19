@@ -6,6 +6,7 @@ import { MyContextProvider } from './context/createContext'
 import { Analytics } from "@vercel/analytics/react"
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify'
+import FloatingTickets from './components/floatingTickets'
 
 export const metadata = {
   title: 'Epass',
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
       <Providers >
         <NavBar />
         {children}
+        <FloatingTickets />
         <ToastContainer 
           position="top-right"
           autoClose={5000}
