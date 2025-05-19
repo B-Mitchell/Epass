@@ -259,6 +259,7 @@ const ContactForm = () => {
           toast.error(`Failed to release tickets: ${error.message}`);
         } else {
           toast.success(`Tickets released. Freed ${data} reservation(s).`);
+          setSelectedTickets({});
         }
       } catch (error) {
         toast.error('Error releasing tickets.');
@@ -575,33 +576,6 @@ const handlePaymentSuccess = async (response) => {
       setPaymentSuccessful(true);
   }
 };
-
-  const confirmPurchase = async (tickets_purchased) => {
-    if (!tickets_purchased || tickets_purchased.length === 0) {
-      throw new Error('No tickets selected for confirmation');
-    }
-
-    const sessionIds = tickets_purchased.map((ticket) => ticket.session_id);
-    const uniqueSessionIds = [...new Set(sessionIds)];
-    if (uniqueSessionIds.length > 1) {
-      throw new Error('All tickets must have the same session_id');
-    }
-
-    if (!sessionIds[0]) {
-      throw new Error('Session ID cannot be null or empty');
-    }
-
-    const { data, error } = await supabase.rpc('confirm_purchase', {
-      tickets_purchased,
-    });
-
-    if (error) {
-      throw new Error(`Failed to confirm purchase: ${error.message}`);
-    }
-
-    const deletedCount = data || 0;
-    return { deletedCount };
-  };
 
   const checkIfTicketIsSoldOut = async () => {
     try {
@@ -958,7 +932,7 @@ const handlePaymentSuccess = async (response) => {
                   required
                   value={contact.name}
                   onChange={(e) => handleContactChange(index, 'name', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFC0CB] focus:border-none outline-none transition-all"
                 />
               </div>
               
@@ -970,7 +944,7 @@ const handlePaymentSuccess = async (response) => {
                   required
                   value={contact.phoneNumber}
                   onChange={(e) => handleContactChange(index, 'phoneNumber', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFC0CB] focus:border-none outline-none transition-all"
                 />
               </div>
               
@@ -982,7 +956,7 @@ const handlePaymentSuccess = async (response) => {
                   required
                   value={contact.email}
                   onChange={(e) => handleContactChange(index, 'email', e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFC0CB] focus:border-none outline-none transition-all"
                 />
               </div>
               
@@ -992,7 +966,7 @@ const handlePaymentSuccess = async (response) => {
                   <select
                     value={contact.ticket_uuid}
                     onChange={(e) => handleContactChange(index, 'ticket_uuid', e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#FFC0CB] focus:border-none outline-none transition-all"
                     required
                   >
                     <option value="">Select Ticket Type</option>
