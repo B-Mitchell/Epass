@@ -83,7 +83,7 @@ const page = () => {
     
         <h2 className='text-center font-bold text-[1.4rem]'>Login to your Account</h2>
         <p className='text-[1.2rem] my-2'>Email: </p>
-        <input placeholder='eg: johndoe@gmail.com' required value={emailU} type='email' name="email" onChange={(e) => {setEmailU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: johndoe@gmail.com' required value={emailU} type='email' autoComplete="email" name="email" onChange={(e) => {setEmailU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
 
         <p className='text-[1.2rem] my-2'>Password: </p>
         <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>

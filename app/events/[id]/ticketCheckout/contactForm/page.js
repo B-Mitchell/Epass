@@ -953,6 +953,7 @@ const handlePaymentSuccess = async (response) => {
                 <input
                   type="email"
                   placeholder="Enter email address"
+                  autoComplete="email"
                   required
                   value={contact.email}
                   onChange={(e) => handleContactChange(index, 'email', e.target.value)}

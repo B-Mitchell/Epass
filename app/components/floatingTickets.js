@@ -2,45 +2,55 @@
 import { useState, useEffect } from 'react';
 
 const FloatingTickets = () => {
-  // State for particles
-  const [particles, setParticles] = useState([]);
+  // State for animation elements
+  const [elements, setElements] = useState([]);
   const [windowDimensions, setWindowDimensions] = useState({ 
     width: typeof window !== 'undefined' ? window.innerWidth : 1200,
     height: typeof window !== 'undefined' ? window.innerHeight : 800
   });
 
-  // Theme colors - subtle, professional palette
+  // Theme colors - professional, modern palette
   const themeColors = {
     primary: '#0a1930',
-    accent1: '#244175',
-    accent2: '#2d5da4',
+    secondary: '#244175',
+    accent: '#3a6fc9',
     highlight: '#6892d5'
   };
 
-  // Particle configuration - very subtle
-  const particleConfig = {
-    count: Math.min(50, Math.floor((windowDimensions.width * windowDimensions.height) / 25000)),
-    minSize: 2,
-    maxSize: 6,
-    minOpacity: 0.05,
-    maxOpacity: 0.15,
-    minSpeed: 0.1,
-    maxSpeed: 0.3
+  // Element shapes configuration
+  const shapes = [
+    // Ticket shape with slight curve
+    "M 0,0 L 50,0 C 55,0 55,5 60,5 C 65,5 65,0 70,0 L 120,0 L 120,60 L 70,60 C 65,60 65,55 60,55 C 55,55 55,60 50,60 L 0,60 Z",
+    // Diamond shape
+    "M 0,30 L 60,0 L 120,30 L 60,60 Z",
+    // Abstract wave
+    "M 0,30 Q 30,60 60,30 Q 90,0 120,30 L 120,60 Q 90,30 60,60 Q 30,90 0,60 Z"
+  ];
+
+  // Animation configuration
+  const elementConfig = {
+    count: Math.min(15, Math.floor((windowDimensions.width * windowDimensions.height) / 80000)),
+    minSize: 80,
+    maxSize: 200,
+    minOpacity: 0.03,
+    maxOpacity: 0.08,
+    minSpeed: 0.2,
+    maxSpeed: 0.5
   };
 
-  // Generate initial particles
+  // Generate initial elements
   useEffect(() => {
-    const generateParticles = () => {
-      const newParticles = [];
+    const generateElements = () => {
+      const newElements = [];
       
-      for (let i = 0; i < particleConfig.count; i++) {
-        newParticles.push(createParticle());
+      for (let i = 0; i < elementConfig.count; i++) {
+        newElements.push(createElement());
       }
       
-      setParticles(newParticles);
+      setElements(newElements);
     };
     
-    generateParticles();
+    generateElements();
     
     // Handle window resize
     const handleResize = () => {
@@ -54,115 +64,93 @@ const FloatingTickets = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Create a new particle with random properties
-  const createParticle = () => {
-    const size = Math.random() * (particleConfig.maxSize - particleConfig.minSize) + particleConfig.minSize;
-    const opacity = Math.random() * (particleConfig.maxOpacity - particleConfig.minOpacity) + particleConfig.minOpacity;
-    const speed = Math.random() * (particleConfig.maxSpeed - particleConfig.minSpeed) + particleConfig.minSpeed;
+  // Create a new animated element with random properties
+  const createElement = () => {
+    const baseSize = Math.random() * (elementConfig.maxSize - elementConfig.minSize) + elementConfig.minSize;
+    const opacity = Math.random() * (elementConfig.maxOpacity - elementConfig.minOpacity) + elementConfig.minOpacity;
+    const speed = Math.random() * (elementConfig.maxSpeed - elementConfig.minSpeed) + elementConfig.minSpeed;
     
-    // Position particles evenly across the screen
+    // Position elements across the screen
     const x = Math.random() * windowDimensions.width;
     const y = Math.random() * windowDimensions.height;
     
-    // Choose a color, weighted to use more primary and accent1
+    // Choose a color with weighting
     const colorSelector = Math.random();
-    const color = colorSelector < 0.5 ? themeColors.primary : 
-                 colorSelector < 0.8 ? themeColors.accent1 : 
-                 colorSelector < 0.95 ? themeColors.accent2 : 
-                 themeColors.highlight;
+    const fillColor = colorSelector < 0.4 ? themeColors.primary : 
+                     colorSelector < 0.7 ? themeColors.secondary : 
+                     colorSelector < 0.9 ? themeColors.accent : 
+                     themeColors.highlight;
     
-    // Random but very subtle movement direction
-    const directionX = (Math.random() - 0.5) * 2 * speed;
-    const directionY = (Math.random() - 0.5) * 2 * speed;
+    // Gentle movement direction
+    const directionX = (Math.random() - 0.5) * speed;
+    const directionY = (Math.random() - 0.5) * speed;
+    
+    // Choose a random shape
+    const shapeIndex = Math.floor(Math.random() * shapes.length);
+    
+    // Random rotation
+    const rotation = Math.random() * 360;
+    const rotationSpeed = (Math.random() - 0.5) * 0.2;
     
     return {
       id: Date.now() + Math.random(),
       x,
       y,
-      size,
+      baseSize,
       opacity,
-      color,
+      fillColor,
       directionX,
       directionY,
-      pulsePhase: Math.random() * Math.PI * 2, // For subtle pulsing effect
-      pulseSpeed: 0.005 + Math.random() * 0.02
+      shapeIndex,
+      rotation,
+      rotationSpeed,
+      pulsePhase: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.005 + Math.random() * 0.01
     };
   };
 
   // Animation loop
   useEffect(() => {
-    const animateParticles = () => {
-      setParticles(prevParticles => {
-        return prevParticles.map(particle => {
-          // Move particle
-          let newX = particle.x + particle.directionX;
-          let newY = particle.y + particle.directionY;
+    const animateElements = () => {
+      setElements(prevElements => {
+        return prevElements.map(element => {
+          // Move element
+          let newX = element.x + element.directionX;
+          let newY = element.y + element.directionY;
           
-          // Wrap particles around the screen
-          if (newX > windowDimensions.width) newX = 0;
-          if (newX < 0) newX = windowDimensions.width;
-          if (newY > windowDimensions.height) newY = 0;
-          if (newY < 0) newY = windowDimensions.height;
+          // Wrap elements around the screen with some margin
+          const margin = element.baseSize;
+          if (newX > windowDimensions.width + margin) newX = -margin;
+          if (newX < -margin) newX = windowDimensions.width + margin;
+          if (newY > windowDimensions.height + margin) newY = -margin;
+          if (newY < -margin) newY = windowDimensions.height + margin;
           
           // Update pulse phase
-          const newPhase = (particle.pulsePhase + particle.pulseSpeed) % (Math.PI * 2);
+          const newPhase = (element.pulsePhase + element.pulseSpeed) % (Math.PI * 2);
           
-          // Calculate pulsing opacity
-          const pulsingFactor = (Math.sin(newPhase) + 1) / 2; // 0 to 1
-          const baseOpacity = particle.opacity;
-          const opacityVariation = baseOpacity * 0.3; // Small variation
-          const currentOpacity = baseOpacity - (opacityVariation * pulsingFactor);
+          // Calculate size pulsing
+          const pulseFactor = (Math.sin(newPhase) + 1) / 2; // 0 to 1
+          const sizeVariation = element.baseSize * 0.1;
+          const currentSize = element.baseSize + (sizeVariation * pulseFactor);
+          
+          // Update rotation
+          const newRotation = (element.rotation + element.rotationSpeed) % 360;
           
           return {
-            ...particle,
+            ...element,
             x: newX,
             y: newY,
+            currentSize,
             pulsePhase: newPhase,
-            currentOpacity
+            rotation: newRotation
           };
         });
       });
     };
     
-    const intervalId = setInterval(animateParticles, 50); // Slower animation for subtlety
+    const intervalId = setInterval(animateElements, 50);
     return () => clearInterval(intervalId);
   }, [windowDimensions]);
-
-  // Connection lines between nearby particles
-  const generateConnections = () => {
-    const connections = [];
-    const connectionDistance = Math.min(150, windowDimensions.width / 10);
-    
-    // Only check connections between nearby particles for efficiency
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const p1 = particles[i];
-        const p2 = particles[j];
-        
-        const distance = Math.sqrt(
-          Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)
-        );
-        
-        if (distance < connectionDistance) {
-          // Calculate opacity based on distance (closer = more visible)
-          const opacity = 0.05 * (1 - (distance / connectionDistance));
-          
-          connections.push({
-            id: `${p1.id}-${p2.id}`,
-            x1: p1.x,
-            y1: p1.y,
-            x2: p2.x,
-            y2: p2.y,
-            opacity
-          });
-        }
-      }
-    }
-    
-    return connections;
-  };
-
-  const connections = generateConnections();
 
   return (
     <div style={{ 
@@ -172,47 +160,61 @@ const FloatingTickets = () => {
       width: '100%', 
       height: '100%', 
       pointerEvents: 'none', 
-      zIndex: 5, // Very low z-index
-      overflow: 'hidden',
-      opacity: 0.85 // Further reduce overall visibility
+      zIndex: 0,
+      overflow: 'hidden'
     }}>
       <svg width="100%" height="100%" viewBox={`0 0 ${windowDimensions.width} ${windowDimensions.height}`} preserveAspectRatio="xMidYMid slice">
         {/* Subtle gradient background */}
         <defs>
-          <radialGradient id="bg-gradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+          <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor={themeColors.primary} stopOpacity="0.01" />
-            <stop offset="100%" stopColor={themeColors.primary} stopOpacity="0.05" />
-          </radialGradient>
+            <stop offset="50%" stopColor={themeColors.secondary} stopOpacity="0.02" />
+            <stop offset="100%" stopColor={themeColors.primary} stopOpacity="0.01" />
+          </linearGradient>
+          
+          {/* Define shape patterns */}
+          {shapes.map((path, index) => (
+            <pattern 
+              key={`pattern-${index}`} 
+              id={`shape-pattern-${index}`} 
+              patternUnits="userSpaceOnUse" 
+              width="120" 
+              height="60" 
+              patternTransform="scale(0.5)"
+            >
+              <path d={path} fill="currentColor" />
+            </pattern>
+          ))}
         </defs>
         
-        {/* Ultra-subtle radial gradient */}
+        {/* Very subtle background gradient */}
         <rect x="0" y="0" width="100%" height="100%" fill="url(#bg-gradient)" />
         
-        {/* Connection lines between particles - faint network effect */}
-        {connections.map(conn => (
-          <line 
-            key={conn.id}
-            x1={conn.x1}
-            y1={conn.y1}
-            x2={conn.x2}
-            y2={conn.y2}
-            stroke={themeColors.accent1}
-            strokeWidth="0.5"
-            opacity={conn.opacity}
-          />
-        ))}
-        
-        {/* Particles */}
-        {particles.map(particle => (
-          <circle
-            key={particle.id}
-            cx={particle.x}
-            cy={particle.y}
-            r={particle.size}
-            fill={particle.color}
-            opacity={particle.currentOpacity || particle.opacity}
-          />
-        ))}
+        {/* Animated elements */}
+        {elements.map(element => {
+          const size = element.currentSize || element.baseSize;
+          const aspectRatio = 2; // Most shapes are twice as wide as tall
+          
+          return (
+            <g 
+              key={element.id}
+              transform={`translate(${element.x}, ${element.y}) rotate(${element.rotation}) scale(${size/120})`}
+              style={{ 
+                opacity: element.opacity,
+                color: element.fillColor
+              }}
+            >
+              <rect 
+                x={-60} 
+                y={-30} 
+                width="120" 
+                height="60"
+                fill={`url(#shape-pattern-${element.shapeIndex})`}
+                style={{ filter: 'blur(1px)' }}
+              />
+            </g>
+          );
+        })}
       </svg>
     </div>
   );
