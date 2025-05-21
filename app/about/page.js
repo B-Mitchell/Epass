@@ -130,7 +130,7 @@ const AboutPage = () => {
                 <div className="absolute -inset-0.5 rounded-full blur opacity-50 group-hover:opacity-75 transition duration-300 bg-gradient-to-r from-[#FFC0CB] via-white to-[#8B5E3C]"></div>
               </div>
               <h3 className="text-xl font-semibold mb-2">Clinton Odira</h3>
-              <p className="text-[#8B5E3C] font-medium">Chief Marketing & Co-Founder</p>
+              <p className="text-[#8B5E3C] font-medium">Chief Marketing</p>
             </div>
           </div>
         </section>

@@ -47,6 +47,16 @@ const ContactForm = () => {
   }, []);
 
   useEffect(() => {
+    const handleBeforeUnload = async (event) => {
+      setSelectedTickets({});
+      if (isTicketsLockedRef.current && paymentPendingRef.current && sessionIdRef.current) {
+        await releaseLockedTickets(sessionIdRef.current);
+      }
+      // Show browser confirmation dialog
+      event.preventDefault();
+      event.returnValue = '';
+    };
+  
     if (!isTransactionComplete) {
       if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
         toast.error('Invalid ticket price.');
@@ -61,7 +71,11 @@ const ContactForm = () => {
       checkIfTicketIsSoldOut();
       fetchTicketOptions();
     }
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+  
     return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
       (async () => {
         cleanupTimer();
         if (isTicketsLockedRef.current && paymentPendingRef.current && sessionId) {
@@ -70,6 +84,31 @@ const ContactForm = () => {
       })();
     };
   }, [ticketPrice, selectedTickets, sessionId, isTransactionComplete]);
+  
+  // useEffect(() => {
+  //   if (!isTransactionComplete) {
+  //     if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
+  //       toast.error('Invalid ticket price.');
+  //       router.back();
+  //       return;
+  //     }
+  //     if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
+  //       toast.error('No tickets selected. Redirecting...');
+  //       setTimeout(() => router.back(), 100);
+  //       return;
+  //     }
+  //     checkIfTicketIsSoldOut();
+  //     fetchTicketOptions();
+  //   }
+  //   return () => {
+  //     (async () => {
+  //       cleanupTimer();
+  //       if (isTicketsLockedRef.current && paymentPendingRef.current && sessionId) {
+  //         await releaseLockedTickets(sessionId);
+  //       }
+  //     })();
+  //   };
+  // }, [ticketPrice, selectedTickets, sessionId, isTransactionComplete]);
 
   const fetchTicketOptions = async () => {
     try {
@@ -1048,7 +1087,7 @@ const handlePaymentSuccess = async (response) => {
         <div className="mt-4 text-center text-gray-500 text-sm">
           {isTicketsLocked ? 
             "Complete your payment to secure your tickets" : 
-            "Tickets will be reserved for 10 minutes after locking"}
+            "Tickets will be reserved for 4 minutes after locking"}
         </div>
       )}
     </div>
