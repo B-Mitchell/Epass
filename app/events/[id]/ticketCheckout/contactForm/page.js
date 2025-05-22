@@ -617,34 +617,29 @@ const handlePaymentSuccess = async (response) => {
 };
 
   const checkIfTicketIsSoldOut = async () => {
+    console.log('running bro...');
     try {
       let { data: queryData, error: queryError } = await supabase
         .from('ticketdata')
         .select('currentStock, ticketPrice')
         .eq('event_id', ticketRoute);
+  
       if (queryError) {
         toast.error('Error checking ticket availability.');
         return;
       }
-
+  
       if (queryData && queryData.length > 0) {
         const isFreeTicket = queryData.some((ticket) => ticket.ticketPrice === 0);
         const currentStock = queryData[0].currentStock;
-
-        const { data: reservations, error: resError } = await supabase
-          .from('reservations')
-          .select('quantity')
-          .eq('ticket_uuid', queryData[0].uuid)
-          .gt('expires_at', new Date().toISOString());
-
-        const reservedQuantity = reservations?.reduce((sum, r) => sum + r.quantity, 0) || 0;
-
-        if (currentStock - reservedQuantity <= 0 && !isFreeTicket) {
+  
+        if (currentStock <= 0 && !isFreeTicket) {
           setIsSoldOut(true);
           toast.error('Tickets have been sold out! Redirecting...');
           setTimeout(() => router.back(), 1000);
         } else {
           setIsSoldOut(false);
+          console.log(queryData);
         }
       }
     } catch (err) {
@@ -804,7 +799,7 @@ const handlePaymentSuccess = async (response) => {
         }
 
         toast.success('Free ticket registered successfully! Check your email for confirmation.');
-        router.push('/payment-success');
+        router.push('/');
       }
     } catch (error) {
       console.error('Error processing free ticket:', error);
