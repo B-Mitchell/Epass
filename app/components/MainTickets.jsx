@@ -4,6 +4,8 @@ import React, {useState, useEffect} from 'react'
 import Image from 'next/image'
 import supabase from '../supabase'
 import LoadingAnimation from './LoadingAnimation'
+import { FaMapMarkerAlt, FaClock, FaCalendarAlt, FaTicketAlt, FaGift, FaDollarSign, FaArrowRight, FaStar } from 'react-icons/fa'
+import { IoSparkles } from 'react-icons/io5'
 import { data } from 'autoprefixer'
 
 const MainTickets = () => {
@@ -24,7 +26,7 @@ const MainTickets = () => {
                     .select('*')
                     .eq('pricingType', 'free');
 
-                    console.log(data,'this is the data')
+                    // console.log(ticketData,'this is the data')
                 if (ticketError) {
                     console.error('Error fetching ticket data:', ticketError);
                     return;
@@ -112,8 +114,8 @@ const MainTickets = () => {
         fetchPaidTickets();
     }, []);
 
-    // Ticket card component for reusability
-    const TicketCard = ({ data }) => {
+    // Enhanced Ticket card component
+    const TicketCard = ({ data, isFree = false }) => {
         // Format time to show only HH:MM (without seconds)
         const formatTime = (timeString) => {
             if (!timeString) return "";
@@ -151,53 +153,69 @@ const MainTickets = () => {
         
         return (
             <div 
-                className='flex-shrink-0 w-[17rem] md:w-[22rem] mr-4 bg-white rounded-xl overflow-hidden 
-                          hover:scale-[1.02] transition-all duration-300 cursor-pointer relative 
-                          shadow-[0_10px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)]'
-                onClick={() => {router.push(`events/${data.uuid}`)}}
-            >
-                <div className="relative">
+                className='group flex-shrink-0 w-[18rem] md:w-[24rem] mr-6 bg-white rounded-2xl overflow-hidden hover:scale-[105%] transition-all duration-500 cursor-pointer relative shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] border border-gray-100 hover:border-[#FFC0CB]/30'
+                onClick={() => {router.push(`events/${data.uuid}`)}}>
+                <div className="relative overflow-hidden">
                     <Image 
                         src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${data.user_id}_${data.image}`} 
                         alt='event image' 
-                        className='w-full h-[180px] object-cover' 
+                        className='w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500' 
                         width={400} 
                         height={400}
                     />
-                    <div className="absolute top-3 right-3">
-                        <span className='bg-white/80 backdrop-blur-sm px-3 py-1 rounded-full text-[#8B5E3C] text-sm font-medium'>
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    
+                    {/* Enhanced badges */}
+                    <div className="absolute top-4 left-4">
+                        <span className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-semibold backdrop-blur-sm ${
+                            isFree 
+                                ? 'bg-green-500/90 text-white'
+                                : 'bg-gradient-to-r from-[#FFC0CB] to-[#FFC0CB]/80 text-white'
+                        }`}>
+                            {isFree ? <FaGift className="w-3 h-3" /> : <FaDollarSign className="w-3 h-3" />}
+                            {isFree ? 'FREE' : 'PAID'}
+                        </span>
+                    </div>
+                    
+                    <div className="absolute top-4 right-4">
+                        <span className='bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[#8B5E3C] text-sm font-medium border border-white/20'>
                             {data?.typeOfEvent}
                         </span>
                     </div>
+
+                    {/* Floating star rating */}
+                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="flex items-center gap-1">
+                            <FaStar className="w-3 h-3 text-yellow-500" />
+                            <span className="text-xs font-medium">4.8</span>
+                        </div>
+                    </div>
                 </div>
                 
-                <div className='px-4 py-4'>
-                    <h2 className='font-bold text-[1.15rem] text-[#1E1E1E] uppercase overflow-hidden whitespace-nowrap text-ellipsis mb-2'>
-                        {data?.title}
-                    </h2>
+                <div className='px-5 py-5'>
+                    <div className="flex items-start justify-between mb-3">
+                        <h2 className='font-bold text-lg text-[#1E1E1E] uppercase overflow-hidden whitespace-nowrap text-ellipsis flex-1 pr-2 group-hover:text-[#FFC0CB] transition-colors duration-300'>
+                            {data?.title}
+                        </h2>
+                        <IoSparkles className="w-5 h-5 text-[#FFC0CB] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
                     
-                    <div className="flex items-center mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5E3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <p className='text-[.9rem] ml-1 text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis max-w-[17rem]'>
+                    <div className="flex items-center mb-3 group/location hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors duration-200">
+                        <FaMapMarkerAlt className="w-4 h-4 text-[#FFC0CB] flex-shrink-0" />
+                        <p className='text-sm ml-2 text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis'>
                             {data?.address}
                         </p>
                     </div>
                     
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                        <div className="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5E3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <p className='text-[.9rem] ml-1 text-gray-600'>{formatTime(data?.startTime)}</p>
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                        <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2 hover:bg-[#FFC0CB]/10 transition-colors duration-200">
+                            <FaClock className="w-4 h-4 text-[#8B5E3C]" />
+                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatTime(data?.startTime)}</p>
                         </div>
-                        <div className="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-[#8B5E3C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p className='text-[.9rem] ml-1 text-gray-600'>{formatDate(data?.date)}</p>
+                        <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2 hover:bg-[#FFC0CB]/10 transition-colors duration-200">
+                            <FaCalendarAlt className="w-4 h-4 text-[#8B5E3C]" />
+                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatDate(data?.date)}</p>
                         </div>
                     </div>
                 </div>
@@ -205,69 +223,101 @@ const MainTickets = () => {
         );
     };
 
-  return (
-    <div className="py-6 px-4 md:px-8 bg-gray-50">
-        {/* FREE TICKETS */}
-        <div className="mb-10">
-            <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-[1px] bg-[#FFC0CB] hidden md:block"></div>
-                <h2 className='mx-4 text-center font-bold text-[1.5rem] text-[#1E1E1E] flex items-center'>
-                    <span className="mr-2">🎟️</span>Free Events
-                </h2>
-                <div className="w-16 h-[1px] bg-[#FFC0CB] hidden md:block"></div>
-            </div>
-            
-            {loadingFree ? (
-                <LoadingAnimation />
-            ) : freeTickets.length > 0 ? (
-                <div className='flex w-full overflow-x-auto py-4 scrollbar-hide'>
-                    <div className="flex px-2">
-                        {freeTickets.map((data) => (
-                            <TicketCard key={data.id} data={data} />
-                        ))}
-                    </div>
-            </div>
-        ) : (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                    </svg>
-                    <p className='text-bold text-gray-500'>No free tickets available at the moment</p>
+    // Enhanced Section Header Component
+    const SectionHeader = ({ title, icon, isFree = false }) => (
+        <div className="relative mb-8">
+            <div className="flex items-center justify-center">
+                <div className="hidden md:block w-20 h-px bg-gradient-to-r from-transparent to-[#FFC0CB]"></div>
+                <div className="mx-6 flex items-center bg-white rounded-2xl px-6 py-3 shadow-lg border border-[#FFC0CB]/20">
+                    <span className="text-2xl mr-3">{icon}</span>
+                    <h2 className='font-bold text-2xl text-[#1E1E1E] bg-gradient-to-r from-[#1E1E1E] to-[#8B5E3C] bg-clip-text'>
+                        {title}
+                    </h2>
+                    <IoSparkles className="w-5 h-5 text-[#FFC0CB] ml-2" />
                 </div>
-            )}
+                <div className="hidden md:block w-20 h-px bg-gradient-to-l from-transparent to-[#FFC0CB]"></div>
+            </div>
+        </div>
+    );
+
+    // Enhanced Empty State Component
+    const EmptyState = ({ message, isFree = false }) => (
+        <div className="text-center py-16 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-sm border border-gray-100">
+            <div className="relative inline-block mb-6">
+                <FaTicketAlt className="h-16 w-16 text-gray-300 mx-auto" />
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-[#FFC0CB] rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs">!</span>
+                </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">No Events Available</h3>
+            <p className='text-gray-500 max-w-md mx-auto'>{message}</p>
+            <button className="mt-4 px-6 py-2 bg-gradient-to-r from-[#FFC0CB] to-black hover:from-black hover:to-[#FFC0CB] text-white rounded-xl font-medium transition-all duration-300 transform hover:scale-105">
+                Browse All Events
+            </button>
+        </div>
+    );
+
+  return (
+    <div className="py-12 px-4 md:px-8 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+        {/* Background decorations */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+            <div className="absolute top-20 right-10 w-32 h-32 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-20 left-10 w-40 h-40 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
         </div>
 
-        {/* PAID TICKETS */}
-        <div className="mb-6">
-            <div className="flex items-center justify-center mb-6">
-                <div className="w-16 h-[1px] bg-[#FFC0CB] hidden md:block"></div>
-                <h2 className='mx-4 text-center font-bold text-[1.5rem] text-[#1E1E1E] flex items-center'>
-                    <span className="mr-2">🎟️</span>Paid Events
-                </h2>
-                <div className="w-16 h-[1px] bg-[#FFC0CB] hidden md:block"></div>
-            </div>
-            
-            {loadingPaid ? (
-            <LoadingAnimation />
-            ) : paidTickets.length > 0 ? (
-                <div className='flex w-full overflow-x-auto py-4 scrollbar-hide'>
-                    <div className="flex px-2">
-                {paidTickets.map((data) => (
-                            <TicketCard key={data.id} data={data} />
-                        ))}
+        <div className="relative z-10">
+            {/* FREE TICKETS */}
+            <div className="mb-16">
+                <SectionHeader title="Free Events" icon="🎁" isFree={true} />
+                
+                {loadingFree ? (
+                    <div className="flex justify-center py-12">
+                        <LoadingAnimation />
                     </div>
+                ) : freeTickets.length > 0 ? (
+                    <div className='relative'>
+                        <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
+                            <div className="flex px-4">
+                                {freeTickets.map((data) => (
+                                    <TicketCard key={data.id} data={data} isFree={true} />
+                                ))}
+                            </div>
+                        </div>
+                        {/* Gradient fade on scroll */}
+                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                    </div>
+                ) : (
+                    <EmptyState message="No free events available at the moment. Check back soon for exciting free events!" isFree={true} />
+                )}
             </div>
-        ) : (
-                <div className="text-center py-12 bg-white rounded-xl shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
-                    </svg>
-                    <p className='text-bold text-gray-500'>No paid tickets available at the moment</p>
-                </div>
-            )}
+
+            {/* PAID TICKETS */}
+            <div className="mb-8">
+                <SectionHeader title="Premium Events" icon="💎" />
+                
+                {loadingPaid ? (
+                    <div className="flex justify-center py-12">
+                        <LoadingAnimation />
+                    </div>
+                ) : paidTickets.length > 0 ? (
+                    <div className='relative'>
+                        <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
+                            <div className="flex px-4">
+                                {paidTickets.map((data) => (
+                                    <TicketCard key={data.id} data={data} isFree={false} />
+                                ))}
+                            </div>
+                        </div>
+                        {/* Gradient fade on scroll */}
+                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                    </div>
+                ) : (
+                    <EmptyState message="No premium events available at the moment. Discover amazing paid experiences soon!" />
+                )}
+            </div>
         </div>
     </div>
   )
 }
 
-export default MainTickets
+export default MainTickets;

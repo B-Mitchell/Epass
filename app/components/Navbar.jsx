@@ -1,18 +1,23 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../globalRedux/slices/userSlice';
 import LogoImage from '../../public/images/Epass.png'
 import Image from 'next/image';
+import { FaHome, FaCalendarAlt, FaInfoCircle, FaDollarSign, FaUser, FaSignInAlt, FaSignOutAlt, FaUserPlus, FaTimes } from 'react-icons/fa';
+import { IoSparkles } from 'react-icons/io5';
 
 const NavBar = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const userId = useSelector(state => state.user.user_id);
   const loginOut = userId ? 'logout' : 'login';
+  const [active, setIsActive] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   const handleLoginOut = () => {
-    if ( loginOut == 'login' ) {
+    if (loginOut == 'login') {
         if (!userId) {
             router.push('/login')
         }
@@ -22,61 +27,237 @@ const NavBar = () => {
         router.push('/login');
     }
   }
-  const [active , setIsActive] = useState(false);
 
-  const dynamicNav = active ? 'transition transform rotate-90' : 'transition';
+  // Add scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 10;
+      setScrolled(isScrolled);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (active && !event.target.closest('nav')) {
+        setIsActive(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [active]);
+
+  const navItems = [
+    { name: 'Home', path: '/', icon: FaHome },
+    { name: 'Events', path: '/events', icon: FaCalendarAlt },
+    { name: 'About', path: '/about', icon: FaInfoCircle },
+    { name: 'Pricing', path: '/pricing', icon: FaDollarSign },
+  ];
+
+  const handleNavigation = (path) => {
+    router.push(path);
+    setIsActive(false);
+  };
+
+  const handleProfileClick = () => {
+    if (userId) {
+      router.push('/profile');
+    } else {
+      alert('please login');
+    }
+    setIsActive(false);
+  };
 
   return (
-    <nav className='bg-[#1E1E1E] text-white w-full flex justify-between pb-3'>
-        <div className='mt-5 -mb-1 ml-3 md:ml-6 relative w-[120px] h-[40px]'>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      scrolled 
+        ? 'bg-[#1E1E1E]/95 backdrop-blur-md shadow-lg border-b border-[#FFC0CB]/20' 
+        : 'bg-[#1E1E1E]'
+    }`}>
+      <div className="container mx-auto px-4 md:px-6">
+        <div className='flex justify-between items-center py-4'>
+          {/* Enhanced Logo */}
+          <div 
+            className='relative w-[120px] h-[40px] cursor-pointer group transition-transform duration-300 hover:scale-105'
+            onClick={() => handleNavigation('/')}
+          >
             <Image 
-                src={LogoImage} 
-                alt="E-Pass Logo"
-                fill
-                className='object-contain'
-                priority
+              src={LogoImage} 
+              alt="E-Pass Logo"
+              fill
+              className='object-contain'
+              priority
             />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#FFC0CB]/20 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+
+          {/* DESKTOP VIEW - Enhanced */}
+          <div className='hidden md:flex items-center space-x-8'>
+            <ul className='flex items-center space-x-6'>
+              {navItems.map((item) => (
+                <li key={item.name}>
+                  <button
+                    className='group flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:text-[#FFC0CB] hover:bg-white/5 transition-all duration-300 font-medium'
+                    onClick={() => handleNavigation(item.path)}
+                  >
+                    <item.icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                    <span>{item.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Auth Section */}
+            <div className="flex items-center space-x-4 ml-6 pl-6 border-l border-gray-600">
+              <button
+                className='group flex items-center space-x-2 px-3 py-2 rounded-lg text-white hover:text-[#FFC0CB] hover:bg-white/5 transition-all duration-300 font-medium'
+                onClick={handleProfileClick}
+              >
+                <FaUser className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                <span>Profile</span>
+              </button>
+              
+              <button
+                className={`group flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                  loginOut == 'logout' 
+                    ? 'text-white hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 hover:border-red-400/40' 
+                    : 'text-white hover:text-[#FFC0CB] hover:bg-[#FFC0CB]/10 border border-[#FFC0CB]/20 hover:border-[#FFC0CB]/40'
+                }`}
+                onClick={handleLoginOut}
+              >
+                {loginOut == 'logout' ? (
+                  <FaSignOutAlt className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                ) : (
+                  <FaSignInAlt className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                )}
+                <span className="capitalize">{loginOut}</span>
+              </button>
+
+              {loginOut == 'login' && (
+                <button
+                  className='group flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-[#FFC0CB] to-black hover:from-black hover:to-[#FFC0CB] text-white rounded-lg font-medium transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl'
+                  onClick={() => handleNavigation('/createAccount')}
+                >
+                  <FaUserPlus className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" />
+                  <span>Sign Up</span>
+                  <IoSparkles className="w-3 h-3 opacity-70" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Enhanced Mobile Menu Button */}
+          <button
+            onClick={() => setIsActive(!active)}
+            className={`md:hidden relative w-8 h-8 flex flex-col justify-center items-center transition-all duration-300 ${
+              active ? 'rotate-90' : ''
+            }`}
+          >
+            {active ? (
+              <FaTimes className="w-6 h-6 text-white hover:text-[#FFC0CB] transition-colors duration-300" />
+            ) : (
+              <div className="space-y-1.5">
+                <div className="w-6 h-0.5 bg-white transition-all duration-300 hover:bg-[#FFC0CB]"></div>
+                <div className="w-6 h-0.5 bg-white transition-all duration-300 hover:bg-[#FFC0CB]"></div>
+                <div className="w-6 h-0.5 bg-white transition-all duration-300 hover:bg-[#FFC0CB]"></div>
+              </div>
+            )}
+          </button>
         </div>
+      </div>
 
-        {/* DESKTOP VIEW*/}
-        <ul className='hidden md:flex justify-between w-[50%] mt-5 mr-4'>
-            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/')}}>Home</li>
-            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/events')}}>Events</li>
-            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/about')}}>About</li>
-            <li className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {router.push('/pricing')}}>Pricing</li>
-            <li  className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => {userId ? null : alert('please login'); router.push('/profile')}}>Profile</li>
-            <li  className={`cursor-pointer transition ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#FFCOCB]'}`} onClick={() => {handleLoginOut()}}>{loginOut}</li>
-            {
-                loginOut == 'login' ? 
-                <li  className='cursor-pointer hover:text-[#FFCOCB] transition' onClick={() => router.push('/createAccount')}>Create Account</li> : null
-            }
-        </ul>
+      {/* Enhanced Mobile Menu */}
+      <div className={`md:hidden transition-all duration-300 overflow-hidden ${
+        active 
+          ? 'max-h-screen opacity-100' 
+          : 'max-h-0 opacity-0'
+      }`}>
+        <div className="bg-[#1E1E1E]/98 backdrop-blur-md border-t border-[#FFC0CB]/20">
+          <div className="container mx-auto px-4 py-6">
+            <ul className='space-y-4'>
+              {navItems.map((item, index) => (
+                <li 
+                  key={item.name}
+                  className={`transform transition-all duration-300 delay-${index * 100}`}
+                  style={{ 
+                    transform: active ? 'translateY(0)' : 'translateY(-20px)',
+                    opacity: active ? 1 : 0
+                  }}
+                >
+                  <button
+                    className='group w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:text-[#FFC0CB] hover:bg-white/5 transition-all duration-300 font-medium text-lg border border-transparent hover:border-[#FFC0CB]/20'
+                    onClick={() => handleNavigation(item.path)}
+                  >
+                    <item.icon className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                    <span>{item.name}</span>
+                  </button>
+                </li>
+              ))}
+              
+              {/* Mobile Profile */}
+              <li className={`transform transition-all duration-300 delay-400`}
+                  style={{ 
+                    transform: active ? 'translateY(0)' : 'translateY(-20px)',
+                    opacity: active ? 1 : 0
+                  }}>
+                <button
+                  className='group w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-white hover:text-[#FFC0CB] hover:bg-white/5 transition-all duration-300 font-medium text-lg border border-transparent hover:border-[#FFC0CB]/20'
+                  onClick={handleProfileClick}
+                >
+                  <FaUser className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  <span>Profile</span>
+                </button>
+              </li>
 
-        {/* MOBILE VIEW */}
-        <svg onClick={() => setIsActive(!active)}  className={`mr-3 md:hidden flex mt-5 cursor-pointer m-3 ${dynamicNav}`} xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 19 14" fill="none">
-            <path d="M1.35714 0H8.14286C8.50279 0 8.84799 0.1475 9.1025 0.410051C9.35701 0.672601 9.5 1.0287 9.5 1.4C9.5 1.7713 9.35701 2.1274 9.1025 2.38995C8.84799 2.6525 8.50279 2.8 8.14286 2.8H1.35714C0.997206 2.8 0.652012 2.6525 0.397498 2.38995C0.142984 2.1274 0 1.7713 0 1.4C0 1.0287 0.142984 0.672601 0.397498 0.410051C0.652012 0.1475 0.997206 0 1.35714 0ZM10.8571 11.2H17.6429C18.0028 11.2 18.348 11.3475 18.6025 11.6101C18.857 11.8726 19 12.2287 19 12.6C19 12.9713 18.857 13.3274 18.6025 13.5899C18.348 13.8525 18.0028 14 17.6429 14H10.8571C10.4972 14 10.152 13.8525 9.8975 13.5899C9.64298 13.3274 9.5 12.9713 9.5 12.6C9.5 12.2287 9.64298 11.8726 9.8975 11.6101C10.152 11.3475 10.4972 11.2 10.8571 11.2ZM1.35714 5.6H17.6429C18.0028 5.6 18.348 5.7475 18.6025 6.01005C18.857 6.2726 19 6.6287 19 7C19 7.3713 18.857 7.7274 18.6025 7.98995C18.348 8.2525 18.0028 8.4 17.6429 8.4H1.35714C0.997206 8.4 0.652012 8.2525 0.397498 7.98995C0.142984 7.7274 0 7.3713 0 7C0 6.6287 0.142984 6.2726 0.397498 6.01005C0.652012 5.7475 0.997206 5.6 1.35714 5.6Z" fill="WHITE"/>
-        </svg>
+              {/* Mobile Auth Buttons */}
+              <li className={`transform transition-all duration-300 delay-500`}
+                  style={{ 
+                    transform: active ? 'translateY(0)' : 'translateY(-20px)',
+                    opacity: active ? 1 : 0
+                  }}>
+                <button
+                  className={`group w-full flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-lg transition-all duration-300 ${
+                    loginOut == 'logout' 
+                      ? 'text-white hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 hover:border-red-400/40' 
+                      : 'text-white hover:text-[#FFC0CB] hover:bg-[#FFC0CB]/10 border border-[#FFC0CB]/20 hover:border-[#FFC0CB]/40'
+                  }`}
+                  onClick={handleLoginOut}
+                >
+                  {loginOut == 'logout' ? (
+                    <FaSignOutAlt className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  ) : (
+                    <FaSignInAlt className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                  )}
+                  <span className="capitalize">{loginOut}</span>
+                </button>
+              </li>
 
-        {
-          active ?
-         <ul className={`md:hidden block absolute m-0 w-[100%] mt-[4.56rem] bg-[#1E1E1E] text-center pb-5 z-50`}>
-              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-3 text-[1.3rem]' onClick={() => {router.push('/') ; setIsActive(!active)}}>Home</li>
-              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/events'); setIsActive(!active)}}>Events</li>
-              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/about'); setIsActive(!active)}}>About</li>
-              <li className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {router.push('/pricing'); setIsActive(!active)}}>Pricing</li>
-              <li  className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem]' onClick={() => {userId ? null : alert('please login'); router.push('/profile'); setIsActive(!active)}}>Profile</li>
-              <li  className={`cursor-pointer transition mt-6 text-[1.3rem] ${loginOut == 'logout' ? 'hover:text-red-600' : 'hover:text-[#FFCOCB]'}`} onClick={() => {
-                handleLoginOut(); 
-                setIsActive(!active)}
-                }>{loginOut}</li>
-            {
-                loginOut == 'login' ? 
-                <li  className='cursor-pointer hover:text-[#FFCOCB] transition mt-6 text-[1.3rem] mb-5' onClick={() => {router.push('/createAccount'); setIsActive(!active)}}>Create Account</li> : null
-            }
-          </ul> : null
-        }
+              {loginOut == 'login' && (
+                <li className={`transform transition-all duration-300 delay-600`}
+                    style={{ 
+                      transform: active ? 'translateY(0)' : 'translateY(-20px)',
+                      opacity: active ? 1 : 0
+                    }}>
+                  <button
+                    className='group w-full flex items-center justify-center space-x-3 px-4 py-3 bg-gradient-to-r from-[#FFC0CB] to-black hover:from-black hover:to-[#FFC0CB] text-white rounded-xl font-medium text-lg transition-all duration-300 transform hover:scale-105 shadow-lg'
+                    onClick={() => handleNavigation('/createAccount')}
+                  >
+                    <FaUserPlus className="w-5 h-5 group-hover:scale-110 transition-transform duration-300" />
+                    <span>Create Account</span>
+                    <IoSparkles className="w-4 h-4 opacity-70" />
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+        </div>
+      </div>
     </nav>
   )
 }
 
-export default NavBar
+export default NavBar;
