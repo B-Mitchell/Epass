@@ -1093,6 +1093,9 @@ const ContactForm = () => {
             "Tickets will be reserved for 4 minutes after locking"}
         </div>
       )}
+      <p className="mt-4 text-center text-blue-600 text-sm font-semibold bg-blue-50 py-2 rounded-lg">
+        More payment services coming soon...
+      </p>
     </div>
   );
 };
