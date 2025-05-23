@@ -70,7 +70,7 @@ export default function Home() {
             
             {/* Enhanced Text content */}
             <div className={`w-full md:w-1/2 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 md:pt-0 mt-10 mb-6 border border-[#FFC0CB]/30">
+              <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-[#FFC0CB]/30">
                 <IoSparkles className="w-4 h-4 text-[#FFC0CB]" />
                 <span className="text-sm font-medium text-gray-700">Africa's #1 Event Platform</span>
               </div>
@@ -178,7 +178,7 @@ export default function Home() {
         </div>
 
         {/* Stats Section */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20">
+        <div className="absolute hidden md:block bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20">
           <div className="container mx-auto px-4 py-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
@@ -191,6 +191,20 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/*mobile view */}
+      <div className="bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20 block md:hidden">
+          <div className="container mx-auto px-4 py-6">
+            <div className="grid grid-cols-4 gap-6">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <p className="text-xl md:text-2xl font-bold text-[#1E1E1E]">{stat.number}</p>
+                  <p className="text-sm text-gray-600">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
       {/* Your original MainTickets section */}
       <section className='bg-white'>

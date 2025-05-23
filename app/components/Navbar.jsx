@@ -83,8 +83,7 @@ const NavBar = () => {
           {/* Enhanced Logo */}
           <div 
             className='relative w-[120px] h-[40px] cursor-pointer group transition-transform duration-300 hover:scale-105'
-            onClick={() => handleNavigation('/')}
-          >
+            onClick={() => handleNavigation('/')}>
             <Image 
               src={LogoImage} 
               alt="E-Pass Logo"

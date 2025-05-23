@@ -153,7 +153,7 @@ const MainTickets = () => {
         
         return (
             <div 
-                className='group flex-shrink-0 w-[18rem] md:w-[24rem] mr-6 bg-white rounded-2xl overflow-hidden hover:scale-[105%] transition-all duration-500 cursor-pointer relative shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] border border-gray-100 hover:border-[#FFC0CB]/30'
+                className='group flex-shrink-0 w-[18rem] md:w-[24rem] mr-6 bg-white rounded-2xl overflow-hidden hover:scale-[102%] transition-all duration-500 cursor-pointer relative shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] border border-gray-100 hover:border-[#FFC0CB]/30'
                 onClick={() => {router.push(`events/${data.uuid}`)}}>
                 <div className="relative overflow-hidden">
                     <Image 
@@ -182,14 +182,6 @@ const MainTickets = () => {
                         <span className='bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[#8B5E3C] text-sm font-medium border border-white/20'>
                             {data?.typeOfEvent}
                         </span>
-                    </div>
-
-                    {/* Floating star rating */}
-                    <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="flex items-center gap-1">
-                            <FaStar className="w-3 h-3 text-yellow-500" />
-                            <span className="text-xs font-medium">4.8</span>
-                        </div>
                     </div>
                 </div>
                 
