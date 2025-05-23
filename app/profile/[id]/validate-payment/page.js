@@ -61,7 +61,7 @@ const Page = () => {
 
         const { data: ticketData, error: ticketError } = await supabase
           .from('ticket_instances')
-          .select('unique_ticket_id, ticket_uuid, transaction_id, email, used, created_at')
+          .select('unique_ticket_id, ticket_uuid, transaction_id, email, used, ticket_name, created_at')
           .in('transaction_id', txData.map((tx) => tx.transaction_id));
 
         if (ticketError) {
@@ -231,7 +231,7 @@ const Page = () => {
       console.log('Searching for ticket with email:', value, 'Event ID:', id);
       const { data: tickets, error: ticketError } = await supabase
         .from('ticket_instances')
-        .select('unique_ticket_id, ticket_uuid, transaction_id, email, used, created_at')
+        .select('unique_ticket_id, ticket_uuid, transaction_id, email, used, ticket_name, created_at')
         .ilike('email', value);
 
       if (ticketError) {
@@ -579,6 +579,9 @@ const Page = () => {
                                     <FaEnvelope className="inline mr-1 h-3 w-3" />
                                     {ticket.email}
                                   </p>
+                                  <p className="text-xs text-white w-fit px-2 rounded-xl bg-gray-600">
+                                    {ticket.ticket_name}
+                                  </p>
                                   <p className="text-xs text-gray-500">
                                     Created: {new Date(ticket.created_at).toLocaleDateString()}
                                   </p>
@@ -696,6 +699,10 @@ const Page = () => {
                                 <div>
                                   <p className="text-xs sm:text-sm font-medium text-gray-600">Email</p>
                                   <p className="text-gray-900 text-sm sm:text-base">{ticket.email}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs sm:text-sm font-medium text-gray-600">Ticket Name</p>
+                                  <p className="text-gray-900 text-sm sm:text-base">{ticket.ticket_name}</p>
                                 </div>
                                 <div>
                                   <p className="text-xs sm:text-sm font-medium text-gray-600">Status</p>
