@@ -407,6 +407,222 @@ const ContactForm = () => {
       }
     }
   };
+  // const handlePaymentSuccess = async (response) => {
+  //   try {
+  //     console.log('Flutterwave response:', {
+  //       transaction_id: response.transaction_id,
+  //       type: typeof response.transaction_id,
+  //       tx_ref: response.tx_ref,
+  //       amount: response.amount,
+  //     });
+  //     if (!sessionIdRef.current) {
+  //       toast.error('Payment session expired. Please try again.');
+  //       throw new Error('Invalid session ID');
+  //     }
+  
+  //     // Validate session_id format
+  //     if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(sessionIdRef.current)) {
+  //       console.error('Invalid session_id:', sessionIdRef.current);
+  //       toast.error('Invalid session ID format. Please try again.');
+  //       throw new Error(`Invalid session ID format: ${sessionIdRef.current}`);
+  //     }
+  
+  //     // Fetch ticketDetails first
+  //     const ticketDetails = await Promise.all(
+  //       Object.entries(selectedTickets)
+  //         .filter(([_, quantity]) => quantity > 0)
+  //         .map(async ([ticketId, quantity]) => {
+  //           const { data: ticketData, error: ticketError } = await supabase
+  //             .from('ticketdata')
+  //             .select('ticketName, ticketPrice')
+  //             .eq('uuid', ticketId)
+  //             .single();
+  //           if (ticketError) throw new Error(`Error fetching ticket data: ${ticketError.message}`);
+  //           return { ticketName: ticketData.ticketName, quantity, ticketPrice: ticketData.ticketPrice, ticket_uuid: ticketId };
+  //         })
+  //     );
+  
+  //     // Now construct tickets_purchased using ticketDetails
+  //     const tickets_purchased = useSingleEmail
+  //       ? Object.entries(selectedTickets)
+  //           .filter(([_, quantity]) => quantity > 0)
+  //           .flatMap(([ticketId, quantity]) =>
+  //             Array.from({ length: quantity }, () => ({
+  //               ticket_uuid: ticketId,
+  //               quantity: 1,
+  //               email: contacts[0].email,
+  //               ticket_name: ticketDetails.find((t) => t.ticket_uuid === ticketId)?.ticketName || 'Unknown',
+  //             }))
+  //           )
+  //       : contacts.map((contact) => ({
+  //           ticket_uuid: contact.ticket_uuid,
+  //           quantity: 1,
+  //           email: contact.email,
+  //           ticket_name: ticketDetails.find((t) => t.ticket_uuid === contact.ticket_uuid)?.ticketName || 'Unknown',
+  //         }));
+  
+  //     if (tickets_purchased.length === 0) {
+  //       toast.error('No tickets selected. Please try again.');
+  //       throw new Error('No tickets selected');
+  //     }
+  
+  //     // Validate ticket_uuid and ticket_name
+  //     tickets_purchased.forEach((ticket, index) => {
+  //       if (!/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(ticket.ticket_uuid)) {
+  //         console.error(`Invalid ticket_uuid at index ${index}:`, ticket.ticket_uuid);
+  //         throw new Error(`Invalid ticket UUID format: ${ticket.ticket_uuid}`);
+  //       }
+  //       if (!ticket.ticket_name || typeof ticket.ticket_name !== 'string') {
+  //         console.warn(`Invalid ticket_name at index ${index}:`, ticket.ticket_name);
+  //         ticket.ticket_name = 'Unknown';
+  //       }
+  //     });
+  
+  //     console.log('Tickets purchased for confirm_purchase:', JSON.stringify(tickets_purchased, null, 2));
+  
+  //     const { data: eventData, error: eventError } = await supabase
+  //       .from('tickets')
+  //       .select('*')
+  //       .eq('uuid', ticketRoute)
+  //       .single();
+  //     if (eventError) {
+  //       toast.error('Error processing payment.');
+  //       throw new Error('Error fetching event data');
+  //     }
+  
+  //     const individualTickets = tickets_purchased.map((ticket, index) => ({
+  //       unique_ticket_id: crypto.randomUUID(),
+  //       ticket_uuid: ticket.ticket_uuid,
+  //       ticketName: ticketDetails.find((t) => t.ticket_uuid === ticket.ticket_uuid)?.ticketName || 'Unknown',
+  //       contact: useSingleEmail ? contacts[0] : contacts[index],
+  //     }));
+  
+  //     const txnData = {
+  //       name: contacts[0].name,
+  //       email: contacts[0].email,
+  //       phone_number: contacts[0].phoneNumber,
+  //       transaction_id: parseInt(response.transaction_id),
+  //       tx_ref: response.tx_ref,
+  //       charged_amount: response.amount,
+  //       event_id: ticketRoute,
+  //       ticketsbought: numberOfTickets,
+  //       ticketsInfo: individualTickets.map((t) => ({
+  //         unique_ticket_id: t.unique_ticket_id,
+  //         ticketName: t.ticketName,
+  //         email: t.contact.email,
+  //       })),
+  //     };
+  
+  //     const transactionId = await savetxn(txnData);
+  //     if (!transactionId) throw new Error('Failed to save transaction');
+  
+  //     const { data: ticketsCreated, error: createError } = await retry(async () => {
+  //       return await supabase.rpc('create_ticket_instances', {
+  //         p_tickets_purchased: tickets_purchased,
+  //         p_transaction_id: transactionId,
+  //         p_email: contacts[0].email,
+  //       });
+  //     });
+  //     if (createError) {
+  //       console.error('Create ticket instances error:', createError.message, createError.details, createError.hint);
+  //       toast.error(`Failed to create tickets: ${createError.message}`);
+  //       throw new Error(`Failed to create ticket instances: ${createError.message}`);
+  //     }
+  
+  //     const { deletedCount } = await retry(async () => {
+  //       console.log('Calling confirm_purchase with:', {
+  //         p_tickets_purchased: JSON.stringify(tickets_purchased, null, 2),
+  //         p_session_id: sessionIdRef.current,
+  //       });
+  //       const { data, error } = await supabase.rpc('confirm_purchase', {
+  //         p_tickets_purchased: tickets_purchased,
+  //         p_session_id: sessionIdRef.current,
+  //       });
+  //       if (error) {
+  //         console.error('Confirm purchase error:', {
+  //           message: error.message,
+  //           details: error.details,
+  //           hint: error.hint,
+  //           code: error.code,
+  //         });
+  //         throw new Error(`Failed to confirm purchase: ${error.message}`);
+  //       }
+  //       return { deletedCount: data || 0 };
+  //     });
+  //     if (deletedCount === 0) {
+  //       console.warn('No reservations deleted. Checking reservations table...');
+  //       const { data: reservations, error: resError } = await supabase
+  //         .from('reservations')
+  //         .select('*')
+  //         .eq('session_id', sessionIdRef.current)
+  //         .gt('expires_at', new Date().toISOString());
+  //       console.log('Current reservations:', reservations, 'Error:', resError);
+  //       toast.error('No valid reservations found. Tickets may have expired or been released.');
+  //       throw new Error('No reservations found');
+  //     }
+  
+  //     // Email sending commented out for testing
+  //     /*
+  //     await Promise.all(individualTickets.map(async (ticket) => {
+  //       try {
+  //         const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
+  //         const emailBody = {
+  //           email: ticket.contact.email,
+  //           ticketDetails: {
+  //             ticketName: ticket.ticketName,
+  //             quantity: 1,
+  //             ticketPrice: ticketDetails.find((t) => t.ticketName === ticket.ticketName)?.ticketPrice || 0,
+  //             uniqueTicketId: ticket.unique_ticket_id,
+  //           },
+  //           eventDetails: {
+  //             title: eventData.title,
+  //             date: eventData.date,
+  //             startTime: eventData.startTime,
+  //             endTime: eventData.endTime,
+  //             address: eventData.address,
+  //           },
+  //           qrCodeUrl: qrCode,
+  //           transaction_id: response.transaction_id,
+  //         };
+  //         console.log('Sending email to:', ticket.contact.email, 'with body:', JSON.stringify(emailBody, null, 2));
+  //         const emailResponse = await fetch('/api/send-ticket', {
+  //           method: 'POST',
+  //           headers: { 'Content-Type': 'application/json' },
+  //           body: JSON.stringify(emailBody),
+  //         });
+  //         if (!emailResponse.ok) {
+  //           const errorText = await emailResponse.text();
+  //           console.warn(`Failed to send email to ${ticket.contact.email}:`, {
+  //             status: emailResponse.status,
+  //             statusText: emailResponse.statusText,
+  //             error: errorText,
+  //           });
+  //           toast.warn(`Purchase confirmed, but failed to send email to ${ticket.contact.email}.`);
+  //         }
+  //       } catch (err) {
+  //         console.error(`Error sending email to ${ticket.contact.email}:`, err);
+  //       }
+  //     }));
+  //     */
+  
+  //     toast.success(`Purchase confirmed! Processed ${ticketsCreated} ticket(s).`);
+  //     setIsTransactionComplete(true);
+  //     setPaymentSuccessful(true);
+  //     router.push(`/payment-success?transaction_id=${response.transaction_id}`);
+  //     setIsTicketsLocked(false);
+  //     isTicketsLockedRef.current = false;
+  //     setPaymentPending(false);
+  //     paymentPendingRef.current = false;
+  //     setSessionId(null);
+  //     setSelectedTickets({});
+  //     setContacts([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
+  //   } catch (error) {
+  //     console.error('Error confirming purchase:', error.message, error.stack);
+  //     toast.error(`Failed to confirm purchase. Contact support with transaction ID: ${response?.transaction_id}`);
+  //     setPaymentSuccessful(true);
+  //   }
+  // };
+  
   const handlePaymentSuccess = async (response) => {
     try {
       console.log('Flutterwave response:', {
@@ -442,7 +658,7 @@ const ContactForm = () => {
           })
       );
   
-      // Now construct tickets_purchased using ticketDetails
+      // Construct tickets_purchased
       const tickets_purchased = useSingleEmail
         ? Object.entries(selectedTickets)
             .filter(([_, quantity]) => quantity > 0)
@@ -490,13 +706,6 @@ const ContactForm = () => {
         throw new Error('Error fetching event data');
       }
   
-      const individualTickets = tickets_purchased.map((ticket, index) => ({
-        unique_ticket_id: crypto.randomUUID(),
-        ticket_uuid: ticket.ticket_uuid,
-        ticketName: ticketDetails.find((t) => t.ticket_uuid === ticket.ticket_uuid)?.ticketName || 'Unknown',
-        contact: useSingleEmail ? contacts[0] : contacts[index],
-      }));
-  
       const txnData = {
         name: contacts[0].name,
         email: contacts[0].email,
@@ -506,17 +715,17 @@ const ContactForm = () => {
         charged_amount: response.amount,
         event_id: ticketRoute,
         ticketsbought: numberOfTickets,
-        ticketsInfo: individualTickets.map((t) => ({
-          unique_ticket_id: t.unique_ticket_id,
-          ticketName: t.ticketName,
-          email: t.contact.email,
+        ticketsInfo: tickets_purchased.map((ticket) => ({
+          unique_ticket_id: null, // Placeholder
+          ticketName: ticket.ticket_name,
+          email: ticket.email,
         })),
       };
   
       const transactionId = await savetxn(txnData);
       if (!transactionId) throw new Error('Failed to save transaction');
   
-      const { data: ticketsCreated, error: createError } = await retry(async () => {
+      const { data: ticketInstanceData, error: createError } = await retry(async () => {
         return await supabase.rpc('create_ticket_instances', {
           p_tickets_purchased: tickets_purchased,
           p_transaction_id: transactionId,
@@ -527,6 +736,38 @@ const ContactForm = () => {
         console.error('Create ticket instances error:', createError.message, createError.details, createError.hint);
         toast.error(`Failed to create tickets: ${createError.message}`);
         throw new Error(`Failed to create ticket instances: ${createError.message}`);
+      }
+  
+      // Extract tickets_created and unique_ticket_ids
+      const { tickets_created, unique_ticket_ids } = ticketInstanceData;
+      if (!unique_ticket_ids || unique_ticket_ids.length !== tickets_purchased.length) {
+        console.error('Mismatch in unique_ticket_ids:', unique_ticket_ids, tickets_purchased);
+        throw new Error('Invalid unique_ticket_ids returned from create_ticket_instances');
+      }
+  
+      // Construct individualTickets using server-generated unique_ticket_ids
+      const individualTickets = tickets_purchased.map((ticket, index) => ({
+        unique_ticket_id: unique_ticket_ids[index],
+        ticket_uuid: ticket.ticket_uuid,
+        ticketName: ticket.ticket_name,
+        contact: useSingleEmail ? contacts[0] : contacts[index],
+      }));
+  
+      // Update txnData.ticketsInfo with correct unique_ticket_ids
+      txnData.ticketsInfo = individualTickets.map((t) => ({
+        unique_ticket_id: t.unique_ticket_id,
+        ticketName: t.ticketName,
+        email: t.contact.email,
+      }));
+  
+      // Update transaction with correct ticketsInfo
+      const { error: updateTxnError } = await supabase
+        .from('transactions')
+        .update({ ticketsInfo: txnData.ticketsInfo })
+        .eq('transaction_id', transactionId);
+      if (updateTxnError) {
+        console.error('Error updating transaction:', updateTxnError);
+        toast.error('Error updating transaction data.');
       }
   
       const { deletedCount } = await retry(async () => {
@@ -561,7 +802,7 @@ const ContactForm = () => {
         throw new Error('No reservations found');
       }
   
-      // Email sending commented out for testing
+      // Email sending
       /*
       await Promise.all(individualTickets.map(async (ticket) => {
         try {
@@ -605,7 +846,7 @@ const ContactForm = () => {
       }));
       */
   
-      toast.success(`Purchase confirmed! Processed ${ticketsCreated} ticket(s).`);
+      toast.success(`Purchase confirmed! Processed ${tickets_created} ticket(s).`);
       setIsTransactionComplete(true);
       setPaymentSuccessful(true);
       router.push(`/payment-success?transaction_id=${response.transaction_id}`);
@@ -622,7 +863,7 @@ const ContactForm = () => {
       setPaymentSuccessful(true);
     }
   };
-  
+
   const checkIfTicketIsSoldOut = async () => {
     console.log('running bro...');
     try {
