@@ -72,7 +72,7 @@ export default function Home() {
             <div className={`w-full md:w-1/2 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 mb-6 border border-[#FFC0CB]/30">
                 <IoSparkles className="w-4 h-4 text-[#FFC0CB]" />
-                <span className="text-sm font-medium text-gray-700">Africa's #1 Event Platform</span>
+                <span className="text-sm font-medium text-gray-700">#Top rated Event Platform</span>
               </div>
               
               <h1 className='text-3xl md:text-4xl lg:text-5xl font-bold text-[#1E1E1E] leading-tight mb-4'>
