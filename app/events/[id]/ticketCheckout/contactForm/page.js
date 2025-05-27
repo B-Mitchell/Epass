@@ -588,48 +588,49 @@ const ContactForm = () => {
       }
   
       // Email sending
-      /*
-      await Promise.all(individualTickets.map(async (ticket) => {
+      for (const ticket of individualTickets) {
         try {
+          // Generate QR code with just the ticket ID
           const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
-          const emailBody = {
-            email: ticket.contact.email,
-            ticketDetails: {
-              ticketName: ticket.ticketName,
-              quantity: 1,
-              ticketPrice: ticketDetails.find((t) => t.ticketName === ticket.ticketName)?.ticketPrice || 0,
-              uniqueTicketId: ticket.unique_ticket_id,
-            },
-            eventDetails: {
-              title: eventData.title,
-              date: eventData.date,
-              startTime: eventData.startTime,
-              endTime: eventData.endTime,
-              address: eventData.address,
-            },
-            qrCodeUrl: qrCode,
-            transaction_id: response.transaction_id,
-          };
-          console.log('Sending email to:', ticket.contact.email, 'with body:', JSON.stringify(emailBody, null, 2));
+          
+          // Get the actual ticket price from ticketDetails
+          const ticketDetail = ticketDetails.find(t => t.ticket_uuid === ticket.ticket_uuid);
+          const actualTicketPrice = ticketDetail ? ticketDetail.ticketPrice : 0;
+          
           const emailResponse = await fetch('/api/send-ticket', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emailBody),
+            body: JSON.stringify({
+              email: ticket.contact.email,
+              ticketDetails: {
+                ticketName: ticket.ticketName,
+                quantity: 1,
+                ticketPrice: actualTicketPrice
+              },
+              eventDetails: {
+                title: eventData.title,
+                date: eventData.date,
+                startTime: eventData.startTime,
+                endTime: eventData.endTime,
+                address: eventData.address
+              },
+              qrCodeUrl: qrCode,
+              uniqueTicketId: ticket.unique_ticket_id
+            })
           });
+
           if (!emailResponse.ok) {
-            const errorText = await emailResponse.text();
-            console.warn(`Failed to send email to ${ticket.contact.email}:`, {
-              status: emailResponse.status,
-              statusText: emailResponse.statusText,
-              error: errorText,
-            });
-            toast.warn(`Purchase confirmed, but failed to send email to ${ticket.contact.email}.`);
+            const errorData = await emailResponse.text();
+            console.error(`Failed to send email to ${ticket.contact.email}:`, errorData);
+            toast.warn(`Ticket confirmed, but email delivery to ${ticket.contact.email} failed. Please contact support.`);
+          } else {
+            console.log(`Email sent successfully to ${ticket.contact.email}`);
           }
         } catch (err) {
           console.error(`Error sending email to ${ticket.contact.email}:`, err);
+          toast.warn(`Ticket confirmed, but email delivery to ${ticket.contact.email} failed. Please contact support.`);
         }
-      }));
-      */
+      }
   
       toast.success(`Purchase confirmed! Processed ${tickets_created} ticket(s).`);
       setIsTransactionComplete(true);
@@ -805,30 +806,46 @@ const ContactForm = () => {
         await updateStock();
 
         for (const ticket of individualTickets) {
-          const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
-          const emailResponse = await fetch('/api/send-ticket', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: ticket.contact.email,
-              ticketDetails: {
-                ticketName: ticket.ticketName,
-                quantity: 1,
-                ticketPrice: 0,
-                uniqueTicketId: ticket.unique_ticket_id,
-              },
-              eventDetails: {
-                title: eventData.title,
-                date: eventData.date,
-                startTime: eventData.startTime,
-                endTime: eventData.endTime,
-                address: eventData.address,
-              },
-              qrCodeUrl: qrCode,
-            }),
-          });
-          if (!emailResponse.ok) {
-            toast.warn(`Failed to send ticket email to ${ticket.contact.email}.`);
+          try {
+            // Generate QR code with just the ticket ID
+            const qrCode = await QRCode.toDataURL(ticket.unique_ticket_id);
+            
+            // Get the actual ticket price from ticketDetails
+            const ticketDetail = ticketDetails.find(t => t.ticket_uuid === ticket.ticket_uuid);
+            const actualTicketPrice = ticketDetail ? ticketDetail.ticketPrice : 0;
+            
+            const emailResponse = await fetch('/api/send-ticket', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: ticket.contact.email,
+                ticketDetails: {
+                  ticketName: ticket.ticketName,
+                  quantity: 1,
+                  ticketPrice: actualTicketPrice
+                },
+                eventDetails: {
+                  title: eventData.title,
+                  date: eventData.date,
+                  startTime: eventData.startTime,
+                  endTime: eventData.endTime,
+                  address: eventData.address
+                },
+                qrCodeUrl: qrCode,
+                uniqueTicketId: ticket.unique_ticket_id
+              })
+            });
+
+            if (!emailResponse.ok) {
+              const errorData = await emailResponse.text();
+              console.error(`Failed to send email to ${ticket.contact.email}:`, errorData);
+              toast.warn(`Ticket confirmed, but email delivery to ${ticket.contact.email} failed. Please contact support.`);
+            } else {
+              console.log(`Email sent successfully to ${ticket.contact.email}`);
+            }
+          } catch (err) {
+            console.error(`Error sending email to ${ticket.contact.email}:`, err);
+            toast.warn(`Ticket confirmed, but email delivery to ${ticket.contact.email} failed. Please contact support.`);
           }
         }
 
@@ -953,7 +970,7 @@ const ContactForm = () => {
               disabled={isProcessing}
             >
               <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
               Unlock Tickets
             </button>
