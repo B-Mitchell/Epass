@@ -260,7 +260,7 @@ const Page = () => {
             </svg>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No events found</h3>
             <p className="text-gray-500 mb-4">Try adjusting your search or filter to find what you're looking for.</p>
-            <button onClick={clearFilters} className="px-4 py-2 bg-[#FFC0CB] text-white rounded-lg hover:bg-[#FFC0CB]/90 transition">
+            <button onClick={clearFilters} className="px-4 py-2 bg-gradient-to-r from-[#FFC0CB] to-black text-white rounded-lg hover:bg-[#FFC0CB]/90 transition">
               Clear Filters
             </button>
           </div>
