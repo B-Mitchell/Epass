@@ -117,11 +117,11 @@ const page = () => {
     </div>
 
 
-        <button className='hover:bg-[#FFCOCB] w-[70%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
+        <button className='hover:bg-[#FFC0CB] hover:bg-gradient-to-r from-[#FFC0CB] to-black w-[70%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
         <br />
-        <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#FFCOCB] font-extrabold'>login to your Account</span></p>
+        <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#FFC0CB] font-extrabold'>login to your Account</span></p>
     </form>
-    <button className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
+    <button className='hover:bg-[#FFC0CB] hover:bg-gradient-to-r from-[#FFC0CB] to-black md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
     </div>
   )
 }

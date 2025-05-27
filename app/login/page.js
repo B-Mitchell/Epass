@@ -89,12 +89,12 @@ const page = () => {
         <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         <p className='text-red-400 text-[.9rem] mt-2'>{errorMsg && 'Invalid login credentials, please try again'}</p>
 
-        <button type='submit' className='hover:bg-[#FFCOCB] w-[70%] block m-auto mt-6 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging in...' : 'Login to your account'}</button>
+        <button type='submit' className='hover:bg-[#FFC0CB] hover:bg-gradient-to-r from-[#FFC0CB] to-black w-[70%] block m-auto mt-6 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging in...' : 'Login to your account'}</button>
         <br />
-        <p onClick={() => {router.push('/createAccount')}} className='text-center'>you don't have an account ? <span className='cursor-pointer text-[#FFCOCB] font-extrabold'>Create an Account</span></p>
+        <p onClick={() => {router.push('/createAccount')}} className='text-center'>you don't have an account ? <span className='cursor-pointer text-[#FFC0CB] font-extrabold'>Create an Account</span></p>
 
     </form>
-    <button className='hover:bg-[#FFCOCB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
+    <button className='hover:bg-[#FFC0CB] md:w-1/2 w-[80%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' onClick={() => router.push('/')}>Continue as guest</button>
     </div>
   )
 }

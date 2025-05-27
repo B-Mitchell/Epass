@@ -1,4 +1,4 @@
-'use client'
+// 'use client'
 import {useRouter} from 'next/navigation'
 import React, {useState, useEffect} from 'react'
 import Image from 'next/image'
@@ -10,6 +10,9 @@ import { data } from 'autoprefixer'
 
 const MainTickets = () => {
     const router = useRouter();
+    
+    // Combined loading state to prevent flashing
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [loadingFree, setLoadingFree] = useState(false);
     const [loadingPaid, setLoadingPaid] = useState(false);
     const [freeTickets, setFreeTickets] = useState([]);
@@ -17,105 +20,140 @@ const MainTickets = () => {
 
    
     // FETCHING FREE TICKETS
-        const fetchFreeTickets = async () => {
-            setLoadingFree(true);
-            try {
-                // Step 1: Fetch ticketdata with pricingType as 'free'
-                let { data: ticketData, error: ticketError } = await supabase
-                    .from('ticketdata')
-                    .select('*')
-                    .eq('pricingType', 'free');
+    const fetchFreeTickets = async () => {
+        setLoadingFree(true);
+        try {
+            // Step 1: Fetch ticketdata with pricingType as 'free'
+            let { data: ticketData, error: ticketError } = await supabase
+                .from('ticketdata')
+                .select('*')
+                .eq('pricingType', 'free');
 
-                    // console.log(ticketData,'this is the data')
-                if (ticketError) {
-                    console.error('Error fetching ticket data:', ticketError);
-                    return;
-                }
+            if (ticketError) {
+                console.error('Error fetching ticket data:', ticketError);
+                return;
+            }
 
-                if (ticketData.length === 0) {
-                    setFreeTickets([]);
-                    return;
-                }
+            if (ticketData.length === 0) {
+                setFreeTickets([]);
+                return;
+            }
 
-                // Step 2: Get all eventIds from the fetched ticketData
-                const eventIds = ticketData.map((ticket) => ticket.event_id);
+            // Step 2: Get all eventIds from the fetched ticketData
+            const eventIds = ticketData.map((ticket) => ticket.event_id);
 
-                // Step 3: Fetch the corresponding events from the tickets table
-                let { data: eventData, error: eventError } = await supabase
-                    .from('tickets')
-                    .select('*')
-                    .in('uuid', eventIds)
-                    .eq('publishEvent', true); // Fetch only events with matching .order('created_at', { ascending: false });
+            // Step 3: Fetch the corresponding events from the tickets table
+            let { data: eventData, error: eventError } = await supabase
+                .from('tickets')
+                .select('*')
+                .in('uuid', eventIds)
+                .eq('publishEvent', true)
+                .order('date', { ascending: false })
+                .limit(4);
 
-                    if (eventError) {
-                        console.log('Error fetching event data:', eventError);
-                        return;
-                    }
-            
-                    // Set the eventData directly since you only want those events
-                    setFreeTickets(eventData);
-                    console.log(eventData)
-                } catch (error) {
-                    console.error('Main page error is:', error);
-                } finally {
-                    setLoadingFree(false);
-                }
-        };
+            if (eventError) {
+                console.log('Error fetching event data:', eventError);
+                return;
+            }
+        
+            // Set the eventData directly since you only want those events
+            setFreeTickets(eventData || []);
+            console.log(eventData)
+        } catch (error) {
+            console.error('Main page error is:', error);
+        } finally {
+            setLoadingFree(false);
+        }
+    };
 
     
    // FETCHING PAID TICKETS
-        const fetchPaidTickets = async () => {
-            setLoadingPaid(true);
-            try {
-                // Step 1: Fetch ticketdata with pricingType as 'paid'
-                let { data: ticketData, error: ticketError } = await supabase
-                    .from('ticketdata')
-                    .select('*')
-                    .eq('pricingType', 'paid');
+    const fetchPaidTickets = async () => {
+        setLoadingPaid(true);
+        try {
+            // Step 1: Fetch ticketdata with pricingType as 'paid'
+            let { data: ticketData, error: ticketError } = await supabase
+                .from('ticketdata')
+                .select('*')
+                .eq('pricingType', 'paid');
 
-                console.log(ticketData, 'this is the paid ticket data');
-                if (ticketError) {
-                    console.error('Error fetching ticket data:', ticketError);
-                    return;
-                }
-
-                if (ticketData.length === 0) {
-                    setPaidTickets([]);
-                    return;
-                }
-
-                // Step 2: Get all eventIds from the fetched ticketData
-                const eventIds = ticketData.map((ticket) => ticket.event_id);
-
-                // Step 3: Fetch the corresponding events from the tickets table
-                let { data: eventData, error: eventError } = await supabase
-                    .from('tickets')
-                    .select('*')
-                    .in('uuid', eventIds)
-                    .eq('publishEvent', true); // Fetch only events with matching eventIds
-
-                if (eventError) {
-                    console.error('Error fetching event data:', eventError);
-                    return;
-                }
-
-                // Set the eventData directly since you only want those events
-                setPaidTickets(eventData);
-                console.log(eventData, 'this is the paid event data');
-            } catch (error) {
-                console.error('Main page error is:', error);
-            } finally {
-                setLoadingPaid(false);
+            console.log(ticketData, 'this is the paid ticket data');
+            if (ticketError) {
+                console.error('Error fetching ticket data:', ticketError);
+                return;
             }
-        };
+
+            if (ticketData.length === 0) {
+                setPaidTickets([]);
+                return;
+            }
+
+            // Step 2: Get all eventIds from the fetched ticketData
+            const eventIds = ticketData.map((ticket) => ticket.event_id);
+
+            // Step 3: Fetch the corresponding events from the tickets table
+            let { data: eventData, error: eventError } = await supabase
+                .from('tickets')
+                .select('*')
+                .in('uuid', eventIds)
+                .eq('publishEvent', true)
+                .order('created_at', { ascending: false })
+                .limit(4);
+
+            if (eventError) {
+                console.error('Error fetching event data:', eventError);
+                return;
+            }
+
+            // Set the eventData directly since you only want those events
+            setPaidTickets(eventData || []);
+            console.log(eventData, 'this is the paid event data');
+        } catch (error) {
+            console.error('Main page error is:', error);
+        } finally {
+            setLoadingPaid(false);
+        }
+    };
+
+    // Combined fetch function to prevent flashing
+    const fetchAllTickets = async () => {
+        setIsInitialLoading(true);
+        
+        try {
+            // Run both fetches in parallel
+            await Promise.all([
+                fetchFreeTickets(),
+                fetchPaidTickets()
+            ]);
+        } catch (error) {
+            console.error('Error fetching tickets:', error);
+        } finally {
+            // Only set initial loading to false after both are complete
+            setIsInitialLoading(false);
+        }
+    };
 
     useEffect(() => {
-        fetchFreeTickets();
-        fetchPaidTickets();
+        fetchAllTickets();
     }, []);
 
-    // Enhanced Ticket card component
+    // Show initial loading screen to prevent flashing
+    if (isInitialLoading) {
+        return (
+            <div className="py-12 px-4 md:px-8 bg-gradient-to-br from-gray-50 to-white min-h-[400px] flex items-center justify-center">
+                <div className="text-center">
+                    <LoadingAnimation />
+                    <p className="mt-4 text-gray-600">Loading events...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Enhanced Ticket card component with skeleton loading prevention
     const TicketCard = ({ data, isFree = false }) => {
+        // Add safety checks to prevent flashing from undefined data
+        if (!data) return null;
+
         // Format time to show only HH:MM (without seconds)
         const formatTime = (timeString) => {
             if (!timeString) return "";
@@ -162,6 +200,11 @@ const MainTickets = () => {
                         className='w-full h-[200px] object-cover group-hover:scale-110 transition-transform duration-500' 
                         width={400} 
                         height={400}
+                        loading="lazy" // Add lazy loading to prevent layout shifts
+                        onError={(e) => {
+                            // Fallback for broken images
+                            e.target.src = '/placeholder-event-image.jpg';
+                        }}
                     />
                     {/* Gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -180,7 +223,7 @@ const MainTickets = () => {
                     
                     <div className="absolute top-4 right-4">
                         <span className='bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-[#8B5E3C] text-sm font-medium border border-white/20'>
-                            {data?.typeOfEvent}
+                            {data?.typeOfEvent || 'Event'}
                         </span>
                     </div>
                 </div>
@@ -188,7 +231,7 @@ const MainTickets = () => {
                 <div className='px-5 py-5'>
                     <div className="flex items-start justify-between mb-3">
                         <h2 className='font-bold text-lg text-[#1E1E1E] uppercase overflow-hidden whitespace-nowrap text-ellipsis flex-1 pr-2 group-hover:text-[#FFC0CB] transition-colors duration-300'>
-                            {data?.title}
+                            {data?.title || 'Untitled Event'}
                         </h2>
                         <IoSparkles className="w-5 h-5 text-[#FFC0CB] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
@@ -196,18 +239,18 @@ const MainTickets = () => {
                     <div className="flex items-center mb-3 group/location hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <FaMapMarkerAlt className="w-4 h-4 text-[#FFC0CB] flex-shrink-0" />
                         <p className='text-sm ml-2 text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis'>
-                            {data?.address}
+                            {data?.address || 'Location TBD'}
                         </p>
                     </div>
                     
                     <div className="flex justify-between items-center pt-3 border-t border-gray-100">
                         <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2 hover:bg-[#FFC0CB]/10 transition-colors duration-200">
                             <FaClock className="w-4 h-4 text-[#8B5E3C]" />
-                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatTime(data?.startTime)}</p>
+                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatTime(data?.startTime) || 'TBD'}</p>
                         </div>
                         <div className="flex items-center bg-gray-50 rounded-lg px-3 py-2 hover:bg-[#FFC0CB]/10 transition-colors duration-200">
                             <FaCalendarAlt className="w-4 h-4 text-[#8B5E3C]" />
-                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatDate(data?.date)}</p>
+                            <p className='text-sm ml-2 text-gray-600 font-medium'>{formatDate(data?.date) || 'TBD'}</p>
                         </div>
                     </div>
                 </div>
@@ -249,67 +292,67 @@ const MainTickets = () => {
         </div>
     );
 
-  return (
-    <div className="py-12 px-4 md:px-8 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-            <div className="absolute top-20 right-10 w-32 h-32 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
-            <div className="absolute bottom-20 left-10 w-40 h-40 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
-        </div>
-
-        <div className="relative z-10">
-            {/* FREE TICKETS */}
-            <div className="mb-16">
-                <SectionHeader title="Free Events" icon="🎁" isFree={true} />
-                
-                {loadingFree ? (
-                    <div className="flex justify-center py-12">
-                        <LoadingAnimation />
-                    </div>
-                ) : freeTickets.length > 0 ? (
-                    <div className='relative'>
-                        <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
-                            <div className="flex px-4">
-                                {freeTickets.map((data) => (
-                                    <TicketCard key={data.id} data={data} isFree={true} />
-                                ))}
-                            </div>
-                        </div>
-                        {/* Gradient fade on scroll */}
-                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
-                    </div>
-                ) : (
-                    <EmptyState message="No free events available at the moment. Check back soon for exciting free events!" isFree={true} />
-                )}
+    return (
+        <div className="py-12 px-4 md:px-8 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+            {/* Background decorations */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                <div className="absolute top-20 right-10 w-32 h-32 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-20 left-10 w-40 h-40 bg-[#FFC0CB]/5 rounded-full blur-2xl"></div>
             </div>
 
-            {/* PAID TICKETS */}
-            <div className="mb-8">
-                <SectionHeader title="Premium Events" icon="💎" />
-                
-                {loadingPaid ? (
-                    <div className="flex justify-center py-12">
-                        <LoadingAnimation />
-                    </div>
-                ) : paidTickets.length > 0 ? (
-                    <div className='relative'>
-                        <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
-                            <div className="flex px-4">
-                                {paidTickets.map((data) => (
-                                    <TicketCard key={data.id} data={data} isFree={false} />
-                                ))}
-                            </div>
+            <div className="relative z-10">
+                {/* FREE TICKETS */}
+                <div className="mb-16">
+                    <SectionHeader title="Free Events" icon="🎁" isFree={true} />
+                    
+                    {loadingFree ? (
+                        <div className="flex justify-center py-12">
+                            <LoadingAnimation />
                         </div>
-                        {/* Gradient fade on scroll */}
-                        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
-                    </div>
-                ) : (
-                    <EmptyState message="No premium events available at the moment. Discover amazing paid experiences soon!" />
-                )}
+                    ) : freeTickets.length > 0 ? (
+                        <div className='relative'>
+                            <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
+                                <div className="flex px-4">
+                                    {freeTickets.map((data) => (
+                                        <TicketCard key={data.id || data.uuid} data={data} isFree={true} />
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Gradient fade on scroll */}
+                            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                        </div>
+                    ) : (
+                        <EmptyState message="No free events available at the moment. Check back soon for exciting free events!" isFree={true} />
+                    )}
+                </div>
+
+                {/* PAID TICKETS */}
+                <div className="mb-8">
+                    <SectionHeader title="Premium Events" icon="💎" />
+                    
+                    {loadingPaid ? (
+                        <div className="flex justify-center py-12">
+                            <LoadingAnimation />
+                        </div>
+                    ) : paidTickets.length > 0 ? (
+                        <div className='relative'>
+                            <div className='flex w-full overflow-x-auto py-6 scrollbar-hide'>
+                                <div className="flex px-4">
+                                    {paidTickets.map((data) => (
+                                        <TicketCard key={data.id || data.uuid} data={data} isFree={false} />
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Gradient fade on scroll */}
+                            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
+                        </div>
+                    ) : (
+                        <EmptyState message="No premium events available at the moment. Discover amazing paid experiences soon!" />
+                    )}
+                </div>
             </div>
         </div>
-    </div>
-  )
+    )
 }
 
 export default MainTickets;
