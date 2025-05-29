@@ -116,7 +116,7 @@ const PricingPage = () => {
             <div className="border rounded-lg p-6">
               <h3 className="text-xl font-semibold mb-2">Are there any hidden fees?</h3>
               <p className="text-gray-600">
-                No, there are no hidden fees. The 4% fee is the only charge for using our standard services. 
+                Yes, there is a hidden fee. A default 100 naira fee is the only hidden charge for using our standard services. 
                 Additional services like tag production and on-site validation are priced separately.
               </p>
             </div>
