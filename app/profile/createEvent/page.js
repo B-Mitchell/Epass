@@ -307,8 +307,8 @@ const Page = () => {
                 </div>
 
                 <div className='flex justify-center mb-6'>
-                    <button type="button" className={`px-4 py-2 rounded-l-lg ${activeTab === 'single' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('single')}>Single Event</button>
-                    <button type="button" className={`px-4 py-2 rounded-r-lg ${activeTab === 'recurring' ? 'bg-[#FFC0CB] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('recurring')}>Recurring Event</button>
+                    <button type="button" className={`px-4 py-2 rounded-l-lg ${activeTab === 'single' ? 'bg-[#8B5E3C] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('single')}>Single Event</button>
+                    <button type="button" className={`px-4 py-2 rounded-r-lg ${activeTab === 'recurring' ? 'bg-[#8B5E3C] text-white' : 'bg-gray-200'} transition`} onClick={() => setActiveTab('recurring')}>Recurring Event</button>
                 </div>
 
                 {activeTab === 'single' && (
@@ -395,7 +395,7 @@ const Page = () => {
 
                     
                 </div>
-                <button type='button' className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={()=>setIsAddingTicket(true)}> + Add Ticket</button>
+                <button type='button' className="bg-[#6e6164] text-white px-4 py-2 rounded-lg mb-3" onClick={()=>setIsAddingTicket(true)}> + Add Ticket</button>
                 {
                     isAddingTicket ? (
                         <>
@@ -491,7 +491,7 @@ const Page = () => {
                     
                 )}
                 <div className='flex gap-3'>
-                    <button type="button" className="bg-[#FFC0CB] text-white px-4 py-2 rounded-lg mb-3" onClick={handleCreateTicket}>
+                    <button type="button" className="bg-[#8B5E3C] text-white px-4 py-2 rounded-lg mb-3" onClick={handleCreateTicket}>
                     Create Ticket
                 </button>
                 <button type="button" className="bg-white text-black border hover:bg-gray-300 border-gray-500 border-1 px-4 py-2 rounded-lg mb-3" onClick={()=>setIsAddingTicket(false)}>Cancel</button>
@@ -534,7 +534,7 @@ const Page = () => {
   <span>Publish Event Immediately</span>
       </div>
                 <div className='flex justify-end'>
-                    <button type='submit' className='bg-[#FFC0CB] text-white px-6 py-3 rounded-xl hover:bg-[#E0BFB9] mt-2'>Create Event</button>
+                    <button type='submit' className='bg-[#8B5E3C] text-white px-6 py-3 rounded-xl hover:bg-[#E0BFB9] mt-2'>Create Event</button>
                 </div>
             </form>
         </div>

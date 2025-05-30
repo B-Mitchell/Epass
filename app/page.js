@@ -166,19 +166,19 @@ export default function Home() {
                 </div>
 
                 {/* Additional floating stats card */}
-                <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-3 border border-[#FFC0CB]/20 backdrop-blur-sm hidden md:block">
+                {/* <div className="absolute -top-4 -left-4 bg-white rounded-xl shadow-lg p-3 border border-[#FFC0CB]/20 backdrop-blur-sm hidden md:block">
                   <div className="text-center">
                     <p className="text-lg font-bold text-[#FFC0CB]">8K+</p>
                     <p className="text-xs text-gray-500">Events</p>
                   </div>
-                </div>
+                </div> */} 
               </div>
             </div>
           </div>
         </div>
 
         {/* Stats Section */}
-        <div className="absolute hidden md:block bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20">
+        {/* <div className="absolute hidden md:block bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20">
           <div className="container mx-auto px-4 py-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
@@ -189,11 +189,11 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/*mobile view */}
-      <div className="bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20 block md:hidden">
+      {/* <div className="bg-white/80 backdrop-blur-sm border-t border-[#FFC0CB]/20 block md:hidden">
           <div className="container mx-auto px-4 py-6">
             <div className="grid grid-cols-4 gap-6">
               {stats.map((stat, index) => (
@@ -204,7 +204,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
+        </div> */}
 
       {/* Your original MainTickets section */}
       <section className='bg-white'>
