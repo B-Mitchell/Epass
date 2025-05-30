@@ -315,18 +315,25 @@ const Page = () => {
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Event Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]} />
                         </div>
 
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>Start Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime}
+                                min={eventDate === new Date().toISOString().split("T")[0]
+                                ? new Date().toTimeString().slice(0, 5)
+                                : undefined}
+                                />
+
                             </div>
 
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>End Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime}  min={eventDate === new Date().toISOString().split("T")[0]
+                                ? new Date().toTimeString().slice(0, 5)
+                                : undefined}/>
                             </div>
                         </div>
 
@@ -338,7 +345,7 @@ const Page = () => {
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Start Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]}/>
                         </div>
 
                         <div className='mb-4'>
