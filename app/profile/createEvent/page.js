@@ -322,18 +322,14 @@ const Page = () => {
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>Start Time:</label>
                                 <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime}
-                                min={eventDate === new Date().toISOString().split("T")[0]
-                                ? new Date().toTimeString().slice(0, 5)
-                                : undefined}
+                               
                                 />
 
                             </div>
 
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>End Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime}  min={eventDate === new Date().toISOString().split("T")[0]
-                                ? new Date().toTimeString().slice(0, 5)
-                                : undefined}/>
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime}/>
                             </div>
                         </div>
 
