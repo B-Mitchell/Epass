@@ -239,7 +239,7 @@ const MainTickets = () => {
                     <div className="flex items-center mb-3 group/location hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors duration-200">
                         <FaMapMarkerAlt className="w-4 h-4 text-[#FFC0CB] flex-shrink-0" />
                         <p className='text-sm ml-2 text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis'>
-                            {data?.address || 'Location TBD'}
+                            {data?.address || 'Undisclosed'}
                         </p>
                     </div>
                     

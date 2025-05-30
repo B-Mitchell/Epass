@@ -303,7 +303,7 @@ const Page = () => {
 
                 <div className='mb-4'>
                     <label className='block text-lg font-medium mb-2'>Address:</label>
-                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
+                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]'  onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
                 </div>
 
                 <div className='flex justify-center mb-6'>
@@ -385,7 +385,7 @@ const Page = () => {
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Twitter Handle:</label>
-                        <input type='text' required className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
                     </div>
 
                     <div>
