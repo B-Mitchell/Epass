@@ -12,7 +12,12 @@ export const metadata = {
   title: 'Epass',
   description: 'Your favourite ticket app',
   openGraph: {
-    images: ['/images/Epass.png'],
+    images: [{
+        url: 'https://www.e-pass.xyz/images/Epass.png', 
+        width: 1200,
+        height: 630,
+        alt: 'Epass logo',
+      },],
   },
 }
 
