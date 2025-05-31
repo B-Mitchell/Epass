@@ -94,7 +94,7 @@ const PricingPage = () => {
               </li>
             </ul>
             <button 
-              onClick={() => router.push('/contact')}
+              onClick={() => window.location.href = 'mailto:epasslimited@gmail.com'}
               className="w-full bg-[#1E1E1E] text-white py-3 rounded-lg hover:bg-[#8B5E3C] transition-colors duration-300"
             >
               Contact Us

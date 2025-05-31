@@ -11,14 +11,6 @@ import FloatingTickets from './components/floatingTickets'
 export const metadata = {
   title: 'Epass',
   description: 'Your favourite ticket app',
-  openGraph: {
-    images: [{
-        url: 'https://www.e-pass.xyz/images/Epass.png', 
-        width: 1200,
-        height: 630,
-        alt: 'Epass logo',
-      },],
-  },
 }
 
 export default function RootLayout({ children }) {
