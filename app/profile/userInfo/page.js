@@ -7,6 +7,29 @@ import { FiAlertCircle } from 'react-icons/fi';
 import { BsLockFill, BsShieldLock } from 'react-icons/bs';
 
 const Page = () => {
+  const bankNames = Array.from(
+    new Set(
+      Object.keys({
+        'ACCESS BANK NIGERIA': '044',
+        'ACCESS BANK': '044',
+        'ZENITH BANK': '057',
+        'ZENITH': '057',
+        'GUARANTY TRUST BANK': '058',
+        'GTBANK': '058',
+        'FIRST BANK OF NIGERIA': '011',
+        'FIRST BANK': '011',
+        'UNITED BANK FOR AFRICA': '033',
+        'UBA': '033',
+        'STANBIC IBTC BANK': '221',
+        'STANBIC IBTC': '221',
+        'FIDELITY BANK': '070',
+        'WEMA BANK': '035',
+        'ECOBANK NIGERIA': '050',
+        'ECOBANK': '050',
+      }).map(name => name.replace(/ NIGERIA$/, '').replace(/^GUARANTY TRUST BANK$/, 'GTBANK').replace(/^UNITED BANK FOR AFRICA$/, 'UBA'))
+    )
+  ).sort();
+
   // check if authenticated
   const [loading, setLoading] = useState(false);
   const [detailsSubmitted, setDetailsSubmitted] = useState(false);
@@ -268,7 +291,7 @@ const Page = () => {
             </div>
           </div>
           
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <p className='text-sm font-medium mb-1'>Bank Name:</p>
             <input 
               className='border border-[#FFC0CB] w-full p-3 outline-none bg-transparent rounded-xl focus:border-2 transition' 
@@ -277,6 +300,22 @@ const Page = () => {
               onChange={(e) => setBankName(e.target.value)} 
               value={bankName}
             />
+          </div> */}
+          <div className="mb-4">
+            <p className='text-sm font-medium mb-1'>Bank Name:</p>
+            <select
+              className='border border-[#FFC0CB] w-full p-3 outline-none bg-transparent rounded-xl focus:border-2 transition'
+              required
+              onChange={(e) => setBankName(e.target.value)}
+              value={bankName}
+            >
+              <option value="" disabled>Select a bank</option>
+              {bankNames.map((bank) => (
+                <option key={bank} value={bank}>
+                  {bank}
+                </option>
+              ))}
+            </select>
           </div>
           
           <div className="mb-4">

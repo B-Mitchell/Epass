@@ -313,7 +313,8 @@ const ContactForm = () => {
   };
 
   const config = {
-    public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
+    // public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
+    public_key: FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X,
     tx_ref: Date.now().toString(),
     amount: ticketPrice,
     currency: 'NGN',
