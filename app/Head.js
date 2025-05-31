@@ -8,6 +8,10 @@ export default function Head() {
         <meta property="og:image" content="https://www.e-pass.xyz/Epass.png" />
         <meta property="og:url" content="https://www.e-pass.xyz/" />
         <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Epass" />
+        <meta name="twitter:description" content="Your favourite ticket app for discovering and buying event tickets." />
+        <meta name="twitter:image" content="https://www.e-pass.xyz/Epass.png" />
       </>
     )
   }
