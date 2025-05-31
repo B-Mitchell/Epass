@@ -714,6 +714,7 @@ const TicketDashboard = ({ params }) => {
                                 onChange={(e) => setEditEventData({...editEventData, date: e.target.value})}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                                 required
+                                min={new Date().toISOString().split("T")[0]}
                               />
                             </div>
                             
@@ -725,6 +726,7 @@ const TicketDashboard = ({ params }) => {
                                 onChange={(e) => setEditEventData({...editEventData, startTime: e.target.value})}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                                 required
+                                
                               />
                             </div>
                             
@@ -736,6 +738,7 @@ const TicketDashboard = ({ params }) => {
                                 onChange={(e) => setEditEventData({...editEventData, endTime: e.target.value})}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
                                 required
+                               
                               />
                             </div>
                           </div>

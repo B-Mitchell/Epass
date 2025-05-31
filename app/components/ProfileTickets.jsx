@@ -30,7 +30,7 @@ const ProfileTickets = (props) => {
           {typeOfEvent}
         </p>
         <p className="text-[.9rem] overflow-hidden whitespace-nowrap text-ellipsis">
-          {address}
+          {address? address:"Undisclosed"}
         </p>
         
         <div className="flex justify-between mt-1">

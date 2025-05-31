@@ -79,7 +79,7 @@ const Event_Ticket = (props) => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <p className={`ml-1 text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis ${isCompact ? 'text-[0.8rem]' : 'text-[.9rem]'}`}>
-                        {address}
+                        {address ? address:"Undisclosed"}
                     </p>
                 </div>
                 

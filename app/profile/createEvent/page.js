@@ -303,7 +303,7 @@ const Page = () => {
 
                 <div className='mb-4'>
                     <label className='block text-lg font-medium mb-2'>Address:</label>
-                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
+                    <input type='text' placeholder='e.g., 19 Avenue building, Victoria Island' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]'  onChange={(e) => { setEventAddress(e.target.value) }} value={eventAddress} />
                 </div>
 
                 <div className='flex justify-center mb-6'>
@@ -315,18 +315,21 @@ const Page = () => {
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Event Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]} />
                         </div>
 
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>Start Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime}
+                               
+                                />
+
                             </div>
 
                             <div className='mb-4'>
                                 <label className='block text-lg font-medium mb-2'>End Time:</label>
-                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime} />
+                                <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime}/>
                             </div>
                         </div>
 
@@ -338,7 +341,7 @@ const Page = () => {
                     <>
                         <div className='mb-4'>
                             <label className='block text-lg font-medium mb-2'>Start Date:</label>
-                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate} />
+                            <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]}/>
                         </div>
 
                         <div className='mb-4'>
@@ -385,7 +388,7 @@ const Page = () => {
 
                     <div>
                         <label className='block text-lg font-medium mb-2'>Twitter Handle:</label>
-                        <input type='text' required className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
+                        <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setTwitterHandle(e.target.value) }} value={twitterHandle} />
                     </div>
 
                     <div>
