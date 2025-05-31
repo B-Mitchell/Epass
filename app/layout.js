@@ -11,6 +11,22 @@ import FloatingTickets from './components/floatingTickets'
 export const metadata = {
   title: 'Epass',
   description: 'Your favourite ticket app',
+  openGraph: {
+    title: 'Epass',
+    description: 'Your favourite ticket app for discovering and buying event tickets.',
+    url: 'https://www.e-pass.xyz/', // replace with your actual domain
+    siteName: 'Epass',
+    images: [
+      {
+        url: 'https://www.e-pass.xyz/Epass.png', // must be full URL
+        width: 1200,
+        height: 630,
+        alt: 'Epass preview image',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
 }
 
 export default function RootLayout({ children }) {
