@@ -167,7 +167,12 @@ export async function POST(req) {
                                       <div style="display: flex; justify-content: space-between; align-items: center;">
                                           <strong style="color: #495057; font-size: 18px;">Total Price:</strong>
                                           <span style="color: #28a745; font-size: 20px; font-weight: bold;">
-                                              ${ticketDetails.ticketPrice === 0 ? 'FREE' : `NGN ${ticketDetails.ticketPrice.toLocaleString()}`}
+                                              ${typeof ticketDetails.ticketPrice === 'number'
+                                            ? (ticketDetails.ticketPrice === 0 
+                                                ? 'FREE' 
+                                                : `NGN ${ticketDetails.ticketPrice.toLocaleString()}`)
+                                            : 'Price not available'}
+
                                           </span>
                                       </div>
                                   </div>
