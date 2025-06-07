@@ -171,7 +171,7 @@ export async function POST(req) {
                                             ? (ticketDetails.ticketPrice === 0 
                                                 ? 'FREE' 
                                                 : `NGN ${ticketDetails.ticketPrice.toLocaleString()}`)
-                                            : 'Price not available'}
+                                            : 'FREE'}
 
                                           </span>
                                       </div>
