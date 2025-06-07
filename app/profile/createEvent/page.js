@@ -244,7 +244,7 @@ const Page = () => {
 
             <form className='border border-gray-300 md:w-1/2 w-[90%] mx-auto rounded-3xl p-6 shadow-lg' onSubmit={handleSubmit}>
                 <div className='mb-4'>
-                    <label className='block text-lg font-medium mb-2'>Event Image:</label>
+                    <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Event Image:</label>
                     <input type='file' onChange={(e) => { setEventImage(URL.createObjectURL(e.target.files[0])); setImageFileName(e.target.files[0]) }} className='bg-gray-100 w-full p-3 rounded-xl' required />
                     {eventImage && <div className='border border-gray-300 mt-2 w-[40%] h-20 rounded-xl overflow-hidden'>
                         <img src={eventImage} alt='event' className='w-full h-full object-cover' />
@@ -252,7 +252,7 @@ const Page = () => {
                 </div>
 
                 <div className='mb-4'>
-                    <label className='block text-lg font-medium mb-2'>Title:</label>
+                    <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Title:</label>
                     <input type='text' placeholder='e.g., "Sonic Fusion"' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventTitle(e.target.value) }} value={eventTitle} />
                 </div>
                 <div>
@@ -290,7 +290,7 @@ const Page = () => {
 
 
                 <div className='mb-4'>
-                    <label className='block text-lg font-medium mb-2'>Event Type:</label>
+                    <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Event Type:</label>
                     <div className='grid md:grid-cols-3 grid-cols-2 gap-4'>
                         {['party', 'sports', 'concert', 'webinar', 'seminar', 'conference'].map(type => (
                             <label key={type} className='flex items-center space-x-2'>
@@ -314,13 +314,13 @@ const Page = () => {
                 {activeTab === 'single' && (
                     <>
                         <div className='mb-4'>
-                            <label className='block text-lg font-medium mb-2'>Event Date:</label>
+                            <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Event Date:</label>
                             <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]} />
                         </div>
 
                         <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                             <div className='mb-4'>
-                                <label className='block text-lg font-medium mb-2'>Start Time:</label>
+                                <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Start Time:</label>
                                 <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setStartTime(e.target.value) }} value={startTime}
                                
                                 />
@@ -328,7 +328,7 @@ const Page = () => {
                             </div>
 
                             <div className='mb-4'>
-                                <label className='block text-lg font-medium mb-2'>End Time:</label>
+                                <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>End Time:</label>
                                 <input type="time" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-bg-[#FFC0CB]' required onChange={(e) => { setEndTime(e.target.value) }} value={endTime}/>
                             </div>
                         </div>
@@ -340,12 +340,12 @@ const Page = () => {
                 {activeTab === 'recurring' && (
                     <>
                         <div className='mb-4'>
-                            <label className='block text-lg font-medium mb-2'>Start Date:</label>
+                            <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Start Date:</label>
                             <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventDate(e.target.value) }} value={eventDate}  min={new Date().toISOString().split("T")[0]}/>
                         </div>
 
                         <div className='mb-4'>
-                            <label className='block text-lg font-medium mb-2'>Frequency:</label>
+                            <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Frequency:</label>
                             <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEventFrequency(e.target.value) }} value={eventFrequency}>
                                 <option value="">Select</option>
                                 <option value="daily">Daily</option>
@@ -356,7 +356,7 @@ const Page = () => {
                         </div>
 
                         <div className='mb-4'>
-                            <label className='block text-lg font-medium mb-2'>End Condition:</label>
+                            <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>End Condition:</label>
                             <select className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndCondition(e.target.value) }} value={endCondition}>
                                 <option value="">Select</option>
                                 <option value="date">End Date</option>
@@ -366,14 +366,14 @@ const Page = () => {
 
                         {endCondition === 'date' && (
                             <div className='mb-4'>
-                                <label className='block text-lg font-medium mb-2'>End Date:</label>
+                                <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>End Date:</label>
                                 <input type="date" className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setEndDate(e.target.value) }} value={endDate} />
                             </div>
                         )}
 
                         {endCondition === 'occurrences' && (
                             <div className='mb-4'>
-                                <label className='block text-lg font-medium mb-2'>Occurrences:</label>
+                                <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Occurrences:</label>
                                 <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setOccurrences(e.target.value) }} value={occurrences} />
                             </div>
                         )}
@@ -403,7 +403,7 @@ const Page = () => {
                     isAddingTicket ? (
                         <>
                                    <div className='mb-6'>
-                    <label className='block text-lg font-medium mb-2'>Ticket Type:</label>
+                    <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Ticket Type:</label>
                      {/* Add Ticket Button */}
                 
                     <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-3'>
@@ -450,11 +450,11 @@ const Page = () => {
 
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4'>
                     <div className='mb-4'>
-                        <label className='block text-lg font-medium mb-2'>Ticket Name:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Ticket Name:</label>
                         <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketName(e.target.value) }} value={ticketName} />
                     </div>
                     <div className='mb-4'>
-                        <label className='block text-lg font-medium mb-2'>Ticket Price:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Ticket Price:</label>
                         <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]'
                         required={pricingType === 'paid'} // Only required if 'paid' is selected
                         disabled={pricingType === 'free'} 
@@ -462,14 +462,14 @@ const Page = () => {
                     </div>
 
                     <div className='mb-4'>
-                        <label className='block text-lg font-medium mb-2'>Ticket Description:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Ticket Description:</label>
                         <input type='text' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setTicketDescription(e.target.value) }} value={ticketDescription} />
                     </div>
                 </div>
 
                 <div className='grid md:grid-cols-2 grid-cols-1 gap-4 mb-4'>
                     <div>
-                        <label className='block text-lg font-medium mb-2'>Ticket stock:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Ticket stock:</label>
                         <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' disabled={isUnlimited} required onChange={(e) => { setTicketStock(e.target.value) }} value={ticketStock} />
                     </div>
 
@@ -481,14 +481,14 @@ const Page = () => {
 
                 {ticketType === 'single' && (
                     <div className='mb-4'>
-                        <label className='block text-lg font-medium mb-2'>Purchase Limit:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Purchase Limit:</label>
                         <input required type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' onChange={(e) => { setPurchaseLimit(e.target.value) }} value={purchaseLimit} />
                     </div>
                 )}
 
                 {ticketType === 'group' && (
                     <div className='mb-4'>
-                        <label className='block text-lg font-medium mb-2'>Group Size:</label>
+                        <label className='block text-lg font-medium mb-2'><span className='text-red-500 mr-1'>*</span>Group Size:</label>
                         <input type='number' className='border border-gray-300 w-full p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]' required onChange={(e) => { setGroupSize(e.target.value) }} value={groupSize} />
                     </div>
                     
