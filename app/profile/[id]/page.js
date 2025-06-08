@@ -1220,8 +1220,8 @@ const TicketDashboard = ({ params }) => {
                                       </svg>
                                     </button>
           
-                                    {activeMenu === ticket.uuid && (
-                                      <div className="absolute right-0 z-50 w-48 border border-gray-200 bg-white rounded-md shadow-lg origin-top-right" style={{bottom: 'auto', top: 'auto', [index > eventTickets.length - 3 ? 'bottom' : 'top']: '100%'}}>
+                                   {activeMenu === ticket.uuid && (
+                                      <div className="absolute right-0 -mt-4 z-[100] w-48 border border-gray-200 bg-white rounded-md shadow-lg">
                                         <button
                                           onClick={() => {
                                             setEditTicketId(ticket.uuid);
