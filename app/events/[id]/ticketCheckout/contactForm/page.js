@@ -314,11 +314,11 @@ const ContactForm = () => {
 
   const config = {
     // public_key: 'FLWPUBK_TEST-fd2a26787364260bda7cd02898285fb3-X',
-    public_key: FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X,
+    public_key: 'FLWPUBK-f2046835e3ac43d0aa83b4d751157c6b-X',
     tx_ref: Date.now().toString(),
     amount: ticketPrice,
     currency: 'NGN',
-    payment_options: 'card,mobilemoney,ussd',
+    payment_options: 'card,banktransfer,mobilemoney,ussd',
     customer: {
       email: contacts[0].email,
       phone_number: contacts[0].phoneNumber,
@@ -1144,5 +1144,4 @@ const ContactForm = () => {
   );
 };
 
-export default ContactForm;
-
+export default Con

@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@supabase/supabase-js": "^2.39.3",
     "@vercel/analytics": "^1.2.2",
+    "@vercel/speed-insights": "^1.2.0",
     "autoprefixer": "10.4.16",
     "axios": "^1.7.2",
     "eslint": "8.56.0",

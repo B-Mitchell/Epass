@@ -45,7 +45,6 @@ const Event_Ticket = (props) => {
                         shadow-[0_10px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)]
                         ${isCompact ? 'compact-ticket' : ''}`}
             onClick={() => {router.push(`events/${uuid}`)}}>
-
             <div className="relative">
                 <Image 
                     src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/ticketBucket/public/${user_id}_${image}`} 

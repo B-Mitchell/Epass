@@ -4,6 +4,7 @@ import Footer from './components/Footer'
 import { Providers } from './globalRedux/Provider'
 import { MyContextProvider } from './context/createContext'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify'
 import FloatingTickets from './components/floatingTickets'
@@ -32,13 +33,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <SpeedInsights/> 
       <body >
         <MyContextProvider >
       <Providers >
         <NavBar />
         {children}
         <FloatingTickets />
-        <ToastContainer 
+        <ToastContainer
           position="top-right"
           autoClose={5000}
           hideProgressBar={false}

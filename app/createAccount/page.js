@@ -53,7 +53,8 @@ const page = () => {
             
             const { data , error } = await supabase.auth.signUp(formData)
             if (error) {
-                console.log(error)
+                console.log(error);
+                return;
             } else {
                 const User = data.user;
                 console.log(User.identities[0].user_id)
@@ -61,6 +62,26 @@ const page = () => {
                 setAccountCreation(!accountCreation);
                 // saveUserData(data)
             }
+            const user = data.user;
+            if (user) {
+                const { error: dbError } = await supabase
+                .from('userDatabase')
+                .insert([{
+                    id: user.id,
+                    email: emailU,
+                    first_name: firstNameU,
+                    last_name: lastNameU,
+                    organizer_name: organizersNameU,
+                    phone_number: phoneNumberU
+                }]);
+                if (dbError) {
+                    console.log(dbError);
+                    return;
+                }
+            };
+            
+            
+
         } catch(error) {
             console.error('Error is :' + error)
         } finally {
@@ -108,15 +129,13 @@ const page = () => {
     <div className='md:flex block justify-between md:mt-6'>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>Phone Number</p>
-        <input placeholder='eg: 09034*****76' required  value={phoneNumberU} onChange={(e) => {setPhoneNumberU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFCOCB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='eg: 09034*****76' required type='number'  value={phoneNumberU} onChange={(e) => {setPhoneNumberU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFCOCB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
         <div className='w-[100%]'>
         <p className='text-[1.2rem] my-2'>Password</p>
-        <input placeholder='**********' required value={passwordU} onChange={(e) => {setPasswordU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFCOCB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <input placeholder='**********' required type='password' value={passwordU} onChange={(e) => {setPasswordU(e.target.value)}} className='p-3 md:w-[90%] w-[100%] border border-[#FFCOCB] outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
         </div>
     </div>
-
-
         <button className='hover:bg-[#FFC0CB] hover:bg-gradient-to-r from-[#FFC0CB] to-black w-[70%] block m-auto mt-7 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110'>{loading ? 'Registering...' : 'Register' }</button>
         <br />
         <p onClick={() => {router.push('/login')}} className='text-center'>already have an account ? <span className='cursor-pointer text-[#FFC0CB] font-extrabold'>login to your Account</span></p>
