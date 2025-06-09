@@ -1144,4 +1144,5 @@ const ContactForm = () => {
   );
 };
 
-export default Con
+export default ContactForm;
+
