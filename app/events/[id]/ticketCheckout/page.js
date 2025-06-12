@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import supabase from '@/app/supabase';
 import { useMyContext } from '@/app/context/createContext';
 import { toast } from 'react-toastify';
+import Formatprice from '@/app/components/Formatprice';
+
 
 const CheckoutPage = () => {
   const params = useParams();
@@ -131,7 +133,7 @@ const CheckoutPage = () => {
                   <div>
                     <h2 className="text-xl font-semibold">{ticket.ticketName}</h2>
                     <p className="text-red-500">
-                      ₦{ticket.ticketPrice}{' '}
+                      ₦{Formatprice(ticket.ticketPrice)}{' '}
                       <span className="text-sm text-gray-500">includes ₦{totalFees.toFixed(2)} fee</span>
                     </p>
                     <p className="mt-2 text-gray-600">{ticket.ticketDescription}</p>
