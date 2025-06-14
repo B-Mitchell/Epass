@@ -338,21 +338,23 @@ const ContactForm = () => {
       cleanupTimer();
       setPaymentPending(false);
       paymentPendingRef.current = false;
-      try {
-        if (response.status === 'successful') {
-          await handlePaymentSuccess(response);
-        } else {
-          setPaymentSuccessful(false);
-          await releaseLockedTickets(sessionId);
-          toast.error('Payment failed. Please try again.');
-          router.back();
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        closePaymentModal();
+    try {
+      console.log('Flutterwave callback response:', response); // Debug log
+      if (['completed', 'pending', 'successful'].includes(response.status?.toLowerCase())) {
+        await handlePaymentSuccess(response);
+      } else {
+        setPaymentSuccessful(false);
+        console.log(response)
+        await releaseLockedTickets(sessionId);
+        toast.error('Payment failed. Please try again.');
+        router.back();
       }
-    },
+    } catch (error) {
+      console.error('Callback error:', error);
+    } finally {
+      closePaymentModal();
+    }
+  },
     onClose: async () => {
       if (!paymentSuccessful && paymentPendingRef.current && isTicketsLockedRef.current) {
         cleanupTimer();
@@ -408,7 +410,7 @@ const ContactForm = () => {
       }
     }
   };
-  
+
   const handlePaymentSuccess = async (response) => {
     try {
       console.log('Flutterwave response:', {
@@ -651,6 +653,7 @@ const ContactForm = () => {
     }
   };
 
+
   const checkIfTicketIsSoldOut = async () => {
     console.log('running bro...');
     try {
@@ -861,8 +864,8 @@ const ContactForm = () => {
 
   const startTimer = () => {
     cleanupTimer();
-    const paymentTimeout = 4 * 60 * 1000;
-    setTimeLeft(240);
+    const paymentTimeout = 10 * 60 * 1000;
+    setTimeLeft(600);
     countdownRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 0) {
@@ -1134,7 +1137,7 @@ const ContactForm = () => {
         <div className="mt-4 text-center text-gray-500 text-sm">
           {isTicketsLocked ? 
             "Complete your payment to secure your tickets" : 
-            "Tickets will be reserved for 4 minutes after locking"}
+            "Tickets will be reserved for 10 minutes after locking"}
         </div>
       )}
       <p className="mt-4 text-center text-blue-600 text-sm font-semibold bg-blue-50 py-2 rounded-lg">
