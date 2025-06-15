@@ -129,7 +129,7 @@ const Page = () => {
               </div>
               <div className="absolute top-6 right-4">
                 <button
-                  onClick={() => router.push('/profile/userInfo')}
+                  onClick={() => router.push('/profile/payout')}
                   className="text-white hover:text-[#FFC0CB] transition-colors duration-200"
                 >
                   <IoSettingsOutline className="w-6 h-6" />
