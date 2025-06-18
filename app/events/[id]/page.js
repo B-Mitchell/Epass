@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import supabase from '@/app/supabase';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter,useSearchParams } from 'next/navigation';
 import { useMyContext } from '@/app/context/createContext';
 import LoadingAnimation from '@/app/components/LoadingAnimation';
 import QRCode from 'qrcode';
@@ -20,7 +20,7 @@ const Page = ({ params }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [isOwner, setIsOwner] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-
+  const searchParams = useSearchParams();
   // Format time to show only HH:MM
   const formatTime = (timeString) => {
     if (!timeString) return "";
@@ -62,7 +62,13 @@ const Page = ({ params }) => {
       console.error('Error generating QR Code:', error);
     }
   };
-
+  const handleGetTickets = () => {
+    const refCode = searchParams.get('ref'); // Extract ref code from URL
+    const checkoutUrl = refCode
+      ? `/events/${route}/ticketCheckout?ref=${refCode}`
+      : `/events/${route}/ticketCheckout`;
+    router.push(checkoutUrl);
+  };
   const fetchSpecificData = async () => {
     try {
       setLoading(true);
@@ -231,7 +237,7 @@ const Page = ({ params }) => {
                 {/* Get Tickets Button - Prominently positioned */}
                 <div className="mb-8">
                   <button
-                    onClick={() => router.push(`/events/${route}/ticketCheckout`)}
+                    onClick={handleGetTickets}
                     className="w-full bg-[#FFC0CB] text-white py-3 px-4 rounded-xl font-medium hover:bg-[#FFC0CB]/90 transition-all shadow-sm hover:shadow-md flex items-center justify-center"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
