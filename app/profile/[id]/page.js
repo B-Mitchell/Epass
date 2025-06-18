@@ -1249,17 +1249,7 @@ const TicketDashboard = ({ params }) => {
                                     />
                                   </div>
                                   
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                                    <input
-                                      type="number"
-                                      name="ticketPrice"
-                                      value={editFormData.ticketPrice || ""}
-                                      onChange={(e) => handleInputChange(e, setEditFormData)}
-                                      className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
-                                      required
-                                    />
-                                  </div>
+                                 
                                 </div>
                                 
                                 <div>
