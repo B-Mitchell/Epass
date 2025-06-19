@@ -84,31 +84,6 @@ const ContactForm = () => {
       })();
     };
   }, [ticketPrice, selectedTickets, sessionId, isTransactionComplete]);
-  
-  // useEffect(() => {
-  //   if (!isTransactionComplete) {
-  //     if (isNaN(ticketPrice) || ticketPrice === undefined || ticketPrice === null) {
-  //       toast.error('Invalid ticket price.');
-  //       router.back();
-  //       return;
-  //     }
-  //     if (!selectedTickets || Object.keys(selectedTickets).length === 0) {
-  //       toast.error('No tickets selected. Redirecting...');
-  //       setTimeout(() => router.back(), 100);
-  //       return;
-  //     }
-  //     checkIfTicketIsSoldOut();
-  //     fetchTicketOptions();
-  //   }
-  //   return () => {
-  //     (async () => {
-  //       cleanupTimer();
-  //       if (isTicketsLockedRef.current && paymentPendingRef.current && sessionId) {
-  //         await releaseLockedTickets(sessionId);
-  //       }
-  //     })();
-  //   };
-  // }, [ticketPrice, selectedTickets, sessionId, isTransactionComplete]);
 
   const fetchTicketOptions = async () => {
     try {
@@ -864,8 +839,8 @@ const ContactForm = () => {
 
   const startTimer = () => {
     cleanupTimer();
-    const paymentTimeout = 10 * 60 * 1000;
-    setTimeLeft(600);
+    const paymentTimeout = 15 * 60 * 1000;
+    setTimeLeft(900);
     countdownRef.current = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 0) {
