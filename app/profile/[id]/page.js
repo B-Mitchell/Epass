@@ -4,10 +4,12 @@ import { useSelector } from "react-redux";
 import supabase from "@/app/supabase";
 import { useRouter } from "next/navigation";
 import { useMyContext } from "@/app/context/createContext";
+import { nanoid } from 'nanoid';
 import LoadingAnimation from "@/app/components/LoadingAnimation";
 import Image from "next/image";
 import ProgressCircle from "@/app/components/ProgressCircle";
 import dynamic from "next/dynamic";
+import { toast } from 'react-toastify';
 import GuestList from "@/app/components/GuestList";
 
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -28,6 +30,18 @@ const TicketDashboard = ({ params }) => {
   const [calRevenue, setCalRevenue] = useState([]);  //this is to store the tickets to calculate revenue
   const [activeTab, setActiveTab] = useState('details'); // New state for navigation tabs
   const [transactions, setTransactions] = useState([]);  // State for guests/transactions
+    // Function to copy referral link to clipboard
+  const copyReferralLink = (code) => {
+    const referralLink = `${window.location.origin}/events/${ticketId}?ref=${code}`;
+    try {
+      navigator.clipboard.writeText(referralLink);
+      toast.success('Referral link copied to clipboard!');
+    } catch (err) {
+      console.error('Failed to copy referral link:', err);
+      toast.error('Failed to copy referral link.');
+    }
+  };
+  const [referralStats, setReferralStats] = useState([]);
   const [newTicket, setNewTicket] = useState({
     ticketName: "",
     ticketDescription: "",
@@ -117,7 +131,72 @@ const TicketDashboard = ({ params }) => {
     const { name, value } = e.target;
     setter((prev) => ({ ...prev, [name]: value }));
   };
+  
+  const fetchReferralStats = async () => {
+    try {
+      setLoading(true);
+      const { data: refCodes, error: refError } = await supabase
+        .from('referral_codes')
+        .select('code, event_id')
+        .eq('user_id', userId)
+        .eq('event_id', ticketId);
+      if (refError) throw refError;
 
+      const eventIds = [...new Set(refCodes.map(rc => rc.event_id))];
+      const { data: events, error: eventError } = await supabase
+        .from('tickets')
+        .select('uuid, title')
+        .in('uuid', eventIds);
+      if (eventError) throw eventError;
+
+      const codes = refCodes.map(rc => rc.code);
+      const { data: transactions, error: txnError } = await supabase
+        .from('transactions')
+        .select('referral_code, ticketsInfo, event_id')
+        .in('referral_code', codes);
+      if (txnError) throw txnError;
+
+      const calculatedStats = refCodes.map(rc => {
+        const codeTransactions = transactions.filter(t => t.referral_code === rc.code);
+        const ticketCounts = {};
+        codeTransactions.forEach(txn => {
+          txn.ticketsInfo.forEach(ticket => {
+            const name = ticket.ticketName;
+            ticketCounts[name] = (ticketCounts[name] || 0) + 1;
+          });
+        });
+        const eventTitle = events.find(e => e.uuid === rc.event_id)?.title || 'Unknown Event';
+        return {
+          code: rc.code,
+          eventTitle,
+          ticketCounts,
+        };
+      });
+      setReferralStats(calculatedStats);
+    } catch (err) {
+      console.error('Error fetching referral stats:', err);
+      toast.error('Failed to load referral statistics.');
+    } finally {
+      setLoading(false);
+    }
+  };
+   const generateReferralCode = async (eventId) => {
+    const code = nanoid(6);
+    try {
+      const { data, error } = await supabase
+        .from('referral_codes')
+        .insert([{ code, user_id: userId, event_id: eventId }]);
+      if (error) throw error;
+      toast.success(`Referral code generated: ${code}`);
+      const referralLink = `${window.location.origin}/events/${eventId}?ref=${code}`;
+      navigator.clipboard.writeText(referralLink);
+      toast.info('Referral link copied to clipboard!');
+      fetchReferralStats();
+    } catch (err) {
+      console.error('Error generating referral code:', err);
+      toast.error('Failed to generate referral code.');
+    }
+  };
   // Save ticket edits
   const saveTicketEdits = async (id) => {
     try {
@@ -525,7 +604,7 @@ const TicketDashboard = ({ params }) => {
 
   useEffect(() => {
     calculateRevenue();
-
+    fetchReferralStats();
     setTicketRoute(ticketId);
     fetchTickets();
     fetchEventData();
@@ -631,6 +710,19 @@ const TicketDashboard = ({ params }) => {
                     </svg>
                     <span>Tickets</span>
                 </button>
+                <button
+                onClick={() => setActiveTab('referrals')}
+                className={`py-3 px-1 text-xs sm:text-sm font-medium flex flex-col items-center justify-center ${
+                  activeTab === 'referrals'
+                    ? 'border-b-2 border-[#FFC0CB] text-[#FFC0CB]'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-4.553a2 2 0 112.828 2.828L17.828 13H15v-3zM9 10H6a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3l-5-5z" />
+                </svg>
+                <span>Referrals</span>
+              </button>
               </nav>
               </div>
             </div>
@@ -674,6 +766,15 @@ const TicketDashboard = ({ params }) => {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             <span>Edit Event</span>
+                          </button>
+                          <button
+                            onClick={() => generateReferralCode(ticketId)}
+                            className="flex items-center justify-center w-full space-x-2 px-4 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white transition-colors"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-4.553a2 2 0 112.828 2.828L17.828 13H15v-3zM9 10H6a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3l-5-5z" />
+                            </svg>
+                            <span>Generate Referral Code</span>
                           </button>
                         </div>
                       )}
@@ -1148,17 +1249,7 @@ const TicketDashboard = ({ params }) => {
                                     />
                                   </div>
                                   
-                                  <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Price</label>
-                                    <input
-                                      type="number"
-                                      name="ticketPrice"
-                                      value={editFormData.ticketPrice || ""}
-                                      onChange={(e) => handleInputChange(e, setEditFormData)}
-                                      className="border border-gray-300 w-full p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FFC0CB]"
-                                      required
-                                    />
-                                  </div>
+                                 
                                 </div>
                                 
                                 <div>
@@ -1438,6 +1529,88 @@ const TicketDashboard = ({ params }) => {
                           </button>
                         </div>
                       </form>
+                    </div>
+                  )}
+                </div>
+              )}
+              {activeTab === 'referrals' && (
+                <div className="p-8">
+                  <div className="mb-8">
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">My Referral Codes</h2>
+                    <p className="text-gray-600">Track your referral performance and earnings</p>
+                  </div>
+                  
+                  {referralStats.length > 0 ? (
+                    <div className="grid gap-6">
+                      {referralStats.map(stat => (
+                        <div key={stat.code} className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+                          <div className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center space-x-3">
+                                <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-xl">
+                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-4.553a2 2 0 112.828 2.828L17.828 13H15v-3zM9 10H6a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3l-5-5z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-semibold text-gray-900">{stat.eventTitle}</h3>
+                                  <div className="flex items-center space-x-2 mt-1">
+                                    <span className="text-sm text-gray-500">Referral Code:</span>
+                                    <span className="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-mono font-medium">
+                                      {stat.code}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <button className="opacity-0 group-hover:opacity-100 transition-opacity p-2 hover:bg-gray-50 rounded-lg" onClick={() => copyReferralLink(stat.code)}>
+                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+
+                              </button>
+                            </div>
+                            
+                            <div className="border-t border-gray-100 pt-4">
+                              <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                                <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                Tickets Sold
+                              </h4>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {Object.entries(stat.ticketCounts).map(([name, count]) => (
+                                  <div key={name} className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-3 border border-gray-200">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-sm font-medium text-gray-700">{name}</span>
+                                      <span className="bg-white text-gray-900 px-2 py-1 rounded-md text-sm font-bold shadow-sm">
+                                        {count}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm">
+                      <div className="max-w-md mx-auto">
+                        <div className="bg-gradient-to-r from-blue-100 to-purple-100 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                          <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-4.553a2 2 0 112.828 2.828L17.828 13H15v-3zM9 10H6a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-3l-5-5z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 mb-3">No Referral Codes Yet</h3>
+                        <p className="text-gray-600 mb-6 leading-relaxed">
+                          Start earning by generating your first referral code.<br />
+                          Track ticket sales and grow your network effortlessly.
+                        </p>
+                        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                          Generate First Code
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

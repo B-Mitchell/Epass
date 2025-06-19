@@ -11,7 +11,7 @@ const ContactForm = () => {
   const [contacts, setContacts] = useState([{ name: '', phoneNumber: '', email: '', ticket_uuid: '' }]);
   const [useSingleEmail, setUseSingleEmail] = useState(false);
   const [ticketOptions, setTicketOptions] = useState([]);
-  const { ticketPrice, ticketRoute, setTicketPrice, namedTicketCounts, numberOfTickets, selectedTickets, setSelectedTickets } = useMyContext();
+  const { ticketPrice, ticketRoute, setTicketPrice, namedTicketCounts, numberOfTickets, selectedTickets, setSelectedTickets,refCode } = useMyContext();
   const router = useRouter();
   const [isSoldOut, setIsSoldOut] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
@@ -475,6 +475,7 @@ const ContactForm = () => {
         phone_number: contacts[0].phoneNumber,
         transaction_id: parseInt(response.transaction_id),
         tx_ref: response.tx_ref,
+        referral_code:refCode || null,
         charged_amount: response.amount,
         event_id: ticketRoute,
         ticketsbought: numberOfTickets,

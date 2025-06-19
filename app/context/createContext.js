@@ -10,6 +10,7 @@ export const MyContextProvider = ({ children }) => {
   const [accountCreation, setAccountCreation] = useState(false);
   const [ticketPrice, setTicketPrice] = useState(Number);
   const [ticketRoute , setTicketRoute] = useState('');
+  const [refCode, setRefCode] = useState('');
   const [ticketCheckoutData,setTicketCheckoutData]= useState([])
   const [numberOfTickets, setNumberOfTickets]= useState()
   const [selectedTickets, setSelectedTickets] = useState({}); // To store selected quantities.
@@ -31,7 +32,9 @@ export const MyContextProvider = ({ children }) => {
     selectedTickets,
     setSelectedTickets,
     namedTicketCounts,
-    setNamedTicketCounts
+    setNamedTicketCounts,
+    refCode,
+    setRefCode
   }
   // Provide the context value to the children components
   return (

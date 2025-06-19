@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter,useSearchParams} from 'next/navigation';
 import { useParams } from 'next/navigation';
 import supabase from '@/app/supabase';
 import { useMyContext } from '@/app/context/createContext';
@@ -11,9 +11,11 @@ import Formatprice from '@/app/components/Formatprice';
 const CheckoutPage = () => {
   const params = useParams();
   const { id } = params; //fetched the ticket ID from the url, it doesn't lose state
-  const { ticketRoute, setTicketPrice, setTicketCheckoutData, setNumberOfTickets, selectedTickets, setSelectedTickets, setNamedTicketCounts} = useMyContext();
+  const { ticketRoute, setTicketPrice, setTicketCheckoutData, setNumberOfTickets, selectedTickets, setSelectedTickets, setNamedTicketCounts,setRefCode} = useMyContext();
   // State to store fetched ticket options and selected quantities.
   const [ticketOptions, setTicketOptions] = useState([]); // All ticket data is stored here.
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get('ref');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -23,6 +25,9 @@ const CheckoutPage = () => {
   useEffect(() => {
     if (ticketRoute === "") {
       router.push('/events');
+    }
+    if (refCode) {
+      setRefCode(refCode);
     }
     console.log("ticket route:" + ticketRoute);
     const fetchTickets = async () => {
@@ -64,7 +69,7 @@ const CheckoutPage = () => {
     };
 
     fetchTickets();
-  }, [id]);
+  }, [id,refCode,setRefCode]);
 
   // Handle ticket quantity changes.
   const handleTicketQuantityChange = (ticketId, quantity) => {
