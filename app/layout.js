@@ -9,6 +9,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer } from 'react-toastify'
 import FloatingTickets from './components/floatingTickets'
 
+if (process.env.NODE_ENV === 'production') {
+  console.log = function () {};
+  console.debug = function () {};
+  console.info = function () {};
+}
+
 export const metadata = {
   title: 'Epass',
   description: 'Your favourite ticket app',
