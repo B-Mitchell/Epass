@@ -20,6 +20,7 @@ const NavBar = () => {
     if (loginOut == 'login') {
         if (!userId) {
             router.push('/login')
+            setIsActive(false);
         }
     } else {
         dispatch(logoutUser());
