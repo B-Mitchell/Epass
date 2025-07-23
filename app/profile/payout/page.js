@@ -88,7 +88,7 @@ const Page = () => {
   const fetchPayoutHistory = async () => {
     try {
       let { data, error } = await supabase
-        .from('payouts')
+        .from('withdrawals')
         .select('*')
         .eq('userid', userId)
         .order('createdat', { ascending: false });
@@ -102,7 +102,6 @@ const Page = () => {
       console.log('error fetching payout history:' + err);
     }
   }
-  // status: -- pending, successful, processing, completed, failed
 
   useEffect(() => {
     if (fetchedDetails) {
@@ -202,7 +201,7 @@ const Page = () => {
       
       // Insert payout request into database
       const { data, error } = await supabase
-        .from('payouts')
+        .from('withdrawals')
         .insert([{
           userId: userId,
           amount: payoutAmount,
