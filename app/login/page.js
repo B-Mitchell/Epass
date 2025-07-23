@@ -39,7 +39,7 @@ const page = () => {
                 if ( error == 'AuthApiError: Invalid login credentials') {
                     setEmailU('');
                     setPasswordU('');
-                    setErrorMsg(!errorMsg);
+                    setErrorMsg(true);
                 }
             } else {
                 console.log(data);
@@ -87,6 +87,9 @@ const page = () => {
 
         <p className='text-[1.2rem] my-2'>Password: </p>
         <input placeholder='*************' required value={passwordU} type='password' name="password" onChange={(e) => {setPasswordU(e.target.value)}} className='border border-[#FFCOCB] w-[100%] p-3 outline-none bg-transparent rounded-xl focus:scale-105 transition'/>
+        <p className='mt-2 text-left text-sm'>
+            <span className='cursor-pointer text-red-400 font-extrabold' onClick={() => router.push('/forgotPassword')}>Forgot Password ?</span>
+        </p>
         <p className='text-red-400 text-[.9rem] mt-2'>{errorMsg && 'Invalid login credentials, please try again'}</p>
 
         <button type='submit' className='hover:bg-[#FFC0CB] hover:bg-gradient-to-r from-[#FFC0CB] to-black w-[70%] block m-auto mt-6 p-2 border border-[#FFCOCB] transition rounded-2xl hover:text-white hover:scale-110' >{loading ? 'logging in...' : 'Login to your account'}</button>

@@ -13,7 +13,7 @@ const Page = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [view, setView] = useState('standard'); // 'standard' or 'compact' for mobile
+  const [view, setView] = useState('compact'); // 'standard' or 'compact' for mobile
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredEvents, setFeaturedEvents] = useState([]);
   

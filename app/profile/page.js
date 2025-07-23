@@ -23,7 +23,7 @@ const Page = () => {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [isTwoColumn, setIsTwoColumn] = useState(false); // New state for toggle
+  const [isTwoColumn, setIsTwoColumn] = useState(true); // New state for toggle
   const [counts, setCounts] = useState({
     all: 0,
     published: 0,

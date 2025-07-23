@@ -24,6 +24,16 @@ export default function Home() {
   }
 
   useEffect(() => {
+    const hash = window.location.hash.substring(1)
+    const params = new URLSearchParams(hash)
+    const type = params.get('type')
+    const accessToken = params.get('access_token')
+    const refreshToken = params.get('refresh_token')
+
+    if (type === 'recovery' && accessToken && refreshToken) {
+      router.push('/resetPassword#' + hash)
+      return
+    }
     setIsVisible(true);
     
     // Auto-cycle through features

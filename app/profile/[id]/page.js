@@ -1540,6 +1540,16 @@ const TicketDashboard = ({ params }) => {
                     <p className="text-gray-600">Track your referral performance and earnings</p>
                   </div>
                   
+                  {/* Generate New Code Button (always visible) */}
+                  <div className="mb-6">
+                    <button
+                      className="text-white px-6 py-3 rounded-xl font-semibold bg-[#FFC0CB] transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      onClick={() => generateReferralCode(ticketId)}
+                    >
+                      Generate New Code
+                    </button>
+                  </div>
+
                   {referralStats.length > 0 ? (
                     <div className="grid gap-6">
                       {referralStats.map(stat => (
@@ -1566,7 +1576,6 @@ const TicketDashboard = ({ params }) => {
                                 <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                 </svg>
-
                               </button>
                             </div>
                             
@@ -1607,7 +1616,10 @@ const TicketDashboard = ({ params }) => {
                           Start earning by generating your first referral code.<br />
                           Track ticket sales and grow your network effortlessly.
                         </p>
-                        <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <button
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                          onClick={() => generateReferralCode(ticketId)}
+                        >
                           Generate First Code
                         </button>
                       </div>
